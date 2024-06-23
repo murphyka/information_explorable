@@ -93,7 +93,8 @@ function parsePost(path){
 function writePost(post){
   var dir = public + post.permalink
   // if (!fs.existsSync(dir)) execSync(`mkdir ${dir}`)
-  fs.writeFileSync(`${dir}/index.html`, templates[post.template](post))
+  // fs.writeFileSync(`${dir}/index.html`, templates[post.template](post))
+  fs.writeFileSync(public + 'index.html', templates[post.template](post))
 
   var outposts = JSON.parse(JSON.stringify(posts))
   outposts.forEach(d => delete d.html)
