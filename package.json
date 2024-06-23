@@ -12,8 +12,7 @@
     "yarn": "^1.22.19"
   },
   "scripts": {
-    "start": "node index.js --watch && cd public/ && hot-server --port=2344",
-    "pub": "mkdir -p public && node index.js && gcloud --quiet app deploy --project=google.com:explorable-ml"
+    "start": "node index.js",
   },
   "license": "MIT"
 }
