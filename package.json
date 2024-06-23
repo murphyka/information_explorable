@@ -13,8 +13,7 @@
   },
   "scripts": {
     "start": "node index.js --watch && cd public/ && hot-server --port=2344",
-    "pub": "mkdir -p public && node source/third_party/index.js && gcloud --quiet app deploy --project=google.com:explorable-ml",
-    "watch": "bin/watch-doc.sh"
+    "pub": "mkdir -p public && node index.js && gcloud --quiet app deploy --project=google.com:explorable-ml",
   },
   "license": "MIT"
 }
