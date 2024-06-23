@@ -97,7 +97,7 @@ function writePost(post){
   fs.writeFileSync(public + '/index.html', templates[post.template](post))
 
   var outposts = JSON.parse(JSON.stringify(posts))
-  outposts.forEach(d => delete d.html)
+  // outposts.forEach(d => delete d.html)
   fs.writeFileSync(public + '/posts.json', JSON.stringify(outposts, null, 2))
 
 
