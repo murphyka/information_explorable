@@ -1,0 +1,12 @@
+[
+  {
+    "template": "post_v2.html",
+    "title": "Do Machine Learning Models Memorize or Generalize?",
+    "socialsummary": "An interactive introduction to grokking and mechanistic interpretability.",
+    "shareimg": "https://pair.withgoogle.com/explorables/images/grokking.png",
+    "shareimgabstract": "https://pair.withgoogle.com/explorables/images/grokking-abstract.png",
+    "authors": "Adam Pearce, Asma Ghandeharioun, Nada Hussein, Nithum Thain, Martin Wattenberg, Lucas Dixon",
+    "date": "August 2023",
+    "permalink": "/grokking/"
+  }
+]
