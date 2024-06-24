@@ -102,7 +102,7 @@ function writePost(post){
 
 
 }
-console.log(posts)
+
 posts.forEach(writePost)
 
 if (process.argv.includes('--watch')){
