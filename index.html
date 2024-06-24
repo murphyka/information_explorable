@@ -42,7 +42,7 @@ limitations under the License.
   <meta property="og:image" content="https://pair.withgoogle.com/explorables/images/grokking.png">
   <meta name="twitter:card" content="summary_large_image">
   
-  <link rel="stylesheet" type="text/css" href="../style_v2.css">
+  <link rel="stylesheet" type="text/css" href="source/style_v2.css">
 
   <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,500,700|Roboto:700,500,300' rel='stylesheet' type='text/css'>  
   <link href="https://fonts.googleapis.com/css?family=Google+Sans:400,500,700" rel="stylesheet">
@@ -323,14 +323,14 @@ On the 1s and 0s task here, we use L1 weight decay <span class="katex"><span cla
 <span class='fn-break'></span>
 L2 weight decay <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mn>2</mn><mo stretchy="false">(</mo><mi mathvariant="bold">w</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mo>∑</mo><mi>i</mi></msub><msubsup><mi>w</mi><mi>i</mi><mn>2</mn></msubsup></mrow><annotation encoding="application/x-tex">L2(\mathbf{w}) = \sum_{i} w_i^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">L</span><span class="mord">2</span><span class="mopen">(</span><span class="mord mathbf" style="margin-right:0.01597em;">w</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1138em;vertical-align:-0.2997em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.162em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-2.4413em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2587em;"><span></span></span></span></span></span></span></span></span></span> is a more typical choice. It pushes for <a href="https://explained.ai/regularization/L1vsL2.html">lots of small weights</a> leading to redundant neurons on this task:
 <span class='fn-break'></span>
-<img src='img/sp-l2.gif'></img></p>
+<img src='source/grokking/img/sp-l2.gif'></img></p>
 <p><a class='footend' key='overfit'></a> A model overfits the training data when it performs well on the training data but poorly on the test data — this is what we see with our memorizing models. In general, simpler models are less prone to overfitting as, due to their simplicity, decision rules are coarser and are required to make more generalizations. Of course, if a model is too simple for a task, it may not be able to learn good decision rules that capture the nuances of the task. Researchers force models to be simpler through a variety of techniques, including having models with fewer parameters or encouraging the parameters that the model does have to be small in size with weight decay.</p>
 <p><a class='footend' key='unit-circle'></a>
 Computing <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>cos</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>i</mi><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mn>67</mn></mfrac><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\cos(i\frac{2\pi}{67})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mop">cos</span><span class="mopen">(</span><span class="mord mathnormal">i</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">67</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">π</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">)</span></span></span></span> and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>i</mi><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mn>67</mn></mfrac><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\sin (i\frac{2\pi}{67})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mop">sin</span><span class="mopen">(</span><span class="mord mathnormal">i</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">67</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">π</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">)</span></span></span></span> gives us points evenly spaced around the unit circle.
 <span class='fn-break'></span>
 Here’s what <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="bold">W</mtext><mtext>embed</mtext></msub></mrow><annotation encoding="application/x-tex">\textbf{W}_{\text{embed}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8361em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord text"><span class="mord textbf">W</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">embed</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> looks like on the unit circle:
 <span class='fn-break'></span>
-<img src='img/w_embed.png' width=319></img></p>
+<img src='source/grokking/img/w_embed.png' width=319></img></p>
 <p><a class='footend' key='dft'></a> The <a href="https://www.youtube.com/watch?v=spUNpyF58BY">Discrete Fourier Transform</a> helps analyze the periodic nature of a sequence of values (in this case the <a href="https://colab.research.google.com/drive/1F6_1_cWXE5M7WocUcpQWp3v8z4b1jL20#scrollTo=iSPxi3ElsujY">weights for a particular neuron</a>) by breaking it down into sine and cosine functions. The more periodic a function is, the easier it is to represent with sine and cosines, and the sparser the output of the DFT.</p>
 <p><a class='footend' key='dft-sort'></a> We’ve reindexed the neurons by their final frequency and phase to make this grouping easier to see .</p>
 <p><a class='footend' key='logit-wave'></a>
@@ -387,77 +387,77 @@ Henighan, T., Carter, S., Hume, T., Elhage, N., Lasenby, R., Fort, S., Schiefer,
 <p><p id='recirc'></p></p>
 <div class='recirc-feedback-form'></div>
 
-<p><link rel='stylesheet' href='../third_party/footnote_v2.css'></p>
-<p><link rel='stylesheet' href='../third_party/citation_v2.css'></p>
-<link rel='stylesheet' href='style.css'>
+<p><link rel='stylesheet' href='source/third_party/footnote_v2.css'></p>
+<p><link rel='stylesheet' href='source/third_party/citation_v2.css'></p>
+<link rel='stylesheet' href='source/grokking/style.css'>
 
 <script id='MathJax-script' async src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'></script>
 <script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/mathtex-script-type.min.js' integrity='sha384-jiBVvJ8NGGj5n7kJaiWwWp9AjC+Yh8rhZY3GtAX8yU28azcLgoRo4oukO87g7zDT' crossorigin='anonymous'></script>
 
-<script src='../third_party/d3_.js'></script>
-<script src='../third_party/d3-scale-chromatic.v1.min.js'></script>
-<script src='../third_party/tfjsv3.18.0.js'></script>
-<script src='../third_party/npyjs-global.js'></script>
-<script src='../third_party/swoopy-drag.js'></script>
+<script src='source/third_party/d3_.js'></script>
+<script src='source/third_party/d3-scale-chromatic.v1.min.js'></script>
+<script src='source/third_party/tfjsv3.18.0.js'></script>
+<script src='source/third_party/npyjs-global.js'></script>
+<script src='source/third_party/swoopy-drag.js'></script>
 
-<script src='../third_party/footnote_v2.js'></script>
-<script src='../third_party/citation_v2.js'></script>
+<script src='source/third_party/footnote_v2.js'></script>
+<script src='source/third_party/citation_v2.js'></script>
 
-<script src='util.js'></script>
-<script src='init-accuracy-chart.js'></script>
-<script src='init-animate-steps.js'></script>
-<script src='init-embed-vis.js'></script>
-<script src='init-input-sliders.js'></script>
-<script src='init-swoopy.js'></script>
+<script src='source/grokking/util.js'></script>
+<script src='source/grokking/init-accuracy-chart.js'></script>
+<script src='source/grokking/init-animate-steps.js'></script>
+<script src='source/grokking/init-embed-vis.js'></script>
+<script src='source/grokking/init-input-sliders.js'></script>
+<script src='source/grokking/init-swoopy.js'></script>
 
-<p><link rel='stylesheet' href='mod-top/style.css'></p>
-<script src='mod-top/init-waves.js'></script>
-<script src='mod-top/init.js'></script>
+<p><link rel='stylesheet' href='source/grokking/mod-top/style.css'></p>
+<script src='source/grokking/mod-top/init-waves.js'></script>
+<script src='source/grokking/mod-top/init.js'></script>
 
-<p><link rel='stylesheet' href='sparse-parity/style.css'></p>
-<script src='sparse-parity/init.js'></script>
-<script src='sparse-parity/init-weight-trajectory.js'></script>
+<p><link rel='stylesheet' href='source/grokking/sparse-parity/style.css'></p>
+<script src='source/grokking/sparse-parity/init.js'></script>
+<script src='source/grokking/sparse-parity/init-weight-trajectory.js'></script>
 
-<p><link rel='stylesheet' href='sweep-sparse-parity/style.css'></p>
-<script defer src='sweep-sparse-parity/init.js'></script>
+<p><link rel='stylesheet' href='source/grokking/sweep-sparse-parity/style.css'></p>
+<script defer src='source/grokking/sweep-sparse-parity/init.js'></script>
 
-<p><link rel='stylesheet' href='sweep-mod/style.css'></p>
-<script defer src='sweep-mod/sweep-mod-charts.js'></script>
-<script defer src='sweep-mod/init.js'></script>
+<p><link rel='stylesheet' href='source/grokking/sweep-mod/style.css'></p>
+<script defer src='source/grokking/sweep-mod/sweep-mod-charts.js'></script>
+<script defer src='source/grokking/sweep-mod/init.js'></script>
 
-<p><link rel='stylesheet' href='hand-weights/style.css'></p>
-<p><link rel='stylesheet' href='hand-weights/sliders.css'></p>
-<script src='hand-weights/init-embed-vis.js'></script>
-<script src='hand-weights/init-activation-vis.js'></script>
-<script src='hand-weights/init-circle-weights-vis.js'></script>
-<script src='hand-weights/init-circle-input-vis.js'></script>
-<script src='hand-weights/init-circle-weights-freq.js'></script>
-<script defer src='hand-weights/init.js'></script>
+<p><link rel='stylesheet' href='source/grokking/hand-weights/style.css'></p>
+<p><link rel='stylesheet' href='source/grokking/hand-weights/sliders.css'></p>
+<script src='source/grokking/hand-weights/init-embed-vis.js'></script>
+<script src='source/grokking/hand-weights/init-activation-vis.js'></script>
+<script src='source/grokking/hand-weights/init-circle-weights-vis.js'></script>
+<script src='source/grokking/hand-weights/init-circle-input-vis.js'></script>
+<script src='source/grokking/hand-weights/init-circle-weights-freq.js'></script>
+<script defer src='source/grokking/hand-weights/init.js'></script>
 
-<p><link rel='stylesheet' href='five-neurons/style.css'></p>
-<script src='five-neurons/five-circle.js'></script>
-<script defer src='five-neurons/init.js'></script>
+<p><link rel='stylesheet' href='source/grokking/five-neurons/style.css'></p>
+<script src='source/grokking/five-neurons/five-circle.js'></script>
+<script defer src='source/grokking/five-neurons/init.js'></script>
 
-<p><link rel='stylesheet' href='mod-bot/style.css'></p>
-<script src='mod-bot/init-bot-freqs.js'></script>
-<script src='mod-bot/init-bot-logits.js'></script>
-<script src='mod-bot/seeds/init-seeds.js'></script>
-<script defer src='mod-bot/init.js'></script>
+<p><link rel='stylesheet' href='source/grokking/mod-bot/style.css'></p>
+<script src='source/grokking/mod-bot/init-bot-freqs.js'></script>
+<script src='source/grokking/mod-bot/init-bot-logits.js'></script>
+<script src='source/grokking/mod-bot/seeds/init-seeds.js'></script>
+<script defer src='source/grokking/mod-bot/init.js'></script>
 
-<script src='open-q-mem/init-0.js'></script>
-<script src='open-q-mem/init-1.js'></script>
-<script defer src='circle-freq/circle-freq-init.js'></script>
+<script src='source/grokking/open-q-mem/init-0.js'></script>
+<script src='source/grokking/open-q-mem/init-1.js'></script>
+<script defer src='source/grokking/circle-freq/circle-freq-init.js'></script>
 
-<p><link rel='stylesheet' href='appendix/style.css'></p>
-<script src='appendix/debug-vis.js'></script>
-<script src='appendix/init-circle-weights-vis.js'></script>
-<script src='appendix/init-proj-vis.js'></script>
-<script src='appendix/init-sliders.js'></script>
-<script src='appendix/line-error-vis.js'></script>
-<script src='appendix/debug-reuleaux.js'></script>
-<script defer src='appendix/init.js'></script>
+<p><link rel='stylesheet' href='source/grokking/appendix/style.css'></p>
+<script src='source/grokking/appendix/debug-vis.js'></script>
+<script src='source/grokking/appendix/init-circle-weights-vis.js'></script>
+<script src='source/grokking/appendix/init-proj-vis.js'></script>
+<script src='source/grokking/appendix/init-sliders.js'></script>
+<script src='source/grokking/appendix/line-error-vis.js'></script>
+<script src='source/grokking/appendix/debug-reuleaux.js'></script>
+<script defer src='source/grokking/appendix/init.js'></script>
 
-<script defer src='../third_party/recirc.js'></script>
+<script defer src='source/third_party/recirc.js'></script>
 </body>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-138505774-1"></script>
