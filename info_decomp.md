@@ -117,29 +117,29 @@ Boaz Barak, Benjamin L. Edelman, Surbhi Goel, Sham Kakade, Eran Malach, Cyril Zh
 <p id='recirc'></p>
 <div class='recirc-feedback-form'></div>
 
-<link rel='stylesheet' href='../source/third_party/footnote_v2.css'>
-<link rel='stylesheet' href='../source/third_party/citation_v2.css'>
-<link rel='stylesheet' href='../source/style.css'>
+<link rel='stylesheet' href='source/third_party/footnote_v2.css'>
+<link rel='stylesheet' href='source/third_party/citation_v2.css'>
+<link rel='stylesheet' href='source/style.css'>
 
 <script id='MathJax-script' async src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'></script>
 <script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/mathtex-script-type.min.js' integrity='sha384-jiBVvJ8NGGj5n7kJaiWwWp9AjC+Yh8rhZY3GtAX8yU28azcLgoRo4oukO87g7zDT' crossorigin='anonymous'></script>
 
-<script src='../source/third_party/d3_.js'></script>
-<script src='../source/third_party/d3-scale-chromatic.v1.min.js'></script>
-<script src='../source/third_party/tfjsv3.18.0.js'></script>
-<script src='../source/third_party/npyjs-global.js'></script>
-<script src='../source/third_party/swoopy-drag.js'></script>
+<script src='source/third_party/d3_.js'></script>
+<script src='source/third_party/d3-scale-chromatic.v1.min.js'></script>
+<script src='source/third_party/tfjsv3.18.0.js'></script>
+<script src='source/third_party/npyjs-global.js'></script>
+<script src='source/third_party/swoopy-drag.js'></script>
 
-<script src='../source/third_party/footnote_v2.js'></script>
-<script src='../source/third_party/citation_v2.js'></script>
+<script src='source/third_party/footnote_v2.js'></script>
+<script src='source/third_party/citation_v2.js'></script>
 
-<script src='../source/scripts/util.js'></script>
-<script src='../source/scripts/init-info-plane.js'></script>
-<script src='../source/scripts/init-animate-steps.js'></script>
-<script src='../source/scripts/init-embed-vis.js'></script>
-<script src='../source/scripts/init-input-sliders.js'></script>
-<script src='../source/scripts/init-swoopy.js'></script>
+<script src='source/scripts/util.js'></script>
+<script src='source/scripts/init-info-plane.js'></script>
+<script src='source/scripts/init-animate-steps.js'></script>
+<script src='source/scripts/init-embed-vis.js'></script>
+<script src='source/scripts/init-input-sliders.js'></script>
+<script src='source/scripts/init-swoopy.js'></script>
 
-<link rel='stylesheet' href='../source/scripts/tabular/style.css'>
-<script src='../source/scripts/tabular/init-waves.js'></script>
-<script src='../source/scripts/tabular/init.js'></script>
+<link rel='stylesheet' href='source/scripts/tabular/style.css'>
+<script src='source/scripts/tabular/init-waves.js'></script>
+<script src='source/scripts/tabular/init.js'></script>
