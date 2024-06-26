@@ -15,40 +15,27 @@ limitations under the License.
 
 
 
-window.modTopState = window.modTopStateX || {
+window.tabularState = window.tabularStateX || {
   isLocked: false,
-  // slug: '2023_06_23_12_29_44',
-  // // slug: '2023_06_30_11_20_39',
-  // slug: '2023_06_30_11_48_11',
-  // slug: '2023_07_02_23_11_54',
-  slug: '2023_07_09_19_38_17',
-  // slug: '2023_07_22_20_23_33', // small, overfit
-
-  stepIndex: 95,
-  activeDim: -1,
-  isSorted: 0,
-  sweepSlug: 'fail-memorize-generalize',
-
-  // slug: '2023_07_20_20_29_11_099260',
-  // sweepSlug: 'mlp_modular_addition_sweep',
+  dataset: 'bikeshare',
 }
 
-window.initModTop = async function(){
-  // console.clear()
+window.initTabular = async function(){
 
-  var state = modTopState
-  state.modelPath = `/mlp_modular/${state.sweepSlug}/${state.slug}`
+  var state = tabularState
+  state.runPath = `${state.dataset}`
   state.renderAll = util.initRenderAll(['step', 'dim'])
   
-  state.hyper = await util.getFile(state.modelPath + '/hyper.json')
-  window.initAccuracyChart({
-    sel: d3.select('.mod-top-accuracy'),
+  // Grab the information decomp and the distinguishability matrices
+  state.info_decomp = await util.getFile(state.runPath + '_info_decomp.npy')
+  // state.dist_matrices = await util.getFile(state.runPath + '_dist_matrices.npy')
+  window.initInfoPlane({
+    sel: d3.select('.tabular-decomp'),
     state,
-    isLoss: false,
     width: 600,
-    title: "An Example Of Grokking: Memorization Followed By Sudden Generalization"
+    lossLabel: "RMSE",
+    title: `Information decomposition on ${state.dataset}`
   })
-
 
   // init annotations quickly to avoid pop in
   var annotations = [
@@ -124,32 +111,20 @@ window.initModTop = async function(){
       "class": "no-shadow"
     }
   ]
-  // window.annotations = annotations
-  // annotations.isDraggable = 1
   initSwoopy(annotations)
-  var topAccuracySel = d3.select('.mod-top-accuracy').classed('hidden-step', 1)
+  var topAccuracySel = d3.select('.tabular-decomp')//.classed('hidden-step', 1)
 
-
-
-  if (state.isSorted){
-    state.hidden_embed_w = await util.getFile(state.modelPath + '/hidden_embed_w_sorted.npy')
-    state.out_embed_t_w = await util.getFile(state.modelPath + '/out_embed_t_w_sorted.npy')
-  } else {
-    state.hidden_embed_w = await util.getFile(state.modelPath + '/hidden_embed_w.npy')
-    state.out_embed_t_w = await util.getFile(state.modelPath + '/out_embed_t_w.npy')
-  }
-  
-  var modWeightSel = d3.select('.mod-top-weights').html('')
+  var distMatrices = d3.select('.tabular-decomp-dist-matrices').html('')
   window.initEmbedVis({
-    sel: modWeightSel.append('div'),
+    sel: distMatrices.append('div'),
     state,
     maxY: 5,
     sx: 5,
     sy: 4,
-    type: 'hidden_embed_w',
+    type: 'dist_matrices',
   })
   window.initEmbedVis({
-    sel: modWeightSel.append('div'),
+    sel: distMatrices.append('div'),
     state,
     maxY: 5,
     sx: 5,
@@ -159,50 +134,24 @@ window.initModTop = async function(){
     yAxisLabel: '',
   })
 
-  state.dft_max = await util.getFile(state.modelPath + '/dft_max.json')
-
-  var modWaveSel = d3.select('.mod-top-waves').html('')
-  window.initModTopWaves({
-    sel: modWaveSel.append('div'),
-    state,
-    type: 'hidden_embed_w',
-  })
-  window.initModTopWaves({
-    sel: modWaveSel.append('div'),
-    state,
-    type: 'out_embed_t_w',
-    xAxisLabel: 'Output Number',
-    yAxisLabel: '',
-  })
 
 
   state.renderAll.step()
 
-  initAnimateSteps({
-    sel: d3.select(`animate[data-animate='top-switches']`),
-    state,
-    minStep: 30000,
-    stepTarget: 49500,
-    isBlink: true,
-  })
-
-
-  initSwoopy(annotations)
-  var observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting){
-        d3.select('.scroll-show').st({opacity: 1})
-        topAccuracySel.classed('hidden-step', 0)
-      }
-    })
-  }, {root: null, rootMargin: '0px', threshold: 1.0})
-  observer.observe(modWeightSel.node())
+  // initSwoopy(annotations)
+  // var observer = new IntersectionObserver(entries => {
+  //   entries.forEach(entry => {
+  //     if (entry.isIntersecting){
+  //       d3.select('.scroll-show').st({opacity: 1})
+  //       topAccuracySel.classed('hidden-step', 0)
+  //     }
+  //   })
+  // }, {root: null, rootMargin: '0px', threshold: 1.0})
+  // observer.observe(distMatrices.node())
 
 
   util.addAria([
-    {selector: '.mod-top-accuracy', label: `An Example Of Grokking: Memorization Followed By Sudden Generalization. The model quickly fits the training data with 100% accuracy, but doesn't do better than random guessing on the test data. After more training, accuracy on the test data improves — the model generalizes!'`},
-    {selector: '.mod-top-weights', label: `W_input and W_output heatmaps`},
-    {selector: '.mod-top-waves', label: `W_input and W_output as line charts. They become very wavey at the end of training`},
+    {selector: '.tabular', label: `Information decomposition for a tabular dataset, where the most important bits for lowering the loss are extracted from each of the features.`},
   ])
 }
-window.initModTop()
+window.initTabular()

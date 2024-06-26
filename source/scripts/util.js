@@ -31,7 +31,7 @@ window.util = (function(){
       return data[slug]
     }
 
-    var datadir = `https://storage.googleapis.com/uncertainty-over-space/tiny-transformers`
+    var datadir = `https://kieranamurphy.com/s/`
 
     var res = await fetch(path.includes('..') ? path : datadir + path)
 
@@ -59,29 +59,15 @@ window.util = (function(){
   var color = d3.interpolatePuOr
 
   var colors = {
-    train: '#8920E9',
-    train: '#9730c9',
-    test: '#4CB769',
-
-    // aInput: '#2D733D',
-    // bInput: '#8920E9',
-    aInput: '#2979FF',
-    bInput: '#FF6D00',
-
-    highlight: '#b4cc16',
-    correct: '#FD4376',
-
-    sweepGrok: '#F7DB5C',
-    sweepGen: '#7CB9DF',
-    sweepNoGen: '#fff',
-    sweepNoLearn: '#aaa',
+    distortion: '#000000',
+    feature1: '#000000',
   }
   d3.entries(colors).forEach(({key, value}) => {
     d3.select('html').style('--color-' + key, value)
   })
 
 
-  function addAxisLabel(c, xText, yText, xOffset=30, yOffset=-30){
+  function addAxisLabel(c, xText, yText, y2Text=null, xOffset=30, yOffset=-30){
     if (c.isggPlot) xOffset -= 5
 
     c.svg.select('.x').append('g')
@@ -96,6 +82,15 @@ window.util = (function(){
       .append('text.axis-label')
       .text(yText)
       .at({textAnchor: 'middle', fill: '#000', transform: 'rotate(-90)'})
+
+    if (y2Text) {
+      c.svg.select('.y2')
+        .append('g')
+        .translate([-yOffset, c.height/2])
+        .append('text.axis-label')
+        .text(y2Text)
+        .at({textAnchor: 'middle', fill: '#000', transform: 'rotate(-90)'})
+    }
   }
 
   function ggPlot(c, isBlack=false){
@@ -179,12 +174,8 @@ window.util = (function(){
 
 })()
 
-// window.initHandWeights?.()
-// window.initModBot?.()
-window.initModTop?.()
+window.initTabular?.()
 
-window.initSparseParity?.()
-window.initSparseParitySweep?.()
 
 
 

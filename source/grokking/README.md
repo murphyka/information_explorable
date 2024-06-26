@@ -1,1 +1,0 @@
-Visualization code for [Do Machine Learning Models Memorize or Generalize?](https://pair.withgoogle.com/explorables/grokking/)

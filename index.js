@@ -4,8 +4,8 @@
 var fs = require('fs')
 var {exec, execSync} = require('child_process')
 
-var source = `${__dirname}/../../source`
-var public = `${__dirname}/../../public`
+var source = `${__dirname}/source`
+var public = `${__dirname}/public`
 if (!fs.existsSync(public)) fs.mkdirSync(public)
 
 function rsyncSource(){
@@ -54,21 +54,13 @@ renderer.codespan = function(text) {
 
 
 var templates = {}
-readdirAbs(`${source}/_templates`).forEach(path => {
-  var str = fs.readFileSync(path, 'utf8')
-  var templateName = path.split('_templates/')[1]
-  templates[templateName] = d => eval('`' + str + '`')
-})
+var str = fs.readFileSync(public + '/../post_v2.html', 'utf8')
+var templateName = 'post_v2.html'
+templates[templateName] = d => eval('`' + str + '`')
 
-function readdirAbs(dir){ return fs.readdirSync(dir).map(d => dir + '/' + d) }
 
-var posts = readdirAbs(`${source}/_posts`)
-  .filter(d => !d.includes('.DS_Store'))
-  .map(parsePost)
+var posts = [parsePost(public + '/../info_decomp.md')]
   
-fs.writeFileSync(public + '/rss.xml',  templates['rss.xml'](posts))
-fs.writeFileSync(public + '/sitemap.xml', templates['sitemap.xml'](posts))
-
 function parsePost(path){
   var str = fs.readFileSync(path, 'utf8')
   if (str[0] == '<') str = str.split('License.\n-->')[1]
