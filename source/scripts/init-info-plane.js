@@ -24,9 +24,9 @@ window.initInfoPlane = async function({sel, state, isBig=true, lossLabel, width=
   })
 
   // Add the per-feature information axis
-  c.y2 = d3.scale.linear().range([c.height, 0])
-  c.yAxisRight = d3.svg.axis().scale(c.y2).orient("right")
-  c.y2.domain([0, 4])
+  // c.y2 = d3.scale.linear().range([c.height, 0])
+  // c.yAxisRight = d3.svg.axis().scale(c.y2).orient("right")
+  // c.y2.domain([0, 4])
 
   c.x.domain([0, 20])
   c.y.domain([80, 200])  // change this for diff datasets; could create a plotting params json for each dataset
@@ -34,7 +34,7 @@ window.initInfoPlane = async function({sel, state, isBig=true, lossLabel, width=
 
   // c.xAxis.ticks(isBig ? 10 : 3).tickFormat(d3.format(','))
   c.yAxis.ticks(isBig ? 5 : 3)
-  c.yAxisRight.ticks(isBig ? 5 : 3)
+  // c.yAxisRight.ticks(isBig ? 5 : 3)
 
   d3.drawAxis(c)
   c.svg.select('.y').lower()  // I think this is z order
@@ -52,7 +52,7 @@ window.initInfoPlane = async function({sel, state, isBig=true, lossLabel, width=
     .at({strokeWidth: 2, stroke: util.colors.distortion, fill: 'none'})
   var featurePathSel = c.svg.append('path')
     .at({strokeWidth: 2, stroke: util.colors.feature1, fill: 'none'})
-
+  console.log(state.info_decomp)
   distortionPathSel.at({d: line.y(d => c.y(d[0]))(state.info_decomp)})
 
   // The label below the dotted line that follows the cursor... don't think we need this

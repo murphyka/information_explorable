@@ -27,7 +27,7 @@ window.initTabular = async function(){
   state.renderAll = util.initRenderAll(['step', 'dim'])
   
   // Grab the information decomp and the distinguishability matrices
-  state.info_decomp = await util.getFile(state.runPath + '_info_decomp.npy')
+  state.info_decomp = await util.getFile(state.runPath + '_info_decomp.csv')
   // state.dist_matrices = await util.getFile(state.runPath + '_dist_matrices.npy')
   window.initInfoPlane({
     sel: d3.select('.tabular-decomp'),
@@ -115,24 +115,24 @@ window.initTabular = async function(){
   var topAccuracySel = d3.select('.tabular-decomp')//.classed('hidden-step', 1)
 
   var distMatrices = d3.select('.tabular-decomp-dist-matrices').html('')
-  window.initEmbedVis({
-    sel: distMatrices.append('div'),
-    state,
-    maxY: 5,
-    sx: 5,
-    sy: 4,
-    type: 'dist_matrices',
-  })
-  window.initEmbedVis({
-    sel: distMatrices.append('div'),
-    state,
-    maxY: 5,
-    sx: 5,
-    sy: 4,
-    type: 'out_embed_t_w',
-    xAxisLabel: 'Output Number',
-    yAxisLabel: '',
-  })
+  // window.initEmbedVis({
+  //   sel: distMatrices.append('div'),
+  //   state,
+  //   maxY: 5,
+  //   sx: 5,
+  //   sy: 4,
+  //   type: 'dist_matrices',
+  // })
+  // window.initEmbedVis({
+  //   sel: distMatrices.append('div'),
+  //   state,
+  //   maxY: 5,
+  //   sx: 5,
+  //   sy: 4,
+  //   type: 'out_embed_t_w',
+  //   xAxisLabel: 'Output Number',
+  //   yAxisLabel: '',
+  // })
 
 
 

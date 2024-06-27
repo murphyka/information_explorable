@@ -12,7 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-
 window.util = (function(){
 
   var data = window.__datacache = window.__datacache || {}
@@ -31,26 +30,32 @@ window.util = (function(){
       return data[slug]
     }
 
-    var datadir = `https://kieranamurphy.com/s/`
+    // var datadir = `https://kieranamurphy.com/s/`
+    // var datadir = `http://localhost/data/`
 
-    var res = await fetch(path.includes('..') ? path : datadir + path)
+    // var res = await fetch(path.includes('..') ? path : datadir + path)
+    var res = await fetch('public/'+path)
+    // if (res.status == 500){
+    //   var resText = await res.text()
+    //   console.log(resText, res)
+    //   throw 'up'
+    // }
 
-    if (res.status == 500){
-      var resText = await res.text()
-      console.log(resText, res)
-      throw 'up'
-    }
+    // if (type == 'csv'){
+    //   var parsed = d3.csvParse(await res.text())
+    // } else if (type == 'npy'){
+    //   var parsed = npyjs.parse(await(res).arrayBuffer())
+    // } else if (type == 'json'){
+    //   var parsed = await res.json()
+    // } else{
+    //   throw 'unknown type'
+    // }
 
-    if (type == 'csv'){
-      var parsed = d3.csvParse(await res.text())
-    } else if (type == 'npy'){
-      var parsed = npyjs.parse(await(res).arrayBuffer())
-    } else if (type == 'json'){
-      var parsed = await res.json()
-    } else{
-      throw 'unknown type'
-    }
+    // parsed = npyjs.parse('data/'+path) //.arrayBuffer())
+    
 
+    // var parsed = d3.csvParse(fs.readFile('data/'+path))
+    var parsed = d3.csvParse(await res.text())
     data[slug] = parsed
     return parsed 
   }

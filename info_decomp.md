@@ -7,6 +7,29 @@ shareimgabstract:
 authors: Kieran Murphy, Dani Bassett
 date: June 2024
 ---
+
+Imagine someone walks up and asks you *"Where is the information about whether something is a car or a truck?"*.
+It might be an unusual phrasing, but you'd probably understand what they mean.  
+You might mention the overall size or something about the rear of the vehicle, having an intuitive sense that there is specific variation that best distinguishes between cars and trucks and other variation that is irrelevant (e.g., the color).
+
+The goal of this post is to build upon the intuition that localizing relevant information is something we naturally do when making sense of the world, and that it can be formulated with machine learning as a powerful and practical route to interpretability.
+The long and short (i.e., **TL;DR**) is that we'll place a cost on information about different features in the data, upstream of any model you want to use, and the most relevant variation will reveal itself.  
+
+### Information as distinctions
+
+Let's jump right into something interactive and talk about it after.
+Imagine a disease for which there are two tests on the market, called test A and test B.
+You can 
+
+Information theory bestows mathematical rigor to the rather intuitive notion of information as something that reduces uncertainty. 
+It has deep connections with many fields of research, and particularly machine learning; if  
+You can get very far with just a few building blocks in information theory, starting with entropy as a measure of the amount of uncertainty in a probability distribution<a class='footstart' key='entropy'></a> and then mutual information as the average reduction of uncertainty in one thing when you find out the value of another<a class='footstart' key='mutual_info'></a><a class='citestart' key='cover'></a>.
+
+While the view of mutual information in terms of uncertainty reduction is great, we'll get more mileage here with a slightly different perspective.
+Instead, information can be seen as allowing distinctions to be made between outcomes of one variable when given another. 
+
+
+
 <a class='citestart' key='Omnigrok Universality Zhong23 ProgressParity gromov'></a>
 <a class='footstart' key='modular'></a>
 *grokking*
@@ -91,12 +114,16 @@ Interestingly this circle has a few wrinkles: this construction doesn't give an 
 
 ### Footnotes
 
-<a class='footend' key='modular'></a> In modular addition, we have two input numbers, `$a$` and `$b$`, and a modulus `$m$`. We want to find the remainder of `$a + b$` when divided by `$m$`.
-<span class='fn-break'></span>
-This type of addition is often called clock-face addition, because when adding two times, we often report the result modulo 12 (i.e. 5 hours after 8 o’clock is 1 o’clock).
+<a class='footend' key='entropy'></a> 
+With `$X$` a random variable and `$p(x)$` the probability distribution regarding its outcomes, the entropy `$H(X)=\mathbb{E}_{x\sim p(x)} [- \log p(x)]$`.
+
+<a class='footend' key='mutual_info'></a> 
+With `$X$` any `$Y$` two random variables, the mutual information is `$I(X;Y)=H(X)-H(X|Y)=H(Y)-H(Y|X)$`.  It quantifies the amount of shared variation in the two random variables.
+
 <span class='fn-break'></span>
 Modular addition sounds simple and it is. We can easily train 1,000s of models and treat them like fruit flies in neuroscience: small enough such that it is feasible to extract their [connectome](https://www.science.org/doi/abs/10.1126/science.add9330) synapse-by-synapse, yet providing new interesting insights about the system more broadly. We can get a good understanding of the small models we've trained by visualizing all their internals.
 
+<span class='fn-break'></span>
 
 ### References
 
