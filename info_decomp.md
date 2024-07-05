@@ -8,18 +8,48 @@ authors: Kieran Murphy, Dani Bassett
 date: June 2024
 ---
 
-Imagine someone walks up and asks you *"Where is the information about whether something is a car or a truck?"*.
-It might be an unusual phrasing, but you'd probably understand what they mean.  
+Imagine someone asks you *"**Where is the information about whether something is a car or a truck?**"*
+<p float="left">
+  <img src="data/car.jpg" width="300" />
+  <img src="data/truck.jpg" width="300" /> 
+</p>
+
+It might be an unusual phrasing, but you'd probably understand what they mean.
 You might mention the overall size or something about the rear of the vehicle, having an intuitive sense that there is specific variation that best distinguishes between cars and trucks and other variation that is irrelevant (e.g., the color).
 
 The goal of this post is to build upon the intuition that localizing relevant information is something we naturally do when making sense of the world, and that it can be formulated with machine learning as a powerful and practical route to interpretability.
-The long and short (i.e., **TL;DR**) is that we'll place a cost on information about different features in the data, upstream of any model you want to use, and the most relevant variation will reveal itself.  
+The long and short (**TL;DR**) is that we'll add a loss on the information used about different features in the data, upstream of any model, and it will reveal the most relevant variation contained in the features.  
 
 ### Information as distinctions
 
-Let's jump right into something interactive and talk about it after.
-Imagine a disease for which there are two tests on the market, called test A and test B.
-You can 
+You've been transported back in time to the days of the telegraph, and tasked with setting up a storm communication system with two neighboring towns.
+Each of the towns will send a <digits>0</digits> or <digits>1</digits> to tell about the weather conditions locally, and your town will use the information for its own warning system.
+How much money should you allocate to each of the transmission lines to the towns?
+
+A dataset has been collected, with the joint distribution shown below as a heatmap.
+
+<div class='storm-heatmap row'></div>
+
+With this distribution, we can simulate the full spectrum of information transmission rates from the two towns.  
+Adjust the slider bars to allow less or more information from each town.
+
+<div class='storm-sliders row'></div>
+
+What does it mean to receive a partial bit from town A?  
+Town A inputs a discrete variable on its end, but noise in the transmission line can occasionally cause you to receive the opposite output.
+
+By displaying the total information in versus the information out, we see there is a spectrum of information allocations starting from zero info from the towns and zero info about your own storm likelihood (the origin) to two bits from the towns and maximal info about your own town (the right hand side).
+In between, there are partial information allocations, with a Pareto front (the black curve) of the best allocations for a given budget.
+
+The Pareto front can be traced by maximizing the information from town A first, and then from town B -- indicating that the signal from town A has more relevant information than that of town B.
+We can measure all the mutual information terms and place them on the same plot:
+
+<div class='storm-info row'></div>
+
+Whereas the mutual information terms relate the pristine variables (i.e., the storminess here and the storminess of A), we explored the space of partial information.
+It can be seen as the space of lossy compressions of each random variable, where distinctions present in the pristine random variable can be smoothly eroded.
+In other words, the distinction between <digits>0</digits> and <digits>1</digits> at town A is perfectly communicated with a one bit transmission line, but it becomes murky with a 0.5 bit transmission line.  
+Without a transmission line, there is no distinguishing power in our town about the storminess at town A.
 
 Information theory bestows mathematical rigor to the rather intuitive notion of information as something that reduces uncertainty. 
 It has deep connections with many fields of research, and particularly machine learning; if  
@@ -31,10 +61,8 @@ Instead, information can be seen as allowing distinctions to be made between out
 
 
 <a class='citestart' key='Omnigrok Universality Zhong23 ProgressParity gromov'></a>
-<a class='footstart' key='modular'></a>
-*grokking*
 
-### Grokking Modular Addition
+### Information about bike rentals
 
 <div class='sticky-container'>
 <div class='tabular-decomp row'></div>

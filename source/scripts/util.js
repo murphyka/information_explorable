@@ -30,32 +30,18 @@ window.util = (function(){
       return data[slug]
     }
 
-    // var datadir = `https://kieranamurphy.com/s/`
-    // var datadir = `http://localhost/data/`
+    var res = await fetch('data/'+path)
 
-    // var res = await fetch(path.includes('..') ? path : datadir + path)
-    var res = await fetch('public/'+path)
-    // if (res.status == 500){
-    //   var resText = await res.text()
-    //   console.log(resText, res)
-    //   throw 'up'
-    // }
+    if (type == 'csv'){
+      var parsed = d3.csvParse(await res.text())
+    } else if (type == 'npy'){
+      var parsed = npyjs.parse(await(res).arrayBuffer())
+    } else if (type == 'json'){
+      var parsed = await res.json()
+    } else{
+      throw 'unknown type'
+    }
 
-    // if (type == 'csv'){
-    //   var parsed = d3.csvParse(await res.text())
-    // } else if (type == 'npy'){
-    //   var parsed = npyjs.parse(await(res).arrayBuffer())
-    // } else if (type == 'json'){
-    //   var parsed = await res.json()
-    // } else{
-    //   throw 'unknown type'
-    // }
-
-    // parsed = npyjs.parse('data/'+path) //.arrayBuffer())
-    
-
-    // var parsed = d3.csvParse(fs.readFile('data/'+path))
-    var parsed = d3.csvParse(await res.text())
     data[slug] = parsed
     return parsed 
   }
@@ -65,23 +51,24 @@ window.util = (function(){
 
   var colors = {
     distortion: '#000000',
-    feature1: '#000000',
+    feature1: '#336699',
+    highlight: '#b4cc16',
   }
   d3.entries(colors).forEach(({key, value}) => {
     d3.select('html').style('--color-' + key, value)
   })
 
 
-  function addAxisLabel(c, xText, yText, y2Text=null, xOffset=30, yOffset=-30){
+  function addAxisLabel(c, xText, yText, y2Text=null, xOffset=40, yOffset=-30){
     if (c.isggPlot) xOffset -= 5
 
-    c.svg.select('.x').append('g')
-      .translate([c.width/2, xOffset])
+    c.svg.append('g')
+      .translate([c.width/2, c.height + xOffset])
       .append('text.axis-label')
       .text(xText)
       .at({textAnchor: 'middle', fill: '#000'})
 
-    c.svg.select('.y')
+    c.svg
       .append('g')
       .translate([yOffset, c.height/2])
       .append('text.axis-label')
@@ -89,9 +76,9 @@ window.util = (function(){
       .at({textAnchor: 'middle', fill: '#000', transform: 'rotate(-90)'})
 
     if (y2Text) {
-      c.svg.select('.y2')
+      c.svg
         .append('g')
-        .translate([-yOffset, c.height/2])
+        .translate([-yOffset+c.width, c.height/2])
         .append('text.axis-label')
         .text(y2Text)
         .at({textAnchor: 'middle', fill: '#000', transform: 'rotate(-90)'})

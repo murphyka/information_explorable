@@ -24,10 +24,24 @@ window.initTabular = async function(){
 
   var state = tabularState
   state.runPath = `${state.dataset}`
-  state.renderAll = util.initRenderAll(['step', 'dim'])
+  state.renderAll = util.initRenderAll(['compressionLevel', 'curveHighlighter'])
   
   // Grab the information decomp and the distinguishability matrices
-  state.info_decomp = await util.getFile(state.runPath + '_info_decomp.csv')
+  var almostParsedDecomp = await util.getFile(state.runPath + '_info_decomp.npy')
+  // stone age reshape
+  var decompShape = almostParsedDecomp.shape
+  var decompData = almostParsedDecomp.data
+  var parsedDecomp = [];
+  var i = 0;
+  for (l = decompData.length + 1; (i + decompShape[1]) < l; i += decompShape[1]) {
+      parsedDecomp.push(decompData.slice(i, i + decompShape[1]));
+  }
+  // quick transpose ty stackoverflow
+  // state.info_decomp = _.zip(...parsedDecomp)  // actually, we want [time step, index] for d3
+  state.info_decomp = parsedDecomp
+
+  state.feature_labels = ['season', 'year', 'month', 'hour', 'holiday?', 'day of week', 'working day?', 'weather', 'temperature', 'apparent temp.', 'humidity', 'wind']
+  // state.info_decomp = math.reshape(state.info_decomp.data, state.info_decomp.shape)
   // state.dist_matrices = await util.getFile(state.runPath + '_dist_matrices.npy')
   window.initInfoPlane({
     sel: d3.select('.tabular-decomp'),
@@ -134,9 +148,27 @@ window.initTabular = async function(){
   //   yAxisLabel: '',
   // })
 
+  // state.renderAll.compressionLevel.fns.push(d => {
+  //   var step = state.stepIndex*state.hyper.save_every
+
+  //   hoverTick.translate(c.x(step), 0)
+  //   hoverTick.select('text').text(d3.format(',')(step))
+  // })
+
+  // c.svg.append('rect')
+  //   .at({width: c.width, height: c.height + 30, fillOpacity: 0})
+  //   .on('mousemove touchmove', function(){
+  //     d3.event.preventDefault()
+
+  //     // last training run missing on some models
+  //     var mouseX = d3.clamp(0, d3.mouse(this)[0], c.width - .1)
+  //     state.stepIndex = Math.floor(c.x.clamp(1).invert(mouseX)/state.hyper.save_every)
+  //     state.renderAll.step()
+  //   })
 
 
-  state.renderAll.step()
+
+  state.renderAll.compressionLevel()
 
   // initSwoopy(annotations)
   // var observer = new IntersectionObserver(entries => {
