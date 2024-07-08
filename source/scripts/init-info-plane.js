@@ -90,7 +90,8 @@ window.initInfoPlane = async function({sel, state, isBig=true, lossLabel, width=
   })
 
   var lineSel = c.svg.appendMany('path.info-curve', inputFeatures)
-      .at({stroke: '#000', fill: 'none', opacity: .4})
+      .at({fill: 'none', opacity: .4})
+      .at("stroke", (d, i) => util.colors.features[i])
       .each(drawData)
       .on('mouseover', d => {
         state.curveHighlighter = d
@@ -112,6 +113,8 @@ window.initInfoPlane = async function({sel, state, isBig=true, lossLabel, width=
     var sel = d3.select(this)
     sel.at({d: line.y(d => c.y2(d[featureIndex]))(state.info_decomp)})
       .at("clip-path", "url(#clipDecompPlot)")
+      // .at({stroke: util.colors.features[featureIndex]})
+      
   }
 
   function placeText(featureIndex) {
@@ -119,8 +122,6 @@ window.initInfoPlane = async function({sel, state, isBig=true, lossLabel, width=
     sel.at({x: c.width + 50, y: c.height/2 - 100 + featureIndex*20}) //, dy: '.33em'})
     sel.text(state.feature_labels[featureIndex])
   }
-
-
   
   // The label below the dotted line that follows the cursor... don't think we need this
   // var hoverTick = c.svg.select('.x .tick')

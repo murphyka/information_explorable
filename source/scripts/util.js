@@ -51,8 +51,10 @@ window.util = (function(){
 
   var colors = {
     distortion: '#000000',
-    feature1: '#336699',
+    features: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#003f5c',
+    '#F59F00', '#BF211E', '#489FB5'],
     highlight: '#b4cc16',
+    bars: ['#1f77b4', '#ff7f0e'],
   }
   d3.entries(colors).forEach(({key, value}) => {
     d3.select('html').style('--color-' + key, value)
@@ -166,9 +168,7 @@ window.util = (function(){
 
 })()
 
-window.initTabular?.()
-
-
-
+// window.initStorms?.()
+// window.initTabular?.()
 
 

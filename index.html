@@ -34,8 +34,8 @@ limitations under the License.
     })()
   </script>
 
-  <title>What information does a model use?  </title>
-  <meta property="og:title" content="What information does a model use?  ">
+  <title>Where is the information in data?  </title>
+  <meta property="og:title" content="Where is the information in data?  ">
   <meta property="og:url" content="https://pair.withgoogle.com/explorablesundefined">
 
   <meta name="og:description" content="An interactive introduction to information decomposition as a route to interpretability.">
@@ -50,7 +50,7 @@ limitations under the License.
   <meta name="viewport" content="width=device-width">
 </head>
 <body>
-  <h1 class='headline'>What information does a model use?  </h1>
+  <h1 class='headline'>Where is the information in data?  </h1>
 
   <div class='byline'>
     <div class='authors'>
@@ -58,37 +58,37 @@ limitations under the License.
       Kieran Murphy</b> and <b> Dani Bassett
       </b>
     </div>
-    <div class='date'>June 2024</div>
+    <div class='date'>July 2024</div>
   </div>
 
   
   <p>Imagine someone asks you <em>“<strong>Where is the information about whether something is a car or a truck?</strong>“</em></p>
-<p float="left">
+<p>
   <img src="data/car.jpg" width="300" />
   <img src="data/truck.jpg" width="300" /> 
-</p>  
+</p>
 
 <p>It might be an unusual phrasing, but you’d probably understand what they mean.
-You might mention the overall size or something about the rear of the vehicle, having an intuitive sense that there is specific variation that best distinguishes between cars and trucks and other variation that is irrelevant (e.g., the color).</p>
-<p>The goal of this post is to build upon the intuition that localizing relevant information is something we naturally do when making sense of the world, and that it can be formulated with machine learning as a powerful and practical route to interpretability.
-The long and short (<strong>TL;DR</strong>) is that we’ll add a loss on the information used about different features in the data, upstream of any model, and it will reveal the most relevant variation contained in the features.  </p>
-<h3 id="information-as-distinctions">Information as distinctions</h3>
+You might mention the overall size or something about the rear of the vehicle, having an intuitive sense that there is specific variation among vehicles that best distinguishes between cars and trucks and other variation that is irrelevant (e.g., the color).</p>
+<p>The goal of this post is to build intuition around localizing relevant information, something we naturally do when making sense of the world, and show how it can be formulated with machine learning as a powerful and practical route to interpretability.
+The methodological long and short (<strong>TL;DR</strong>) is that we’ll add a loss on the information used about different features in the data, upstream of any model, and it will reveal the most relevant variation contained in the features.  </p>
+<h3 id="information-as-communicating-distinctions">Information as communicating distinctions</h3>
 <p>You’ve been transported back in time to the days of the telegraph, and tasked with setting up a storm communication system with two neighboring towns.
 Each of the towns will send a <digits>0</digits> or <digits>1</digits> to tell about the weather conditions locally, and your town will use the information for its own warning system.
-How much money should you allocate to each of the transmission lines to the towns?</p>
-<p>A dataset has been collected, with the joint distribution shown below as a heatmap.</p>
-<div class='storm-heatmap row'></div>
+The more money you spend on a transmission line, the lower the noise in the line and the more information that can be sent.<a class='footstart' key='transmission-caveats'></a>
+How much should you allocate to each of the transmission lines to the towns?</p>
+<p>A dataset has been collected, with the joint distribution shown below as a heatmap, where extreme weather is represented as <digits>1</digits> and unfortunately, tragically likely.<a class='footstart' key='weather-caveats'></a></p>
+<div class='storm-probability-sliders'></div>
+
+<div class='storm-telegraph row'></div>
+<div class='storm-transmission-sliders'></div>
 
 <p>With this distribution, we can simulate the full spectrum of information transmission rates from the two towns.<br>Adjust the slider bars to allow less or more information from each town.</p>
-<div class='storm-sliders row'></div>
-
-<p>What does it mean to receive a partial bit from town A?<br>Town A inputs a discrete variable on its end, but noise in the transmission line can occasionally cause you to receive the opposite output.</p>
+<p>What does it mean to receive a partial bit from town A?<br>Town A sends a discrete variable as input, but noise in the transmission line can cause you to receive the opposite output with some probability.</p>
 <p>By displaying the total information in versus the information out, we see there is a spectrum of information allocations starting from zero info from the towns and zero info about your own storm likelihood (the origin) to two bits from the towns and maximal info about your own town (the right hand side).
 In between, there are partial information allocations, with a Pareto front (the black curve) of the best allocations for a given budget.</p>
 <p>The Pareto front can be traced by maximizing the information from town A first, and then from town B – indicating that the signal from town A has more relevant information than that of town B.
 We can measure all the mutual information terms and place them on the same plot:</p>
-<div class='storm-info row'></div>
-
 <p>Whereas the mutual information terms relate the pristine variables (i.e., the storminess here and the storminess of A), we explored the space of partial information.
 It can be seen as the space of lossy compressions of each random variable, where distinctions present in the pristine random variable can be smoothly eroded.
 In other words, the distinction between <digits>0</digits> and <digits>1</digits> at town A is perfectly communicated with a one bit transmission line, but it becomes murky with a 0.5 bit transmission line.<br>Without a transmission line, there is no distinguishing power in our town about the storminess at town A.</p>
@@ -159,6 +159,10 @@ $$
 <p><br></p>
 <p><br></p>
 <h3 id="footnotes">Footnotes</h3>
+<p><a class='footend' key='transmission-caveats'></a> 
+assuming there is some standard operating voltage</p>
+<p><a class='footend' key='weather-caveats'></a> 
+It also turns out that weather one day is statistically independent of weather the next, so forecasting won’t help you.</p>
 <p><a class='footend' key='entropy'></a> 
 With <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi></mrow><annotation encoding="application/x-tex">X</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07847em;">X</span></span></span></span> a random variable and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">p(x)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span> the probability distribution regarding its outcomes, the entropy <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>X</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi mathvariant="double-struck">E</mi><mrow><mi>x</mi><mo>∼</mo><mi>p</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></msub><mo stretchy="false">[</mo><mo>−</mo><mi>log</mi><mo>⁡</mo><mi>p</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">H(X)=\mathbb{E}_{x\sim p(x)} [- \log p(x)]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1052em;vertical-align:-0.3552em;"></span><span class="mord"><span class="mord mathbb">E</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.5198em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">x</span><span class="mrel mtight">∼</span><span class="mord mathnormal mtight">p</span><span class="mopen mtight">(</span><span class="mord mathnormal mtight">x</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3552em;"><span></span></span></span></span></span></span><span class="mopen">[</span><span class="mord">−</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)]</span></span></span></span>.</p>
 <p><a class='footend' key='mutual_info'></a> 
@@ -167,6 +171,8 @@ With <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.o
 Modular addition sounds simple and it is. We can easily train 1,000s of models and treat them like fruit flies in neuroscience: small enough such that it is feasible to extract their <a href="https://www.science.org/doi/abs/10.1126/science.add9330">connectome</a> synapse-by-synapse, yet providing new interesting insights about the system more broadly. We can get a good understanding of the small models we’ve trained by visualizing all their internals.</p>
 <p><span class='fn-break'></span></p>
 <h3 id="references">References</h3>
+<p><a class='citeend' key='cover'></a> [Elements of Information Theory]
+Cover, T. &amp; Thomas, J. (1991). John Wiley &amp; Sons, Inc.</p>
 <p><a class='citeend' key='Omnigrok'></a> <a href="https://arxiv.org/pdf/2210.01117.pdf">Omnigrok: Grokking Beyond Algorithmic Data</a>
 Liu, Z., Michaud, E. J., &amp; Tegmark, M. (2022, September). In The Eleventh International Conference on Learning Representations.</p>
 <p><a class='citeend' key='Universality'></a> <a href="https://arxiv.org/abs/2302.03025">A Toy Model of Universality: Reverse Engineering How Networks Learn Group Operations</a>
@@ -181,7 +187,7 @@ Boaz Barak, Benjamin L. Edelman, Surbhi Goel, Sham Kakade, Eran Malach, Cyril Zh
 
 <p><link rel='stylesheet' href='source/third_party/footnote_v2.css'></p>
 <p><link rel='stylesheet' href='source/third_party/citation_v2.css'></p>
-<link rel='stylesheet' href='source/style.css'>
+<link rel='stylesheet' href='source/scripts/style.css'>
 
 <script id='MathJax-script' async src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'></script>
 <script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/mathtex-script-type.min.js' integrity='sha384-jiBVvJ8NGGj5n7kJaiWwWp9AjC+Yh8rhZY3GtAX8yU28azcLgoRo4oukO87g7zDT' crossorigin='anonymous'></script>
@@ -197,6 +203,7 @@ Boaz Barak, Benjamin L. Edelman, Surbhi Goel, Sham Kakade, Eran Malach, Cyril Zh
 
 <script src='source/scripts/util.js'></script>
 <script src='source/scripts/init-info-plane.js'></script>
+<script src='source/scripts/init-storms.js'></script>
 <script src='source/scripts/init-animate-steps.js'></script>
 <script src='source/scripts/init-embed-vis.js'></script>
 <script src='source/scripts/init-input-sliders.js'></script>
@@ -206,6 +213,7 @@ Boaz Barak, Benjamin L. Edelman, Surbhi Goel, Sham Kakade, Eran Malach, Cyril Zh
 <script src='source/scripts/tabular/init-waves.js'></script>
 <script src='source/scripts/tabular/init.js'></script>
 
+<script src='source/scripts/storms/init.js'></script>
 </body>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-138505774-1"></script>

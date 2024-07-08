@@ -1,50 +1,51 @@
 ---
 template: post_v2.html
-title: What information does a model use?  
+title: Where is the information in data?  
 socialsummary: An interactive introduction to information decomposition as a route to interpretability.
 shareimg: 
 shareimgabstract: 
 authors: Kieran Murphy, Dani Bassett
-date: June 2024
+date: July 2024
 ---
 
 Imagine someone asks you *"**Where is the information about whether something is a car or a truck?**"*
-<p float="left">
+<p>
   <img src="data/car.jpg" width="300" />
   <img src="data/truck.jpg" width="300" /> 
 </p>
 
 It might be an unusual phrasing, but you'd probably understand what they mean.
-You might mention the overall size or something about the rear of the vehicle, having an intuitive sense that there is specific variation that best distinguishes between cars and trucks and other variation that is irrelevant (e.g., the color).
+You might mention the overall size or something about the rear of the vehicle, having an intuitive sense that there is specific variation among vehicles that best distinguishes between cars and trucks and other variation that is irrelevant (e.g., the color).
 
-The goal of this post is to build upon the intuition that localizing relevant information is something we naturally do when making sense of the world, and that it can be formulated with machine learning as a powerful and practical route to interpretability.
-The long and short (**TL;DR**) is that we'll add a loss on the information used about different features in the data, upstream of any model, and it will reveal the most relevant variation contained in the features.  
+The goal of this post is to build intuition around localizing relevant information, something we naturally do when making sense of the world, and show how it can be formulated with machine learning as a powerful and practical route to interpretability.
+The methodological long and short (**TL;DR**) is that we'll add a loss on the information used about different features in the data, upstream of any model, and it will reveal the most relevant variation contained in the features.  
 
-### Information as distinctions
+### Information as communicating distinctions
 
 You've been transported back in time to the days of the telegraph, and tasked with setting up a storm communication system with two neighboring towns.
 Each of the towns will send a <digits>0</digits> or <digits>1</digits> to tell about the weather conditions locally, and your town will use the information for its own warning system.
-How much money should you allocate to each of the transmission lines to the towns?
+The more money you spend on a transmission line, the lower the noise in the line and the more information that can be sent.<a class='footstart' key='transmission-caveats'></a>
+How much should you allocate to each of the transmission lines to the towns?
 
-A dataset has been collected, with the joint distribution shown below as a heatmap.
+A dataset has been collected, with the joint distribution shown below as a heatmap, where extreme weather is represented as <digits>1</digits> and unfortunately, tragically likely.<a class='footstart' key='weather-caveats'></a>
 
-<div class='storm-heatmap row'></div>
+<div class='storm-probability-sliders'></div>
+
+<div class='storm-telegraph row'></div>
+<div class='storm-transmission-sliders'></div>
 
 With this distribution, we can simulate the full spectrum of information transmission rates from the two towns.  
 Adjust the slider bars to allow less or more information from each town.
 
-<div class='storm-sliders row'></div>
 
 What does it mean to receive a partial bit from town A?  
-Town A inputs a discrete variable on its end, but noise in the transmission line can occasionally cause you to receive the opposite output.
+Town A sends a discrete variable as input, but noise in the transmission line can cause you to receive the opposite output with some probability.
 
 By displaying the total information in versus the information out, we see there is a spectrum of information allocations starting from zero info from the towns and zero info about your own storm likelihood (the origin) to two bits from the towns and maximal info about your own town (the right hand side).
 In between, there are partial information allocations, with a Pareto front (the black curve) of the best allocations for a given budget.
 
 The Pareto front can be traced by maximizing the information from town A first, and then from town B -- indicating that the signal from town A has more relevant information than that of town B.
 We can measure all the mutual information terms and place them on the same plot:
-
-<div class='storm-info row'></div>
 
 Whereas the mutual information terms relate the pristine variables (i.e., the storminess here and the storminess of A), we explored the space of partial information.
 It can be seen as the space of lossy compressions of each random variable, where distinctions present in the pristine random variable can be smoothly eroded.
@@ -142,6 +143,13 @@ Interestingly this circle has a few wrinkles: this construction doesn't give an 
 
 ### Footnotes
 
+<a class='footend' key='transmission-caveats'></a> 
+assuming there is some standard operating voltage
+
+<a class='footend' key='weather-caveats'></a> 
+It also turns out that weather one day is statistically independent of weather the next, so forecasting won't help you.
+
+
 <a class='footend' key='entropy'></a> 
 With `$X$` a random variable and `$p(x)$` the probability distribution regarding its outcomes, the entropy `$H(X)=\mathbb{E}_{x\sim p(x)} [- \log p(x)]$`.
 
@@ -154,6 +162,9 @@ Modular addition sounds simple and it is. We can easily train 1,000s of models a
 <span class='fn-break'></span>
 
 ### References
+
+<a class='citeend' key='cover'></a> [Elements of Information Theory]
+Cover, T. & Thomas, J. (1991). John Wiley & Sons, Inc.
 
 <a class='citeend' key='Omnigrok'></a> [Omnigrok: Grokking Beyond Algorithmic Data](https://arxiv.org/pdf/2210.01117.pdf)
 Liu, Z., Michaud, E. J., & Tegmark, M. (2022, September). In The Eleventh International Conference on Learning Representations.
@@ -174,7 +185,7 @@ Boaz Barak, Benjamin L. Edelman, Surbhi Goel, Sham Kakade, Eran Malach, Cyril Zh
 
 <link rel='stylesheet' href='source/third_party/footnote_v2.css'>
 <link rel='stylesheet' href='source/third_party/citation_v2.css'>
-<link rel='stylesheet' href='source/style.css'>
+<link rel='stylesheet' href='source/scripts/style.css'>
 
 <script id='MathJax-script' async src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'></script>
 <script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/mathtex-script-type.min.js' integrity='sha384-jiBVvJ8NGGj5n7kJaiWwWp9AjC+Yh8rhZY3GtAX8yU28azcLgoRo4oukO87g7zDT' crossorigin='anonymous'></script>
@@ -190,6 +201,7 @@ Boaz Barak, Benjamin L. Edelman, Surbhi Goel, Sham Kakade, Eran Malach, Cyril Zh
 
 <script src='source/scripts/util.js'></script>
 <script src='source/scripts/init-info-plane.js'></script>
+<script src='source/scripts/init-storms.js'></script>
 <script src='source/scripts/init-animate-steps.js'></script>
 <script src='source/scripts/init-embed-vis.js'></script>
 <script src='source/scripts/init-input-sliders.js'></script>
@@ -198,3 +210,5 @@ Boaz Barak, Benjamin L. Edelman, Surbhi Goel, Sham Kakade, Eran Malach, Cyril Zh
 <link rel='stylesheet' href='source/scripts/tabular/style.css'>
 <script src='source/scripts/tabular/init-waves.js'></script>
 <script src='source/scripts/tabular/init.js'></script>
+
+<script src='source/scripts/storms/init.js'></script>

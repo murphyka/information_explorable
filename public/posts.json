@@ -1,9 +1,9 @@
 [
   {
     "template": "post_v2.html",
-    "title": "What information does a model use?  ",
+    "title": "Where is the information in data?  ",
     "socialsummary": "An interactive introduction to information decomposition as a route to interpretability.",
     "authors": "Kieran Murphy, Dani Bassett",
-    "date": "June 2024"
+    "date": "July 2024"
   }
 ]
