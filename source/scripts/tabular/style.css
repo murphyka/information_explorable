@@ -1,12 +1,12 @@
 .info-curve{
   opacity: .4;
   fill: none;  
-  stroke-width: 4px;
+  stroke-width: 8px;
 }
 
 .info-curve.active{
   opacity: 1;
-  stroke-width: 6px;
+  stroke-width: 10px;
 }
 
 .feature-label{

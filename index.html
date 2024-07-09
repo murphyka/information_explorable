@@ -78,12 +78,15 @@ Each of the towns will send a <digits>0</digits> or <digits>1</digits> to tell a
 The more money you spend on a transmission line, the lower the noise in the line and the more information that can be sent.<a class='footstart' key='transmission-caveats'></a>
 How much should you allocate to each of the transmission lines to the towns?</p>
 <p>A dataset has been collected, with the joint distribution shown below as a heatmap, where extreme weather is represented as <digits>1</digits> and unfortunately, tragically likely.<a class='footstart' key='weather-caveats'></a></p>
-<div class='storm-probability-sliders'></div>
-
 <div class='storm-telegraph row'></div>
-<div class='storm-transmission-sliders'></div>
 
 <p>With this distribution, we can simulate the full spectrum of information transmission rates from the two towns.<br>Adjust the slider bars to allow less or more information from each town.</p>
+<div class='storm-probability-sliders'></div>
+<div class='storm-telegraph-mod-joint row'></div>
+
+<div class='storm-telegraph-dib row'></div>
+
+
 <p>What does it mean to receive a partial bit from town A?<br>Town A sends a discrete variable as input, but noise in the transmission line can cause you to receive the opposite output with some probability.</p>
 <p>By displaying the total information in versus the information out, we see there is a spectrum of information allocations starting from zero info from the towns and zero info about your own storm likelihood (the origin) to two bits from the towns and maximal info about your own town (the right hand side).
 In between, there are partial information allocations, with a Pareto front (the black curve) of the best allocations for a given budget.</p>
@@ -202,18 +205,22 @@ Boaz Barak, Benjamin L. Edelman, Surbhi Goel, Sham Kakade, Eran Malach, Cyril Zh
 <script src='source/third_party/citation_v2.js'></script>
 
 <script src='source/scripts/util.js'></script>
-<script src='source/scripts/init-info-plane.js'></script>
-<script src='source/scripts/init-storms.js'></script>
-<script src='source/scripts/init-animate-steps.js'></script>
-<script src='source/scripts/init-embed-vis.js'></script>
 <script src='source/scripts/init-input-sliders.js'></script>
-<script src='source/scripts/init-swoopy.js'></script>
 
 <p><link rel='stylesheet' href='source/scripts/tabular/style.css'></p>
 <script src='source/scripts/tabular/init-waves.js'></script>
 <script src='source/scripts/tabular/init.js'></script>
 
-<script src='source/scripts/storms/init.js'></script>
+<p><link rel='stylesheet' href='source/scripts/storms/style.css'></p>
+<script src='source/scripts/storms/init-fixed-joint.js'></script>
+<script src='source/scripts/storms/init-modifiable-joint.js'></script>
+<script src='source/scripts/storms/init-training-dib.js'></script>
+
+<script src='source/scripts/init-info-plane.js'></script>
+<script src='source/scripts/init-storms.js'></script>
+<script src='source/scripts/init-animate-steps.js'></script>
+<script src='source/scripts/init-embed-vis.js'></script>
+<script src='source/scripts/init-swoopy.js'></script> 
 </body>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-138505774-1"></script>

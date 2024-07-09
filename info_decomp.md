@@ -29,13 +29,15 @@ How much should you allocate to each of the transmission lines to the towns?
 
 A dataset has been collected, with the joint distribution shown below as a heatmap, where extreme weather is represented as <digits>1</digits> and unfortunately, tragically likely.<a class='footstart' key='weather-caveats'></a>
 
-<div class='storm-probability-sliders'></div>
 
 <div class='storm-telegraph row'></div>
-<div class='storm-transmission-sliders'></div>
 
 With this distribution, we can simulate the full spectrum of information transmission rates from the two towns.  
 Adjust the slider bars to allow less or more information from each town.
+<div class='storm-probability-sliders'></div>
+<div class='storm-telegraph-mod-joint row'></div>
+
+<div class='storm-telegraph-dib row'></div>
 
 
 What does it mean to receive a partial bit from town A?  
@@ -200,15 +202,19 @@ Boaz Barak, Benjamin L. Edelman, Surbhi Goel, Sham Kakade, Eran Malach, Cyril Zh
 <script src='source/third_party/citation_v2.js'></script>
 
 <script src='source/scripts/util.js'></script>
-<script src='source/scripts/init-info-plane.js'></script>
-<script src='source/scripts/init-storms.js'></script>
-<script src='source/scripts/init-animate-steps.js'></script>
-<script src='source/scripts/init-embed-vis.js'></script>
 <script src='source/scripts/init-input-sliders.js'></script>
-<script src='source/scripts/init-swoopy.js'></script>
 
 <link rel='stylesheet' href='source/scripts/tabular/style.css'>
 <script src='source/scripts/tabular/init-waves.js'></script>
 <script src='source/scripts/tabular/init.js'></script>
 
-<script src='source/scripts/storms/init.js'></script>
+<link rel='stylesheet' href='source/scripts/storms/style.css'>
+<script src='source/scripts/storms/init-fixed-joint.js'></script>
+<script src='source/scripts/storms/init-modifiable-joint.js'></script>
+<script src='source/scripts/storms/init-training-dib.js'></script>
+
+<script src='source/scripts/init-info-plane.js'></script>
+<script src='source/scripts/init-storms.js'></script>
+<script src='source/scripts/init-animate-steps.js'></script>
+<script src='source/scripts/init-embed-vis.js'></script>
+<script src='source/scripts/init-swoopy.js'></script> 
