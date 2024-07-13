@@ -22,14 +22,6 @@ window.initInfoTelegraph = async function({sel, state, isBig=true}){
   d3.drawAxis(c)
   state.pointHighlighter = -1
 
-  state.renderAll.pointHighlighter?.fns.push(() => {
-    bars.data(state.info_ins_all[state.pointHighlighter])
-    bars
-    .attr("x", function(d, i) { return barx(barkeys[i]); })
-    .attr("y", function(d, i) { return bary(d); })
-    .attr("height", function(d, i) { return actualHeight - bary(d); })
-    })
-
   bars_margin = {left: leftMargin, right: rightMargin, top: topMargin, bottom: bottomMargin}
   bars_width = 100
   var bars_svg = sel
@@ -40,41 +32,49 @@ window.initInfoTelegraph = async function({sel, state, isBig=true}){
     .attr("transform",
           "translate(" + bars_margin.left + "," + bars_margin.top + ")");
 
-  var barx = d3.scaleBand()
+  state.barx = d3.scaleBand()
   .range([ 0, bars_width ])
   .domain(['townA', 'townB'])
   .padding(0.2);
 
   bars_svg.append("g")
     .attr("transform", "translate(0," + actualHeight + ")")
-    .call(d3.axisBottom(barx))
+    .call(d3.axisBottom(state.barx))
     .selectAll("text")
       .attr("transform", "translate(15,0)rotate(0)")
       .style("text-anchor", "end");
 
   // Add Y axis
-  var bary = d3.scaleLinear()
+  state.bary = d3.scaleLinear()
     .domain([0, 1])
     .range([ actualHeight, 0]);
   bars_svg.append("g")
-    .call(d3.axisLeft(bary));
+    .call(d3.axisLeft(state.bary));
 
   // Bars
   barkeys = ['townA', 'townB']
   dummyData = [0.5, 0.75]
-  bars = bars_svg.selectAll("mybar")
+  state.bars = bars_svg.selectAll("mybar")
     .data(dummyData)
     .enter()
     .append("rect")
-      .attr("x", function(d, i) { return barx(barkeys[i]); })
-      .attr("y", function(d, i) { return bary(d); })
-      .attr("width", barx.bandwidth())
-      .attr("height", function(d, i) { return actualHeight - bary(d); })
+      .attr("x", function(d, i) { return state.barx(barkeys[i]); })
+      .attr("y", function(d, i) { return state.bary(d); })
+      .attr("width", state.barx.bandwidth())
+      .attr("height", function(d, i) { return actualHeight - state.bary(d); })
       .attr("fill", function(d, i) {return util.colors.bars[i];})
 
   c.svg.select('.y').lower()  // z order
 
   util.addAxisLabel(c, 'Total information from other towns (bits)', 'Information about your town (bits)')
+
+  state.renderAll.pointHighlighter?.fns.push(() => {
+    state.bars.data(state.info_ins_all[state.pointHighlighter])
+    state.bars
+    .attr("x", function(d, i) { return state.barx(barkeys[i]); })
+    .attr("y", function(d, i) { return state.bary(d); })
+    .attr("height", function(d, i) { return actualHeight - state.bary(d); })
+    })
 
   state.p00 = 0.1
   state.p01 = 0.2

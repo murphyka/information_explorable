@@ -94,13 +94,13 @@ window.initInfoTelegraphSingle = async function({sel, state, isBig=true}){
     .call(d3.axisLeft(bary));
 
   // Bars
-  barkeys = ['Transmitted info']
+  barkey = ['Transmitted info']
   infoVal = [await info.array()]
   bars = bars_svg.selectAll("mybar")
     .data(infoVal)
     .enter()
     .append("rect")
-      .attr("x", function(d, i) { return barx(barkeys[i]); })
+      .attr("x", function(d, i) { return barx(barkey[i]); })
       .attr("y", function(d, i) { return bary(d); })
       .attr("width", barx.bandwidth())
       .attr("height", function(d, i) { return actualHeight - bary(d); })
@@ -132,7 +132,7 @@ window.initInfoTelegraphSingle = async function({sel, state, isBig=true}){
     console.log(info)
     bars.data([info])
     bars
-    .attr("x", function(d, i) { return barx(barkeys[i]); })
+    .attr("x", function(d, i) { return barx(barkey[i]); })
     .attr("y", function(d, i) { return bary(d); })
     .attr("height", function(d, i) { return actualHeight - bary(d); })
 
