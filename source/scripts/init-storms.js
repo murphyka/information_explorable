@@ -7,22 +7,32 @@ window.stormState = window.stormStateX || {
 
 window.initStorms = async function(){
 
-  var state = stormState
-  state.renderAll = util.initRenderAll(['pointHighlighter', 'modJoint']);
+  var stateSingle = {}
+  stateSingle.renderAll = util.initRenderAll(['modNoise']);
+  window.initInfoTelegraphSingle({
+    sel: d3.select('.storm-telegraph-single'),
+    state: stateSingle,
+  })
+
+  var stateCombo = stormState
+  stateCombo.renderAll = util.initRenderAll(['pointHighlighter', 'modJoint']);
+
   window.initInfoTelegraph({
     sel: d3.select('.storm-telegraph'),
-    state,
+    state: stateCombo,
   })
 
   window.initInfoTelegraphModJoint({
     sel: d3.select('.storm-telegraph-mod-joint'),
-    state,
+    state: stateCombo,
   })
 
   window.initInfoTelegraphDIB({
     sel: d3.select('.storm-telegraph-dib'),
-    state,
+    state: stateCombo,
   })
+
+
 
 
 }

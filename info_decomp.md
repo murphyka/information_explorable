@@ -20,12 +20,24 @@ You might mention the overall size or something about the rear of the vehicle, h
 The goal of this post is to build intuition around localizing relevant information, something we naturally do when making sense of the world, and show how it can be formulated with machine learning as a powerful and practical route to interpretability.
 The methodological long and short (**TL;DR**) is that we'll add a loss on the information used about different features in the data, upstream of any model, and it will reveal the most relevant variation contained in the features.  
 
-### Information as communicating distinctions
+### Information from the perspective of communicating distinctions
 
-You've been transported back in time to the days of the telegraph, and tasked with setting up a storm communication system with two neighboring towns.
-Each of the towns will send a <digits>0</digits> or <digits>1</digits> to tell about the weather conditions locally, and your town will use the information for its own warning system.
-The more money you spend on a transmission line, the lower the noise in the line and the more information that can be sent.<a class='footstart' key='transmission-caveats'></a>
-How much should you allocate to each of the transmission lines to the towns?
+There are some great intros to information theory out there<a class='footstart' key='other-info-resources'></a>; our goal here is a bit less broad, and that is to build intuition around the idea that you can actually point to where information is contained in data.  To do so, we'll view information as communicating distinctions.
+
+You've been transported back in time to the days of the telegraph, and tasked with setting up a storm communication system with neighboring towns.
+A town can send a binary signal to tell about their weather conditions locally -- essentially a thumbs up or a thumbs down, sent as the voltage in a wire -- and your town will use the information for its own warning system.
+
+The mutual information in two random variables is the amount that knowledge of one reduces your uncertainty about the other<a class='footstart' key='mutual_info'></a><a class='citestart' key='cover'></a>.
+Let's say the weather in a neighboring town is completely unpredictable one hour to the next, and balanced such that 50% of the time there's a storm and 50% of the time it's calm.
+That town's weather will be one of our random variables, which we'll call `$X$` -- it has two equally probable outcomes (stormy or calm), so it has one bit of uncertainty (aka entropy)<a class='footstart' key='entropy'></a>.
+The other random variable we'll use is the message your town receives from the transmission line, which we'll call `$U$`.
+The mutual information between the two, `$I(X;U)$`, is the amount of information transmitted per message -- it's the amount that receiving the message tells us about the weather.
+The more money you spend on the transmission line, the lower the noise in the line and the better you'll be able to guess the other town's weather.
+<div class='storm-telegraph-single row'></div>
+<div class='transmission-noise-slider'></div>
+
+
+Now let's say there are two neighboring towns to build transmission lines with, and you have a fixed budget for the whole project.  How much money should you allocate for each line?<a class='footstart' key='transmission-caveats'></a>
 
 A dataset has been collected, with the joint distribution shown below as a heatmap, where extreme weather is represented as <digits>1</digits> and unfortunately, tragically likely.<a class='footstart' key='weather-caveats'></a>
 
@@ -145,6 +157,9 @@ Interestingly this circle has a few wrinkles: this construction doesn't give an 
 
 ### Footnotes
 
+<a class='footend' key='other-info-resources'></a>
+Two of my favorites are [this classic from Christopher Olah](https://colah.github.io/posts/2015-09-Visual-Information/) and [3blue1brown's excellent video](https://youtu.be/v68zYyaEmEA) of information theory applied to wordle.
+
 <a class='footend' key='transmission-caveats'></a> 
 assuming there is some standard operating voltage
 
@@ -209,6 +224,7 @@ Boaz Barak, Benjamin L. Edelman, Surbhi Goel, Sham Kakade, Eran Malach, Cyril Zh
 <script src='source/scripts/tabular/init.js'></script>
 
 <link rel='stylesheet' href='source/scripts/storms/style.css'>
+<script src='source/scripts/storms/init-single-line.js'></script>
 <script src='source/scripts/storms/init-fixed-joint.js'></script>
 <script src='source/scripts/storms/init-modifiable-joint.js'></script>
 <script src='source/scripts/storms/init-training-dib.js'></script>

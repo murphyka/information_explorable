@@ -72,8 +72,41 @@ window.initProbabilitySliders = function({sel, state, hasColor=true}){
         state.renderAll.modJoint()
       })
     slider.sel.select('val').text(slider.getVal())
-      
     state.renderAll.modJoint.fns.push(() => {
+      var value = slider.getVal()
+      slider.sel.select('val').text(value)
+      slider.sel.select('input').node().value = value
+    })
+
+  })
+}
+
+window.initNoiseSlider = function({sel, state, hasColor=true}){
+  var sliders = ['noise'].map((key, i) => ({
+    sel: sel.append('div.slider'),
+    key,
+    i,
+    getVal: _ => state[key],
+    setVal: d => state[key] = +d
+  }))
+
+  sliders.forEach(slider => {
+    slider.sel.html(`
+      <div style='color:${hasColor ? util.colors[slider.key + 'Input'] : ''}'>
+        ${slider.key}: <val></val>
+      </div>
+      <div>
+        <input type=range min=${state.min_slider_value} max=${state.max_slider_value} step=${state.slider_step_size} value=${slider.getVal()}></input>
+      </div>
+    `)
+
+    slider.sel.select('input[type="range"]')
+      .on('input', function () {
+        slider.setVal(this.value)
+        state.renderAll.modNoise()
+      })
+    slider.sel.select('val').text(slider.getVal())
+    state.renderAll.modNoise.fns.push(() => {
       var value = slider.getVal()
       slider.sel.select('val').text(value)
       slider.sel.select('input').node().value = value
