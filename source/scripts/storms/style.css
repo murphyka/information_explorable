@@ -17,3 +17,8 @@
 .annotation-container{
   z-index: 1000;
 }
+
+.area{    
+  fill: lightsteelblue;
+  stroke-width: 0;
+}

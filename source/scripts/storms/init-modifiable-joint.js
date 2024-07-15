@@ -45,6 +45,7 @@ window.initInfoTelegraphModJoint = async function({sel, state, isBig=true}){
     state,
     hasColor: false,
   });
+  
 
   dummyData = []
   for (let i=0; i<400; i++) {
@@ -84,11 +85,4 @@ window.initInfoTelegraphModJoint = async function({sel, state, isBig=true}){
   state.pareto1 = paretoPathSel1
 
   state.renderAll.modJoint()
-
-
-  // console.log(dots.selectAll("circle"))
-  // dots.attr("r", function (d, i) { return i/100})
-
 }
-
-// window.initStorms?.()

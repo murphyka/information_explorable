@@ -74,11 +74,33 @@ window.initProbabilitySliders = function({sel, state, hasColor=true}){
     slider.sel.select('val').text(slider.getVal())
     state.renderAll.modJoint.fns.push(() => {
       var value = slider.getVal()
-      slider.sel.select('val').text(value)
+      slider.sel.select('val').text(parseFloat(value).toFixed(2))
       slider.sel.select('input').node().value = value
     })
 
   })
+
+  const gateButtons = [
+  ['AND', [0, 0, 0, 1]],
+  ['OR', [0, 1, 1, 1]],
+  ['XOR', [0, 1, 1, 0]],
+  ['NAND', [1, 1, 1, 0]],
+  ]
+  gateButtons.forEach(stuff => {
+    buttonSel = sel.append('div.button')
+    buttonSel.html(`<input type="button" class="button" value=${stuff[0]}>`)
+    .on('click', function () {
+      state.p00 = stuff[1][0]; state.p01 = stuff[1][1]; state.p10 = stuff[1][2]; state.p11 = stuff[1][3]
+      state.renderAll.modJoint()
+    })
+  })
+  buttonSel = sel.append('div.button')
+  buttonSel.html(`<input type="button" class="button" value="random">`)
+  .on('click', function () {
+    state.p00 = Math.random(); state.p01 = Math.random(); state.p10 = Math.random(); state.p11 = Math.random()
+    state.renderAll.modJoint()
+  })
+  
 }
 
 window.initNoiseSlider = function({sel, state, hasColor=true}){
@@ -86,17 +108,20 @@ window.initNoiseSlider = function({sel, state, hasColor=true}){
     sel: sel.append('div.slider'),
     key,
     i,
-    getVal: _ => state[key],
+    getVal: _ => parseFloat(state[key]).toFixed(2),
     setVal: d => state[key] = +d
   }))
 
   sliders.forEach(slider => {
     slider.sel.html(`
       <div style='color:${hasColor ? util.colors[slider.key + 'Input'] : ''}'>
-        ${slider.key}: <val></val>
+        Line noise (V): <val></val>
       </div>
       <div>
         <input type=range min=${state.min_slider_value} max=${state.max_slider_value} step=${state.slider_step_size} value=${slider.getVal()}></input>
+      </div>
+      <div style='color:${hasColor ? util.colors[slider.key + 'Input'] : ''}'>
+        Transmitted information (bits): <val2></val2>
       </div>
     `)
 

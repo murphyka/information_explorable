@@ -69,9 +69,9 @@ function parsePost(path){
     .split('\n---\n')
 
   var html = body
-  if (!path.includes('.html')){
-    html = path.includes('2022-10-14-llm-tricks-of-the-trade.md') ? marked(body) : marked(body, {renderer})
-  }
+
+  html = marked(body, {renderer})
+  
 
   var post = {html}
   top.split('\n').forEach(line => {

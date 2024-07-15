@@ -443,3 +443,25 @@ a:visited {
   text-align: right;
 }
 
+
+.inline-equation{
+  max-width: 850px;
+  overflow: hidden;
+}
+
+
+.katex-html{
+  display: none;
+}
+
+
+img,figcaption {
+  display: inline-block;
+  vertical-align: middle;
+  color: teal;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+}
