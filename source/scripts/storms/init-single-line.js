@@ -24,6 +24,7 @@ window.initInfoTelegraphSingle = async function({sel, state, isBig=true}){
   d3.drawAxis(c)
 
   util.addAxisLabel(c, 'Message received, u (volts)', 'P(u)')
+  
 
   state.noise = 1.
 

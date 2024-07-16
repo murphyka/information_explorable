@@ -80,7 +80,7 @@ window.util = (function(){
     if (y2Text) {
       c.svg
         .append('g')
-        .translate([-yOffset+c.width, c.height/2])
+        .translate([xOffset+c.width, c.height/2])
         .append('text.axis-label')
         .text(y2Text)
         .at({textAnchor: 'middle', fill: '#000', transform: 'rotate(-90)'})

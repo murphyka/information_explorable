@@ -49,7 +49,7 @@ limitations under the License.
 
 window.initProbabilitySliders = function({sel, state, hasColor=true}){
   var sliders = ['p00', 'p01', 'p10', 'p11'].map((key, i) => ({
-    sel: sel.append('div.slider'),
+    sel: sel.append('div.slider'),//.style("position", "relative").style("margin-left", "-150px"),
     key,
     i,
     getVal: _ => state[key],
@@ -85,9 +85,11 @@ window.initProbabilitySliders = function({sel, state, hasColor=true}){
   ['OR', [0, 1, 1, 1]],
   ['XOR', [0, 1, 1, 0]],
   ['NAND', [1, 1, 1, 0]],
+  ['MirrorA', [0, 0, 1, 1]],
+  ['MirrorB', [0, 1, 0, 1]],
   ]
   gateButtons.forEach(stuff => {
-    buttonSel = sel.append('div.button')
+    buttonSel = sel.append('div.button')//.style("position", "relative").style("margin-left", "800px"),
     buttonSel.html(`<input type="button" class="button" value=${stuff[0]}>`)
     .on('click', function () {
       state.p00 = stuff[1][0]; state.p01 = stuff[1][1]; state.p10 = stuff[1][2]; state.p11 = stuff[1][3]
@@ -101,6 +103,16 @@ window.initProbabilitySliders = function({sel, state, hasColor=true}){
     state.renderAll.modJoint()
   })
   
+}
+
+window.initParetoDisplay = function({sel}){
+  buttonSel = sel.append('div.switch')
+  buttonSel.html(`<label class="switch">
+  <input type="checkbox">
+  <span class="slider round"></span>
+</label>`)
+
+
 }
 
 window.initNoiseSlider = function({sel, state, hasColor=true}){

@@ -22,15 +22,15 @@ window.initStorms = async function(){
     state: stateCombo,
   })
 
-  window.initInfoTelegraphModJoint({
-    sel: d3.select('.storm-telegraph-mod-joint'),
-    state: stateCombo,
-  })
+  // window.initInfoTelegraphModJoint({
+  //   sel: d3.select('.storm-telegraph-mod-joint'),
+  //   state: stateCombo,
+  // })
 
-  window.initInfoTelegraphDIB({
-    sel: d3.select('.storm-telegraph-dib'),
-    state: stateCombo,
-  })
+  // window.initInfoTelegraphDIB({
+  //   sel: d3.select('.storm-telegraph-dib'),
+  //   state: stateCombo,
+  // })
 
 
 

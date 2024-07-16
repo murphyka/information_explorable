@@ -39,12 +39,6 @@ window.initInfoTelegraphModJoint = async function({sel, state, isBig=true}){
   state.p01 = 0.2
   state.p10 = 0.4
   state.p11 = 0.9
-
-  window.initProbabilitySliders({
-    sel: d3.select('.storm-probability-sliders').html(''),
-    state,
-    hasColor: false,
-  });
   
 
   dummyData = []

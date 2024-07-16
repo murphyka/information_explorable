@@ -23,12 +23,12 @@ The goal of this post is to build intuition around localizing information, somet
 The long and short (**TL;DR**) is that we can view the information in data as specific distinctions worth making, in that these distinctions tell us the most about some related quantity we care about.
 
 There are some great intros to information theory online<a class='footstart' key='other-info-resources'></a>. 
-The scope here is a little less broad so that we can really hammer home the notion of pointing to specific bits that contain information we care about, though I think that by the end you can walk away with a deeper understanding of information theory more generally.  For this post, we'll repeatedly talk about information in terms of communication between two parties.  
+The scope here is a little less broad so that we can really hammer home the notion of pointing to specific bits that contain information we care about, though hopefully by the end you'll see it's all quite general.  For this post, we'll repeatedly talk about information in terms of communication between two parties.  
 
 ### Information from the perspective of communicating distinctions
 
-You've been transported back in time to the days of the telegraph, and tasked with setting up a storm communication system with neighboring towns.
-A town can send a binary signal to tell about their weather conditions locally -- essentially a thumbs up or a thumbs down, sent as the voltage in a wire -- and your town will use the information for its own warning system.
+You've been transported back in time to the days of the telegraph and tasked with setting up a storm communication system with neighboring towns.
+A nearby town can send a binary signal to tell about their weather conditions locally -- essentially a thumbs up or a thumbs down, sent as the voltage in a wire -- and your town will use the information for its own warning system.
 
 <div class="container">
   <figure>
@@ -37,37 +37,38 @@ A town can send a binary signal to tell about their weather conditions locally -
   </figure>
 </div>
 
-The mutual information in two random variables is the amount that knowledge of one reduces your uncertainty about the other<a class='footstart' key='mutual_info'></a>.
-Let's say the weather in a neighboring town is completely unpredictable one hour to the next<a class='footstart' key='weather-caveats'></a>, and balanced such that 50% of the time it's calm and 50% of the time there's a storm .
+The mutual information in two random variables is the amount that learning the outcome of one reduces your uncertainty about the other<a class='footstart' key='mutual_info'></a>.
+Let's say the weather in a neighboring town is completely unpredictable one hour to the next<a class='footstart' key='weather-caveats'></a>, and balanced such that 50% of the time it's calm and 50% of the time there's a storm.
 That town's weather will be one of our random variables, which we'll call `$X$` -- it has two equally probable outcomes (calm or stormy), so it has one bit of uncertainty (aka entropy)<a class='footstart' key='entropy'></a>.
-The other random variable we'll use is the message your town receives from the transmission line, which we'll call `$U$`.
+The other random variable we'll use is the message your town receives from the telegraph line, which we'll call `$U$`.
 The mutual information between the two, `$I(X;U)$`, is the amount of information transmitted per message -- it's the amount that receiving the message tells us about the other town's weather.
-The more money you spend on the transmission line, the lower the noise in the line and the better you'll be able to guess the other town's weather.
+The more money you spend on the telegraph line, the lower the noise in the line and the better you'll be able to infer the other town's weather.
 <div class="container">
   <div class='transmission-noise-slider'></div>
 </div>
 
 <div class='storm-telegraph-single row'></div>
 
-
-**Why is the transmitted information lower when the noise increases?**  Once the distributions `$p(u|x=-1)$` and `$p(u|x=+1)$` overlap, there's a decent chance you receive a 0 volt signal, in which case you have no idea whether the original signal was `$-1$` or `$+1$`.  Or, you receive 0.1V, in which case you can be slightly more sure that the other town sent +1, but you're still quite uncertain.  The combination of all of these scenarios means that, on average, you receive less than one bit per message.
+**Why is the transmitted information lower when the noise increases?**  Once the distributions `$p(u|x=-1)$` and `$p(u|x=+1)$` overlap, there's a decent chance you receive a 0 volt signal, in which case you have no idea whether the original signal was `$-1$` or `$+1$`.  Or, you receive 0.1V, in which case you can be slightly more sure that the nearby town sent `$+1$`, but you're still quite uncertain.  The combination of all of these scenarios means that, on average, you receive less than one bit per message.
 
 #### Information from multiple sources
 
-Now let's say there are two neighboring towns to build transmission lines with, and you have a fixed budget for the whole project.  How much money should you allocate for each line?  Importantly, due to the surrounding landscape, the weather is not trivially related between all three towns.  A dataset has been collected, with the joint distribution shown below as a heatmap, where extreme weather is represented as <digits>1</digits>.
+Now let's say there are two neighboring towns to build telegraph lines between, and you have a fixed budget for the whole project.  How much money should you allocate for each line?  Importantly, due to the surrounding landscape, the weather is not trivially related between all three towns.  A dataset has been collected, with the joint distribution shown below as a heatmap, with extreme weather is represented as <digits>1</digits>.
+<div class='sticky-container'>
 
+<div class='storm-telegraph row sticky'></div>
 
-<div class='storm-telegraph row'></div>
+<br>
+<br>
+<label class="switch">
+  <input type="checkbox" name="pareto">
+  <span class="toggle round"></span> 
+</label>
+Display Pareto
 
 With this distribution, we can simulate the full spectrum of information transmission rates from the two towns.  
 Adjust the slider bars to allow less or more information from each town.
 <div class='storm-probability-sliders'></div>
-<div class='storm-telegraph-mod-joint row'></div>
-
-<div class='storm-telegraph-dib row'></div>
-
-What does it mean to receive a partial bit from town A?  
-Town A sends a discrete variable as input, but noise in the transmission line can cause you to receive the opposite output with some probability.
 
 By displaying the total information in versus the information out, we see there is a spectrum of information allocations starting from zero info from the towns and zero info about your own storm likelihood (the origin) to two bits from the towns and maximal info about your own town (the right hand side).
 In between, there are partial information allocations, with a Pareto front (the black curve) of the best allocations for a given budget.
@@ -86,11 +87,31 @@ You can get very far with just a few building blocks in information theory, star
 
 While the view of mutual information in terms of uncertainty reduction is great, we'll get more mileage here with a slightly different perspective.
 Instead, information can be seen as allowing distinctions to be made between outcomes of one variable when given another. 
+</div>
+
+**At a high level,** the variation in the sources (the weather of towns A and B) is not all equal in the amount of information it shares with the target variable (your town's weather).
+By mapping out the predictive error in all ways of selecting partial bits from the sources, the variation is sorted and we can "point" to the variation that is most shared with the target. 
+Because mutual information is just shared variation, we've localized the information shared between the sources and the target.
+
+#### Groups of pixels
+
+Occasionally the local board game clubs like to borrow the telegraph lines to play a cooperative game.
+The night before, all three clubs meet in one of the towns and draw out a board of light and dark squares, like the one below.
+
+Then, roles are assigned.
+Two towns will be communicators and the third will aggregate information.
+After working together on communication schemes, the clubs go home and play the following day.
+The game proceeds as follows: a square on the board is chosen at random by the two communicator towns, and its position must be communicated to the aggregator via the information-limited telegraph lines.
+The aggregator uses the limited information to make a prediction about whether the selected square was light or dark.
+After a series of rounds, the towns meet again to check the success of the predictions.
+
+For simplicity, we'll say towns A and B are the communicators.
+A selects a row at random and B selects a column at random.
 
 
-### Information about bike rentals
 
-<div class='sticky-container'>
+#### Information about bike rentals
+
 <div class='tabular-decomp row'></div>
 
 text
