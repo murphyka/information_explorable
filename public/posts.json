@@ -2,8 +2,9 @@
   {
     "template": "post_v2.html",
     "title": "Where is the information in data?  ",
+    "subtitle": "An interactive tutorial about identifying the most relevant variation in data through compression",
     "socialsummary": "An interactive introduction to information decomposition as a route to interpretability.",
-    "authors": "Kieran Murphy, Dani Bassett",
+    "authors": "<a href=https://kieranamurphy.com>Kieran Murphy</a>, <a href=https://complexsystemsupenn.com>Dani Bassett</a>",
     "date": "July 2024"
   }
 ]

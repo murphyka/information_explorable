@@ -15,7 +15,19 @@ body{
 }
 
 .headline{
-  max-width: 500px;
+  max-width: 600px;
+}
+
+.tagline{
+  text-align: center;
+  font-family: 'Google Sans', sans-serif;
+  font-weight: 100;
+  margin-top: .5em;
+  margin-bottom: 1.5em;
+  font-size: 20px;
+  max-width: 600px;
+  color: teal;
+
 }
 
 .highlight-yellow{

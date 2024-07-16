@@ -1,10 +1,11 @@
 ---
 template: post_v2.html
 title: Where is the information in data?  
+subtitle: An interactive tutorial about identifying the most relevant variation in data through compression
 socialsummary: An interactive introduction to information decomposition as a route to interpretability.
 shareimg: 
 shareimgabstract: 
-authors: Kieran Murphy, Dani Bassett
+authors: <a href=https://kieranamurphy.com>Kieran Murphy</a>, <a href=https://complexsystemsupenn.com>Dani Bassett</a>
 date: July 2024
 ---
 
@@ -17,13 +18,14 @@ Imagine someone asks you *"**Where is the information about whether something is
 </div>
 
 It might be an unusual phrasing, but you'd probably understand what they mean.
-You might mention the overall size or something about the rear of the vehicle, having an intuitive sense that there is specific variation among vehicles that best distinguishes cars from trucks and other variation that is irrelevant (e.g., the color).
+You might mention the overall size or something about the rear of the vehicle, having an intuitive sense that there is specific variation among vehicles that best distinguishes cars from trucks and other variation that is less relevant (e.g., the color).
 
-The goal of this post is to build intuition around localizing information, something we naturally do when making sense of the world, and show how it can be formulated with machine learning as a powerful and practical route to interpretability.
+The goal of this post is to build intuition around localizing information, something we naturally do to make sense of the world, and show how it can be formulated with machine learning as a powerful and practical route to interpretability.
 The long and short (**TL;DR**) is that we can view the information in data as specific distinctions worth making, in that these distinctions tell us the most about some related quantity we care about.
 
-There are some great intros to information theory online<a class='footstart' key='other-info-resources'></a>. 
-The scope here is a little less broad so that we can really hammer home the notion of pointing to specific bits that contain information we care about, though hopefully by the end you'll see it's all quite general.  For this post, we'll repeatedly talk about information in terms of communication between two parties.  
+This post presents a slightly different take on mutual information than other great intros to information theory<a class='footstart' key='other-info-resources'></a>.
+Rather than talking about the mutual information between two variables as something fixed in stone, we will introduce (and rely heavily on) auxiliary variables that encapsulate some variation in a variable and compress away the rest.
+The auxiliary variables can be thought of as the messages sent by one party who observes the original variable, to another party who will use the information.
 
 ### Information from the perspective of communicating distinctions
 
@@ -38,10 +40,11 @@ A nearby town can send a binary signal to tell about their weather conditions lo
 </div>
 
 The mutual information in two random variables is the amount that learning the outcome of one reduces your uncertainty about the other<a class='footstart' key='mutual_info'></a>.
-Let's say the weather in a neighboring town is completely unpredictable one hour to the next<a class='footstart' key='weather-caveats'></a>, and balanced such that 50% of the time it's calm and 50% of the time there's a storm.
-That town's weather will be one of our random variables, which we'll call `$X$` -- it has two equally probable outcomes (calm or stormy), so it has one bit of uncertainty (aka entropy)<a class='footstart' key='entropy'></a>.
-The other random variable we'll use is the message your town receives from the telegraph line, which we'll call `$U$`.
-The mutual information between the two, `$I(X;U)$`, is the amount of information transmitted per message -- it's the amount that receiving the message tells us about the other town's weather.
+Let's say the weather in a neighboring town (town A) is completely unpredictable one hour to the next<a class='footstart' key='weather-caveats'></a>, and balanced such that 50% of the time it's calm and 50% of the time there's a storm.
+That town's weather will be one of our "source" random variables, which we'll call `$X_A$` -- it has two equally probable outcomes (calm or stormy), so it has one bit of uncertainty (aka entropy)<a class='footstart' key='entropy'></a>.
+
+The message your town receives from the telegraph line will be our auxiliary variable, containing some amount of information about `$X_A$`, and we'll call it `$U_A$`.
+The mutual information between the two, `$I(X_A;U_A)$`, is the amount of information transmitted per message -- it's the amount that receiving a message reduces your uncertainty about the other town's weather.
 The more money you spend on the telegraph line, the lower the noise in the line and the better you'll be able to infer the other town's weather.
 <div class="container">
   <div class='transmission-noise-slider'></div>
@@ -49,11 +52,17 @@ The more money you spend on the telegraph line, the lower the noise in the line 
 
 <div class='storm-telegraph-single row'></div>
 
-**Why is the transmitted information lower when the noise increases?**  Once the distributions `$p(u|x=-1)$` and `$p(u|x=+1)$` overlap, there's a decent chance you receive a 0 volt signal, in which case you have no idea whether the original signal was `$-1$` or `$+1$`.  Or, you receive 0.1V, in which case you can be slightly more sure that the nearby town sent `$+1$`, but you're still quite uncertain.  The combination of all of these scenarios means that, on average, you receive less than one bit per message.
+**Why is the transmitted information lower when the noise increases?**  As the distributions `$p(u|x=-1)$` and `$p(u|x=+1)$` overlap, there's a growing chance of receiving a low voltage signal (i.e., around 0V), in which case you remain uncertain about whether the original signal was `$-1$` or `$+1$` even after receiving the message.  The transmitted information can **at most** reduce your uncertainty by one bit because that is the amount of uncertainty you started with, so as the chance of receiving ambiguous messages grows, the transmitted information necessarily drops.  
 
 #### Information from multiple sources
 
-Now let's say there are two neighboring towns to build telegraph lines between, and you have a fixed budget for the whole project.  How much money should you allocate for each line?  Importantly, due to the surrounding landscape, the weather is not trivially related between all three towns.  A dataset has been collected, with the joint distribution shown below as a heatmap, with extreme weather is represented as <digits>1</digits>.
+Now let's say there are two neighboring towns (towns A and B) with which to build telegraph lines, and you have a fixed budget for the whole project.  How much money should you allocate for each line?  Importantly, due to the surrounding landscape, the weather is not trivially related between their towns and yours.  A dataset has been collected, with the conditional distributions `$p(y=\text{stormy} |x_\text{A}, x_\text{B})$` shown below as a heatmap.
+
+<div class='storm-heatmap'></div>
+
+Now we have a "target" random variable: your town's weather, which we'll call `$Y$`. 
+We want to identify the most relevant variation in the sources, `$X_A$` and `$X_B$`, to get the most value out of our investment in telegraph lines.
+
 <div class='sticky-container'>
 
 <div class='storm-telegraph row sticky'></div>

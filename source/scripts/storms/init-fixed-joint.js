@@ -135,8 +135,9 @@ window.initInfoTelegraph = async function({sel, state, isBig=true}){
     .attr("transform", "translate(0," + actualHeight + ")")
     .call(d3.axisBottom(state.barx))
     .selectAll("text")
-      .attr("transform", "translate(15,0)rotate(0)")
-      .style("text-anchor", "end");
+      .attr("transform", "translate(0,0)rotate(0)")
+      .style("text-anchor", "middle")
+      .style("font-size", 14)
 
   // Add Y axis
   state.bary = d3.scaleLinear()

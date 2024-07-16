@@ -43,11 +43,10 @@ body{
 
 .byline{
   text-align: center;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.3em;
   margin-bottom: 40px;
   margin-top: -20px;
-
 }
 .byline b{
   font-weight: 400;
@@ -221,7 +220,7 @@ h1, .post-summary{
 }
 
 h1{
-  margin-bottom: 40px;
+  margin-bottom: 0px;
   margin-top: 50px;
 }
 
