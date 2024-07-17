@@ -1,6 +1,7 @@
 {
   "name": "explorable-ml",
   "dependencies": {
+    "braces": ">=3.0.3",
     "chokidar": "^1.7.0",
     "doc2txt": "^0.0.8",
     "googleapis": "39",
