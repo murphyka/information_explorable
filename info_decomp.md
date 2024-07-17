@@ -152,21 +152,10 @@ With `$X$` a random variable and `$p(x)$` the probability distribution regarding
 <a class='footend' key='mutual_info'></a> 
 With `$X$` and `$Y$` two random variables, the mutual information is `$I(X;Y)=H(X)-H(X|Y)=H(Y)-H(Y|X)$`.  It quantifies the amount of shared variation in the two random variables<a class='citestart' key='cover'></a>.
 
-<span class='fn-break'></span>
-Modular addition sounds simple and it is. We can easily train 1,000s of models and treat them like fruit flies in neuroscience: small enough such that it is feasible to extract their [connectome](https://www.science.org/doi/abs/10.1126/science.add9330) synapse-by-synapse, yet providing new interesting insights about the system more broadly. We can get a good understanding of the small models we've trained by visualizing all their internals.
-
-<span class='fn-break'></span>
-
 ### References
 
 <a class='citeend' key='cover'></a> Elements of Information Theory
 Cover, T. & Thomas, J. (1991). John Wiley & Sons, Inc.
-
-<a class='citeend' key='Omnigrok'></a> [Omnigrok: Grokking Beyond Algorithmic Data](https://arxiv.org/pdf/2210.01117.pdf)
-Liu, Z., Michaud, E. J., & Tegmark, M. (2022, September). In The Eleventh International Conference on Learning Representations.
-
-<p id='recirc'></p>
-<div class='recirc-feedback-form'></div>
 
 <link rel='stylesheet' href='source/third_party/footnote_v2.css'>
 <link rel='stylesheet' href='source/third_party/citation_v2.css'>

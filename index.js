@@ -58,9 +58,7 @@ var str = fs.readFileSync(public + '/../post_v2.html', 'utf8')
 var templateName = 'post_v2.html'
 templates[templateName] = d => eval('`' + str + '`')
 
-
 var posts = [parsePost(public + '/../info_decomp.md')]
-  
 function parsePost(path){
   var str = fs.readFileSync(path, 'utf8')
   if (str[0] == '<') str = str.split('License.\n-->')[1]
@@ -69,7 +67,6 @@ function parsePost(path){
     .split('\n---\n')
 
   var html = body
-
   html = marked(body, {renderer})
   
 
