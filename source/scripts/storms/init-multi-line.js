@@ -1,6 +1,7 @@
 
-window.initInfoTelegraph = async function({sel, state, isBig=true}){
-  sel.append("p").style("align-items", "center")
+window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true}){
+  sels = [selHeatmap, selRow]
+
   // Plot the frame
   var leftMargin = 50
   var rightMargin = 50
@@ -11,92 +12,101 @@ window.initInfoTelegraph = async function({sel, state, isBig=true}){
 
   state.p00 = 0.1
   state.p01 = 0.2
-  state.p10 = 0.4
+  state.p10 = 0.3
   state.p11 = 0.9
 
-  pdf_margin = {left: 35, right: rightMargin, top: topMargin, bottom: bottomMargin}
-  pdf_width = 100
-  var pdf_svg = sel
-  .append("svg")
-    .attr("width", pdf_width + pdf_margin.left + pdf_margin.right)
-    .attr("height", pdf_width + pdf_margin.top + pdf_margin.bottom)
-  .append("g")
-    .attr("transform",
-          "translate(" + pdf_margin.left + "," + pdf_margin.top + ")")
-  // Labels of row and columns
-  var rowLabels = ["stormy", "calm"]
-  var colLabels = ["stormy", "calm"]
+  pdf_data = [
+  {A: "calm", B: "calm", value: state.p00}, 
+  {A: "stormy", B: "calm", value: state.p10}, 
+  {A: "calm", B: "stormy", value: state.p01}, 
+  {A: "stormy", B: "stormy", value: state.p11}, 
+  ]
 
-  // Build X scales and axis:
-  var pdfx = d3.scaleBand()
-    .range([ 0, pdf_width ])
-    .domain(rowLabels)
-    .padding(0.01)
-  pdf_svg.append("g")
-    .attr("transform", "translate(0," + pdf_width + ")")
-    .call(d3.axisBottom(pdfx))
-    .selectAll("text")
-      .style("text-anchor", "middle")
-      .style("font-size", 14)
+  // Labels of row and columns
+  var rowLabels = ["calm", "stormy"]
+  var colLabels = ["calm", "stormy"]
+  state.pdf_svgs = []
+  state.pdfxs = []
+  state.pdfys = []
+  for (let j=0; j<2; j++) {
+    sels[j].append("p").style("align-items", "center")
+
+    pdf_margin = {left: 35, right: rightMargin, top: topMargin, bottom: bottomMargin}
+    pdf_width = 100
+    state.pdf_svgs.push(sels[j]
+    .append("svg")
+      .attr("width", pdf_width + pdf_margin.left + pdf_margin.right)
+      .attr("height", pdf_width + pdf_margin.top + pdf_margin.bottom)
+    .append("g")
+      .attr("transform",
+            "translate(" + pdf_margin.left + "," + pdf_margin.top + ")"))
+
+    // Build X scales and axis:
+    state.pdfxs.push(d3.scaleBand()
+      .range([ 0, pdf_width ])
+      .domain(rowLabels)
+      .padding(0.01))
+    state.pdf_svgs[j].append("g")
+      .attr("transform", "translate(0," + pdf_width + ")")
+      .call(d3.axisBottom(state.pdfxs[j]))
+      .selectAll("text")
+        .style("text-anchor", "middle")
+        .style("font-size", 14)
 
   pdfxOffset = 40
   pdfyOffset = -20
-  pdf_svg.append('g')
+  state.pdf_svgs[j].append('g')
       .translate([pdf_width/2, pdf_width + pdfxOffset])
       .append('text.axis-label')
       .text('A')
       .at({textAnchor: 'middle', fill: '#000', "font-weight": "bold"})
 
-  pdf_svg
+  state.pdf_svgs[j]
       .append('g')
       .translate([pdfyOffset, pdf_width/2])
       .append('text.axis-label')
       .text('B')
       .at({textAnchor: 'middle', fill: '#000', transform: 'rotate(-90)', "font-weight": "bold"})
 
-  pdf_svg.append('g')
+  state.pdf_svgs[j].append('g')
       .translate([pdf_width/2, -10])
       .append('text.axis-label')
       .text('p(stormy|A,B)')
       .at({textAnchor: 'middle', fill: '#000'})
 
   // Build X scales and axis:
-  var pdfy = d3.scaleBand()
+  state.pdfys.push(d3.scaleBand()
     .range([ pdf_width, 0 ])
     .domain(colLabels)
-    .padding(0.01);
-  pdf_svg.append("g")
-    .call(d3.axisLeft(pdfy))
+    .padding(0.01))
+  state.pdf_svgs[j].append("g")
+    .call(d3.axisLeft(state.pdfys[j]))
     .selectAll("text")
       .attr("transform", "translate(-10,-25)rotate(-90)")
       .style("text-anchor", "end")
       .style("font-size", 14)
 
-  pdf_svg.selectAll("path,line").remove();
+  state.pdf_svgs[j].selectAll("path,line").remove();
 
   // Build color scale
   var heatmapColor = d3.scaleLinear()
     .range(["white", "#69b3a2"])
     .domain([0,1])
 
-  pdf_data = [
-  {A: "stormy", B: "stormy", value: state.p00}, 
-  {A: "calm", B: "stormy", value: state.p10}, 
-  {A: "stormy", B: "calm", value: state.p01}, 
-  {A: "calm", B: "calm", value: state.p11}, 
-  ]
-  pdf_svg.selectAll()
+
+  state.pdf_svgs[j].selectAll()
       .data(pdf_data)
       .enter()
       .append("rect")
-      .attr("x", function(d) { return pdfx(d.A) })
-      .attr("y", function(d) { return pdfy(d.B) })
-      .attr("width", pdfx.bandwidth() )
-      .attr("height", pdfy.bandwidth() )
+      .attr("x", function(d) { return state.pdfxs[j](d.A) })
+      .attr("y", function(d) { return state.pdfys[j](d.B) })
+      .attr("width", state.pdfxs[j].bandwidth() )
+      .attr("height", state.pdfys[j].bandwidth() )
       .style("fill", function(d) { return heatmapColor(d.value)} )
+  }
 
   var c = d3.conventions({
-    sel: sel.append('div'),
+    sel: selRow.append('div'),
     width: actualWidth,
     height: actualHeight,
     margin: {left: leftMargin, right: rightMargin, top: topMargin, bottom: bottomMargin}
@@ -118,7 +128,7 @@ window.initInfoTelegraph = async function({sel, state, isBig=true}){
 
   bars_margin = {left: 35, right: rightMargin, top: topMargin, bottom: bottomMargin}
   bars_width = 100
-  var bars_svg = sel
+  var bars_svg = selRow
   .append("svg")
     .attr("width", bars_width + bars_margin.left + bars_margin.right)
     .attr("height", actualHeight + bars_margin.top + bars_margin.bottom)
@@ -230,6 +240,17 @@ window.initInfoTelegraph = async function({sel, state, isBig=true}){
     sel: d3.select('.storm-probability-sliders').html(''),
     state,
     hasColor: false,
+    
+  });
+  window.initProbabilityButtons({
+    sel: d3.select('#buttons1').html(''),
+    state,
+    columnIndex: 1,
+  });
+  window.initProbabilityButtons({
+    sel: d3.select('#buttons2').html(''),
+    state,
+    columnIndex: 2,
   });
   paretoDisplayCheckbox = d3.select('.switch').select('input[type="checkbox"]')
   paretoDisplayCheckbox.on("click", function() {
@@ -265,21 +286,22 @@ window.initInfoTelegraph = async function({sel, state, isBig=true}){
       [state.p10, state.p11]])
 
     pdf_data = [
-    {A: "stormy", B: "stormy", value: state.p00}, 
-    {A: "calm", B: "stormy", value: state.p10}, 
-    {A: "stormy", B: "calm", value: state.p01}, 
-    {A: "calm", B: "calm", value: state.p11}, 
+    {A: "calm", B: "calm", value: state.p00}, 
+    {A: "stormy", B: "calm", value: state.p10}, 
+    {A: "calm", B: "stormy", value: state.p01}, 
+    {A: "stormy", B: "stormy", value: state.p11}, 
     ]
-    pdf_svg.selectAll()
-      .data(pdf_data)
-      .enter()
-      .append("rect")
-      .attr("x", function(d) { return pdfx(d.A) })
-      .attr("y", function(d) { return pdfy(d.B) })
-      .attr("width", pdfx.bandwidth() )
-      .attr("height", pdfy.bandwidth() )
-      .style("fill", function(d) { return heatmapColor(d.value)} )
-
+    for (let i = 0; i < 2; i++) {
+      state.pdf_svgs[i].selectAll()
+        .data(pdf_data)
+        .enter()
+        .append("rect")
+        .attr("x", function(d) { return state.pdfxs[i](d.A) })
+        .attr("y", function(d) { return state.pdfys[i](d.B) })
+        .attr("width", state.pdfxs[i].bandwidth() )
+        .attr("height", state.pdfys[i].bandwidth() )
+        .style("fill", function(d) { return heatmapColor(d.value)} )
+    }
     p_xy_channeled = tf.stack([tf.sub(tf.ones([2, 2]), p_xy_channeled), p_xy_channeled], -1)
 
     p_xy_channeled = tf.div(p_xy_channeled, tf.sum(p_xy_channeled))
@@ -337,7 +359,6 @@ window.initInfoTelegraph = async function({sel, state, isBig=true}){
     .attr("cx", function(d) {return c.x(d[0])})
     .attr("cy", function(d) {return c.y(d[1])})
 
-    unique_info_vals = tf.concat([info_vals, tf.add(info_vals, 1.)])
     unique_info_vals = tf.linspace(0, 2, numberParetoPoints)
     min_vals = []
     min_error_allocs = []
@@ -363,4 +384,3 @@ window.initInfoTelegraph = async function({sel, state, isBig=true}){
   }
 
 }
-

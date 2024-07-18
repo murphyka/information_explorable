@@ -43,7 +43,7 @@ window.initInfoTelegraphSingle = async function({sel, state, isBig=true}){
   state.transmittedInfo = await info.array()
 
   state.max_slider_value = 5
-  state.min_slider_value = 0.1
+  state.min_slider_value = 0.2
   state.slider_step_size = 0.05
 
   state.renderAll.modNoise.fns.push(drawMessagePlane)
