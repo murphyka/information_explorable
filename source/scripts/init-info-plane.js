@@ -122,34 +122,35 @@ window.initInfoPlane = async function({sel, state, isBig=true, lossLabel, width=
     sel.at({x: c.width + 50, y: c.height/2 - 100 + featureIndex*20}) //, dy: '.33em'})
     sel.text(state.feature_labels[featureIndex])
   }
-  
-  // The label below the dotted line that follows the cursor... don't think we need this
-  // var hoverTick = c.svg.select('.x .tick')
-  //   .select(function(){ return this.parentNode.insertBefore(this.cloneNode(true), this.nextSibling) })
-  //   .st({opacity: 1}).classed('step-path', 1)
-  //   .raise()
 
-  // hoverTick.select('text').st({fill: '#000', fontWeight: 500})
-  // hoverTick.select('path').at({d: 'M 0 0 V ' + -c.height, stroke: '#000', strokeDasharray: '3 2'})
-
-  // state.renderAll.step.fns.push(d => {
-  //   var step = state.stepIndex*state.hyper.save_every
-
-  //   hoverTick.translate(c.x(step), 0)
-  //   hoverTick.select('text').text(d3.format(',')(step))
-  // })
-
-  // c.svg.append('rect')
-  //   .at({width: c.width, height: c.height + 30, fillOpacity: 0})
-  //   .on('mousemove touchmove', function(){
-  //     d3.event.preventDefault()
-
-  //     // last training run missing on some models
-  //     var mouseX = d3.clamp(0, d3.mouse(this)[0], c.width - .1)
-  //     state.stepIndex = Math.floor(c.x.clamp(1).invert(mouseX)) // state.hyper.save_every)
-  //     state.renderAll.step()
-  //   })
 }
+  
+// The label below the dotted line that follows the cursor... don't think we need this
+// var hoverTick = c.svg.select('.x .tick')
+//   .select(function(){ return this.parentNode.insertBefore(this.cloneNode(true), this.nextSibling) })
+//   .st({opacity: 1}).classed('step-path', 1)
+//   .raise()
+
+// hoverTick.select('text').st({fill: '#000', fontWeight: 500})
+// hoverTick.select('path').at({d: 'M 0 0 V ' + -c.height, stroke: '#000', strokeDasharray: '3 2'})
+
+// state.renderAll.step.fns.push(d => {
+//   var step = state.stepIndex*state.hyper.save_every
+
+//   hoverTick.translate(c.x(step), 0)
+//   hoverTick.select('text').text(d3.format(',')(step))
+// })
+
+// c.svg.append('rect')
+//   .at({width: c.width, height: c.height + 30, fillOpacity: 0})
+//   .on('mousemove touchmove', function(){
+//     d3.event.preventDefault()
+
+//     // last training run missing on some models
+//     var mouseX = d3.clamp(0, d3.mouse(this)[0], c.width - .1)
+//     state.stepIndex = Math.floor(c.x.clamp(1).invert(mouseX)) // state.hyper.save_every)
+//     state.renderAll.step()
+//   })
 
 window.initTabular?.()
 

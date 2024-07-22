@@ -281,6 +281,7 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
   state.renderAll.modJoint.fns.push(drawTelegraphPlane)
   state.renderAll.modJoint()
   async function drawTelegraphPlane (){
+
     await tf.nextFrame()
     var p_xy_channeled = tf.tensor([
       [state.p00, state.p01],
@@ -297,16 +298,26 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
         .data(pdf_data)
         .style("fill", function(d) { return heatmapColor(d.value)} )
     }
-    p_xy_channeled = tf.stack([tf.sub(tf.ones([2, 2]), p_xy_channeled), p_xy_channeled], -1)
+    p_xy_channeled = tf.tidy(() => {
+      return tf.stack([tf.sub(tf.ones([2, 2]), p_xy_channeled), p_xy_channeled], -1)
+    })
 
-    p_xy_channeled = tf.div(p_xy_channeled, tf.sum(p_xy_channeled))
+    p_xy_channeled = tf.tidy(() => {
+      return tf.div(p_xy_channeled, tf.sum(p_xy_channeled))
+    })
 
     p_xy = tf.reshape(p_xy_channeled, [-1, 2])
 
     p_y = tf.sum(p_xy, axis=0)
-    ent_y = tf.div(tf.sum(tf.mul(tf.neg(p_y), tf.log(p_y))), tf.log(2))
-    noise_vectors = tf.reshape(tf.stack(tf.meshgrid(noise_vals, noise_vals,  {'indexing': 'ij'}), -1), [-1, 2])
-    info_vectors = tf.reshape(tf.stack(tf.meshgrid(info_vals, info_vals, {'indexing': 'ij'}), -1), [-1, 2])
+    ent_y = tf.tidy(() => {
+      return tf.div(tf.sum(tf.mul(tf.neg(p_y), tf.log(p_y))), tf.log(2))
+    })
+    noise_vectors = tf.tidy(() => {
+      return tf.reshape(tf.stack(tf.meshgrid(noise_vals, noise_vals,  {'indexing': 'ij'}), -1), [-1, 2])
+    })
+    info_vectors = tf.tidy(() => {
+      return tf.reshape(tf.stack(tf.meshgrid(info_vals, info_vals, {'indexing': 'ij'}), -1), [-1, 2])
+    })
     info_ins_full = tf.sum(info_vectors, axis=1)
 
     // state.info_ins_all = await info_vectors.array()
@@ -314,14 +325,20 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
       state.info_ins_all = vals
     })
 
-    p_ui_cond_xi = tf.concat([
-      tf.concat([tf.ones([numberSampleCompressions**2, 2, 1, 1]), tf.reshape(noise_vectors, [numberSampleCompressions**2, 2, 1, 1])], -1),
-      tf.concat([tf.reshape(noise_vectors, [numberSampleCompressions**2, 2, 1, 1]), tf.ones([numberSampleCompressions**2, 2, 1, 1])], -1)
+    p_ui_cond_xi = tf.tidy(() => {
+      return tf.concat([
+        tf.concat([tf.ones([numberSampleCompressions**2, 2, 1, 1]), tf.reshape(noise_vectors, [numberSampleCompressions**2, 2, 1, 1])], -1),
+        tf.concat([tf.reshape(noise_vectors, [numberSampleCompressions**2, 2, 1, 1]), tf.ones([numberSampleCompressions**2, 2, 1, 1])], -1)
       ], -2)  // 400, 2, 2, 2  ==>  400, channel, u, x
-    p_ui_cond_xi = tf.div(p_ui_cond_xi, tf.sum(p_ui_cond_xi, axis=-2, keepdims=true))
+    })
+    p_ui_cond_xi = tf.tidy(() => {
+      return tf.div(p_ui_cond_xi, tf.sum(p_ui_cond_xi, axis=-2, keepdims=true))
+    })
     reshape_channels = [1, 1, 1, 2, 2, 2]
     tile_channels = [numberSampleCompressions**2, 2, 2, 1, 1, 1]
-    p_uxy = tf.tile(tf.reshape(p_xy_channeled, reshape_channels), tile_channels)  // 400, 2, 2, 2, 2, 2  ==> 400, u1, u2, x1, x2, y
+    p_uxy = tf.tidy(() => {
+      return tf.tile(tf.reshape(p_xy_channeled, reshape_channels), tile_channels)  // 400, 2, 2, 2, 2, 2  ==> 400, u1, u2, x1, x2, y
+    })
     for (let channel_id = 0; channel_id < 2; channel_id++) {
       reshape_channels = [numberSampleCompressions**2, 1, 1, 1, 1, 1]
       reshape_channels[channel_id+1] = 2
@@ -331,19 +348,29 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
       tile_channels[channel_id+1] = 1
       tile_channels[channel_id+3] = 1
 
-      p_uxy = tf.mul(p_uxy, tf.tile(tf.reshape(tf.gather(p_ui_cond_xi, channel_id, axis=1), reshape_channels), tile_channels))
+      p_uxy = tf.tidy(() => {
+        return tf.mul(p_uxy, tf.tile(tf.reshape(tf.gather(p_ui_cond_xi, channel_id, axis=1), reshape_channels), tile_channels))
+      })
     }
     p_uy = tf.sum(p_uxy, axis=[3, 4])
     p_ux = tf.sum(p_uxy, axis=-1)
 
     p_u = tf.sum(p_ux, axis=[3, 4])
-    p_u_p_y = tf.mul(
+    p_u_p_y = tf.tidy(() => {
+      return tf.mul(
       tf.tile(tf.reshape(p_u, [numberSampleCompressions**2, 2, 2, 1]), [1, 1, 1, 2]), 
       tf.tile(tf.reshape(p_y, [1, 1, 1, 2]), [numberSampleCompressions**2, 2, 2, 1]))
+    })
 
-    ent_pupy = tf.sum(tf.mul(tf.neg(p_u_p_y), tf.where(tf.greater(p_u_p_y, 0), tf.log(p_u_p_y), 0)), axis=[1, 2, 3])
-    ent_puy = tf.sum(tf.mul(tf.neg(p_uy), tf.where(tf.greater(p_uy, 0), tf.log(p_uy), 0)), axis=[1, 2, 3])
-    info_y_u = tf.div(tf.sub(ent_pupy, ent_puy), tf.log(2))
+    ent_pupy = tf.tidy(() => {
+      return tf.sum(tf.mul(tf.neg(p_u_p_y), tf.where(tf.greater(p_u_p_y, 0), tf.log(p_u_p_y), 0)), axis=[1, 2, 3])
+    })
+    ent_puy = tf.tidy(() => {
+      return tf.sum(tf.mul(tf.neg(p_uy), tf.where(tf.greater(p_uy, 0), tf.log(p_uy), 0)), axis=[1, 2, 3])
+    })
+    info_y_u = tf.tidy(() => {
+      return tf.div(tf.sub(ent_pupy, ent_puy), tf.log(2))
+    })
     
     error_outs_all = ent_y.sub(info_y_u)
     // infoPlaneData = await tf.stack([info_ins_full, error_outs_all], 1).array()
@@ -371,17 +398,23 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
     min_vals = []
     min_error_allocs = []
     for (let i=0; i<numberParetoPoints; i++) {
-      matching_template = tf.where(tf.less(tf.abs(tf.sub(tf.sum(info_vectors, axis=1),tf.gather(unique_info_vals, i))), tf.tensor(0.03)), error_outs_all, tf.onesLike(error_outs_all).mul(10))
+      matching_template = tf.tidy(() => {
+        return tf.where(tf.less(tf.abs(tf.sub(tf.sum(info_vectors, axis=1),tf.gather(unique_info_vals, i))), tf.tensor(0.03)), error_outs_all, tf.onesLike(error_outs_all).mul(10))
+      })
       min_val = tf.min(matching_template)
       min_ind = tf.argMin(matching_template)
       min_vals.push(min_val)
       min_error_allocs.push(tf.gather(info_vectors, min_ind))
+      tf.dispose([matching_template, min_ind])
     }
 
     min_vals = tf.stack(min_vals)
     min_error_allocs = tf.stack(min_error_allocs)
 
-    tf.concat([tf.stack([unique_info_vals, min_vals], 1), min_error_allocs], 1).array().then(together => {
+    together = tf.tidy(() => {
+      return tf.concat([tf.stack([unique_info_vals, min_vals], 1), min_error_allocs], 1)
+    })
+    together.array().then(together => {
       state.pareto
         .at({d: line.y(d => state.c.y(d[1]))(together)})
       state.pareto0
@@ -389,6 +422,35 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
       state.pareto1
         .at({d: line.y(d => state.c.y2(d[3]))(together)})
     })
+
+  tf.dispose([
+    together,
+    min_error_allocs,
+    min_vals,
+    unique_info_vals,
+    matching_template,
+    infoPlaneData,
+    combinedVals,
+    error_outs_all,
+    info_y_u,
+    ent_puy,
+    ent_pupy,
+    p_u_p_y,
+    p_u,
+    p_uy,
+    p_ux,
+    p_uxy,
+    p_ui_cond_xi,
+    info_ins_full,
+    info_vectors,
+    noise_vectors,
+    ent_y,
+    p_y,
+    p_xy,
+    p_xy_channeled,
+    ])
+  console.log(tf.memory().numBytes, tf.memory().numTensors, tf.memory().unreliable)
+
   }
 
 }
