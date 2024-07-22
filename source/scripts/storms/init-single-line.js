@@ -30,15 +30,15 @@ window.initInfoTelegraphSingle = async function({sel, state, isBig=true}){
 
   const outputVoltages = tf.linspace(-voltageRange, voltageRange, 250)
   const binWidth = tf.gather(outputVoltages, 1).sub(tf.gather(outputVoltages, 0))
-  binWidth.print()
   var noiseTF = tf.tensor(state.noise)
-  var pdfData = tf.exp(outputVoltages.sub(1).div(noiseTF).square().neg().div(2))
-  pdfData = tf.div(pdfData, tf.sum(pdfData).mul(binWidth)).div(2)
+  const rootTwoPi = tf.tensor(2*Math.PI).sqrt()
+  // Really, plot the conditional dists divided by 2, so they add to the displayed joint
+  var pdfData = tf.exp(outputVoltages.sub(1).div(noiseTF).square().neg().div(2)).div(noiseTF).div(rootTwoPi).div(2)
 
   var bothpdf = pdfData.add(tf.reverse(pdfData))
 
   var info = tf.sum(bothpdf.mul(binWidth).mul(tf.where(tf.greater(bothpdf, 0), tf.log(bothpdf), 0)))
-  info = info.sub(tf.sum(pdfData.mul(2).mul(binWidth).mul(tf.where(tf.greater(pdfData, 0), tf.log(pdfData.mul(2)), 0))))
+  info = info.sub(tf.sum(pdfData.mul(binWidth).mul(2).mul(tf.where(tf.greater(pdfData, 0), tf.log(pdfData.mul(2)), 0))))
   info = tf.neg(info).div(tf.log(2))
   state.transmittedInfo = await info.array()
 
@@ -125,38 +125,40 @@ window.initInfoTelegraphSingle = async function({sel, state, isBig=true}){
   state.renderAll.modNoise()
   async function drawMessagePlane (){
     noiseTF = tf.tensor(state.noise)
-    pdfData = tf.exp(outputVoltages.sub(1).div(noiseTF).square().neg().div(2))
-    pdfData = tf.div(pdfData, tf.sum(pdfData.mul(binWidth))).div(2)
+    pdfData = tf.exp(outputVoltages.sub(1).div(noiseTF).square().neg().div(2)).div(noiseTF).div(rootTwoPi).div(2)
+    // pdfData = tf.div(pdfData, tf.sum(pdfData.mul(binWidth))).div(2)
     bothpdf = pdfData.add(tf.reverse(pdfData))
 
-    maxVal = await tf.max(bothpdf).array()
+    tf.max(bothpdf).array().then(maxVal => {
+      c.y.domain([0, maxVal*1.03])
+      c.svg.select('.y.axis').call(c.yAxis)
+    })
 
-    c.y.domain([0, maxVal*1.03])
-    c.svg.select('.y.axis').call(c.yAxis)
+    tf.stack([outputVoltages, pdfData], 1).array().then(plotData1 => {
+      plotData1 = [[-voltageRange, 0], ...plotData1, [voltageRange, 0]]  // to force the fill to the corners of the plot
+      ProbabilityPath1.at({d: line.y(d => c.y(d[1]))(plotData1)})
+    })
+    tf.stack([outputVoltages.neg(), pdfData], 1).array().then(plotData2 => {
+      plotData2 = [[voltageRange, 0], ...plotData2, [-voltageRange, 0]]
+      ProbabilityPath2.at({d: line.y(d => c.y(d[1]))(plotData2)})  
+    })
 
-    plotData1 = await tf.stack([outputVoltages, pdfData], 1).array()
-    plotData1 = [[-voltageRange, 0], ...plotData1, [voltageRange, 0]]  // to force the fill to the corners of the plot
-    plotData2 = await tf.stack([outputVoltages.neg(), pdfData], 1).array()
-    plotData2 = [[voltageRange, 0], ...plotData2, [-voltageRange, 0]]
-
-    plotDataBoth = await tf.stack([outputVoltages.neg(), bothpdf], 1).array()
-
-    ProbabilityPath1.at({d: line.y(d => c.y(d[1]))(plotData1)})
-    ProbabilityPath2.at({d: line.y(d => c.y(d[1]))(plotData2)})
-    ProbabilityPathBoth.at({d: line.y(d => c.y(d[1]))(plotDataBoth)})
+    tf.stack([outputVoltages.neg(), bothpdf], 1).array().then(plotDataBoth => {
+      ProbabilityPathBoth.at({d: line.y(d => c.y(d[1]))(plotDataBoth)})
+    })
 
     info = tf.sum(bothpdf.mul(binWidth).mul(tf.where(tf.greater(bothpdf, 0), tf.log(bothpdf), 0)))
     info = info.sub(tf.sum(pdfData.mul(2).mul(binWidth).mul(tf.where(tf.greater(pdfData, 0), tf.log(pdfData.mul(2)), 0))))
-    info = await tf.neg(info).div(tf.log(2)).array()
-    state.transmittedInfo = info
-
-    d3.select('val2').text(parseFloat(state.transmittedInfo).toFixed(2))
-    bars.data([info])
-    bars
-    .attr("x", function(d, i) { return barx(barkey[i]); })
-    .attr("y", function(d, i) { return bary(d); })
-    .attr("height", function(d, i) { return actualHeight - bary(d); })
-
+    tf.neg(info).div(tf.log(2)).array().then(val => {
+      state.transmittedInfo = val
+      d3.select('val2').text(parseFloat(state.transmittedInfo).toFixed(2))
+      bars.data([val])
+      bars
+      .attr("x", function(d, i) { return barx(barkey[i]); })
+      .attr("y", function(d, i) { return bary(d); })
+      .attr("height", function(d, i) { return actualHeight - bary(d); })
+    })
+    
   }
 
 }

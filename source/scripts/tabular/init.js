@@ -125,7 +125,6 @@ window.initTabular = async function(){
       "class": "no-shadow"
     }
   ]
-  initSwoopy(annotations)
   var topAccuracySel = d3.select('.tabular-decomp')//.classed('hidden-step', 1)
 
   var distMatrices = d3.select('.tabular-decomp-dist-matrices').html('')

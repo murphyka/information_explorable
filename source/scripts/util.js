@@ -16,10 +16,6 @@ window.util = (function(){
 
   var data = window.__datacache = window.__datacache || {}
 
-  function getRoot(){
-    return `https://storage.googleapis.com/uncertainty-over-space/tiny-transformers`
-  }
-
   async function getFile(path, uploadData={}){
     var [slug, type] = path.replaceAll('..', '').split('.')
 
@@ -45,7 +41,6 @@ window.util = (function(){
     data[slug] = parsed
     return parsed 
   }
-  
 
   var color = d3.interpolatePuOr
 
@@ -164,7 +159,7 @@ window.util = (function(){
     })
   }
 
-  return {getFile, color, colors, getRoot, addAxisLabel, ggPlot, ggPlotUpdate, sleep, npy2tfSlice, transpose, initRenderAll, titleFmt, keyFmt, addAria}
+  return {getFile, color, colors, addAxisLabel, ggPlot, ggPlotUpdate, sleep, npy2tfSlice, transpose, initRenderAll, titleFmt, keyFmt, addAria}
 
 })()
 

@@ -176,7 +176,7 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
   
 
   const numberSampleCompressions = 20
-  dummyData = await tf.zeros([numberSampleCompressions**2, 2]).array()
+  dummyData = Array(numberSampleCompressions**2).fill(Array(2).fill(0))
 
   state.pointHighlighter = Math.floor(Math.random() * numberSampleCompressions * numberSampleCompressions)
 
@@ -261,7 +261,7 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
   })
 
   const numberParetoPoints = 20
-  dummyData2 = await tf.zeros([numberParetoPoints, 2]).array() 
+  dummyData2 = Array(numberParetoPoints).fill(Array(2).fill(0)) 
   var line = d3.line().x(d => c.x(d[0])) 
   var paretoPathSel = c.svg.append('path')
     .at({strokeWidth: 2, stroke: "#000", fill: 'none'})
@@ -281,6 +281,7 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
   state.renderAll.modJoint.fns.push(drawTelegraphPlane)
   state.renderAll.modJoint()
   async function drawTelegraphPlane (){
+    await tf.nextFrame()
     var p_xy_channeled = tf.tensor([
       [state.p00, state.p01],
       [state.p10, state.p11]])
@@ -292,14 +293,8 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
     {A: "stormy", B: "stormy", value: state.p11}, 
     ]
     for (let i = 0; i < 2; i++) {
-      state.pdf_svgs[i].selectAll()
+      state.pdf_svgs[i].selectAll("rect")
         .data(pdf_data)
-        .enter()
-        .append("rect")
-        .attr("x", function(d) { return state.pdfxs[i](d.A) })
-        .attr("y", function(d) { return state.pdfys[i](d.B) })
-        .attr("width", state.pdfxs[i].bandwidth() )
-        .attr("height", state.pdfys[i].bandwidth() )
         .style("fill", function(d) { return heatmapColor(d.value)} )
     }
     p_xy_channeled = tf.stack([tf.sub(tf.ones([2, 2]), p_xy_channeled), p_xy_channeled], -1)
@@ -314,7 +309,10 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
     info_vectors = tf.reshape(tf.stack(tf.meshgrid(info_vals, info_vals, {'indexing': 'ij'}), -1), [-1, 2])
     info_ins_full = tf.sum(info_vectors, axis=1)
 
-    state.info_ins_all = await info_vectors.array()
+    // state.info_ins_all = await info_vectors.array()
+    info_vectors.array().then(vals => {
+      state.info_ins_all = vals
+    })
 
     p_ui_cond_xi = tf.concat([
       tf.concat([tf.ones([numberSampleCompressions**2, 2, 1, 1]), tf.reshape(noise_vectors, [numberSampleCompressions**2, 2, 1, 1])], -1),
@@ -348,16 +346,26 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
     info_y_u = tf.div(tf.sub(ent_pupy, ent_puy), tf.log(2))
     
     error_outs_all = ent_y.sub(info_y_u)
-    infoPlaneData = await tf.stack([info_ins_full, error_outs_all], 1).array()
+    // infoPlaneData = await tf.stack([info_ins_full, error_outs_all], 1).array()
+    
+    // min_error = await tf.min(error_outs_all).array()
+    // ent_y_out = await ent_y.array()
+    combinedVals = tf.stack([tf.min(error_outs_all), ent_y])
+    combinedVals.array().then(vals => {
+      min_error = vals[0]
+      ent_y_out = vals[1]
+      state.c.y.domain([min_error*0.97, ent_y_out*1.03])
+      state.c.svg.select('.y.axis').call(c.yAxis)
+      
+    })
+    infoPlaneData = tf.stack([info_ins_full, error_outs_all], 1)
+    infoPlaneData.array().then(vals => {
+      state.dots.data(vals)
+      state.dots
+      .attr("cx", function(d) {return c.x(d[0])})
+      .attr("cy", function(d) {return c.y(d[1])})
+    })
 
-    min_error = await tf.min(error_outs_all).array()
-    ent_y_out = await ent_y.array()
-    state.c.y.domain([min_error*0.97, ent_y_out*1.03])
-    state.c.svg.select('.y.axis').call(c.yAxis)
-    state.dots.data(infoPlaneData)
-    state.dots
-    .attr("cx", function(d) {return c.x(d[0])})
-    .attr("cy", function(d) {return c.y(d[1])})
 
     unique_info_vals = tf.linspace(0, 2, numberParetoPoints)
     min_vals = []
@@ -373,14 +381,14 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
     min_vals = tf.stack(min_vals)
     min_error_allocs = tf.stack(min_error_allocs)
 
-    together = await tf.concat([tf.stack([unique_info_vals, min_vals], 1), min_error_allocs], 1).array()
-    state.pareto
-      .at({d: line.y(d => state.c.y(d[1]))(together)})
-    state.pareto0
-      .at({d: line.y(d => state.c.y2(d[2]))(together)})
-    state.pareto1
-      .at({d: line.y(d => state.c.y2(d[3]))(together)})
-
+    tf.concat([tf.stack([unique_info_vals, min_vals], 1), min_error_allocs], 1).array().then(together => {
+      state.pareto
+        .at({d: line.y(d => state.c.y(d[1]))(together)})
+      state.pareto0
+        .at({d: line.y(d => state.c.y2(d[2]))(together)})
+      state.pareto1
+        .at({d: line.y(d => state.c.y2(d[3]))(together)})
+    })
   }
 
 }

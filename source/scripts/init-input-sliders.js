@@ -120,3 +120,11 @@ window.initNoiseSlider = function({sel, state, hasColor=true}){
   })
 }
 
+window.initTrainDIB = function({sel, state}) {
+
+  buttonSel = sel.append('div.button')//.style("position", "relative").style("margin-left", "800px"),
+  buttonSel.html(`<input type="button" class="pbutton" value="Train">`)
+  .on('click', function () {
+    state.renderAll.trainDIB()
+  })
+}

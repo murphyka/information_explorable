@@ -18,24 +18,24 @@ Imagine someone asks you *"**Where is the information about whether something is
 </div>
 
 It might be an unusual phrasing, but you'd probably understand what they mean.
-You might mention the overall size or something about the rear of the vehicle, having an intuitive sense that there is specific variation among vehicles that best distinguishes cars from trucks and other variation that is less relevant (e.g., the color).
+You might mention the overall size or something about the rear, understanding that there is specific variation among vehicles that best distinguishes cars from trucks and other variation that is less relevant (e.g., the color).
 
 The goal of this post is to build intuition around localizing information, something we naturally do to make sense of the world, and show how it can be formulated with machine learning as a route to interpretability.
 The long and short (**TL;DR**) is that we can view the information in data as specific distinctions worth making, in that these distinctions tell us the most about some other quantity we care about.
 
-This post presents a slightly different take on mutual information than other great intros to information theory<a class='footstart' key='other-info-resources'></a>.
+This post presents a slightly different take on mutual information than other intros to information theory<a class='footstart' key='other-info-resources'></a>.
 Rather than talking about the mutual information between two variables as something fixed in stone, we will introduce auxiliary variables that encapsulate some variation in a variable and compress away the rest.
 The auxiliary variables can be thought of as messages sent by one party who observes the original "source" variable, to another party who will use the information to predict a "target" variable<a class='footstart' key='info-bottleneck'></a>.
 
-### Information from the perspective of communicating distinctions
+### Communicating information
 
 You've been transported back in time to the days of the telegraph and tasked with setting up a storm communication system with neighboring towns.
-A town sends a binary signal to tell about their weather conditions locally -- `$-1$` volt for calm weather, `$+1$` volt for stormy weather -- and your town will use the information for its own warning system.
+A town sends a binary signal to tell about their weather conditions locally, using a voltage of `$-1$` for calm weather and `$+1$` for stormy weather.
 
 <div class="container">
   <figure>
     <img src="data/weather.jpg" width="400" />
-    <figcaption>Good weather: `$-1\text{V}$` <br>Bad weather: `$+1\text{V}$`</figcaption>
+    <figcaption>Calm weather: `$-1\text{V}$` <br>Stormy weather: `$+1\text{V}$`</figcaption>
   </figure>
 </div>
 
@@ -64,8 +64,8 @@ A dataset has been collected (using the random variable `$Y$` to describe the we
 
 <div class='storm-heatmap' align='center'></div>
 
-To get the most value out of the telegraph lines, we need to localize the information contained in the "sources" `$X_A$` and `$X_B$` about the "target" `$Y$`.
-In order to do that, we'll look at all the possible ways to communicate information about the sources -- effectively simulating all different budget allocations on the telegraph lines.
+To get the most value out of the telegraph lines, we need to localize the information contained in the sources `$X_A$` and `$X_B$` about the target `$Y$`.
+In order to do that, we'll look at all the possible ways to communicate information about the sources -- effectively simulating every possible budget allocation.
 
 <div class='sticky-container'>
 
@@ -83,7 +83,7 @@ Let's display these optimal information allocations by clicking the button below
 <label class="switch">
   <input type="checkbox" name="pareto">
   <span class="toggle round"></span> 
-</label> Display optimal information allocations
+</label> *Display optimal information allocations*
 
 The right vertical axis now displays the optimal amount of information to receive from each town.
 If your budget only allows for one total bit of transmitted information, it's best to get about 3/4 of a bit from town A and 1/4 of a bit from town B.
@@ -97,19 +97,49 @@ Adjust the sliders or click on the buttons below, and watch for changes in the o
   <div class='storm-probability-buttons' id='buttons2'></div>
 </div>
 
-When mirroring town A's weather (<digits>MirrorA</digits> button), we see that there is no information in B as it does nothing to reduce our predictive error.
+When mirroring town A's weather (<digits>MirrorA</digits>), we see that there is no information in B as it does nothing to reduce our predictive error.
 With the logic gates, we see that both towns contain relevant information because the optimal allocation is an equal split.
-<digits>XOR</digits> is unique among the logic gates in the way the error does not immediately decrease in the low-information regime, and the greater range of suboptimal information allocations. 
+<digits>XOR</digits> is unique among the logic gates in that the error is slow to decrease in the low-information regime, and in the greater discrepancy between optimal and suboptimal information allocations<a class='footstart' key='xor'></a>. 
 
-Whereas a typical information theory treatment of this scenario might have looked at `$I(X_A;Y)$`, `$I(X_B;Y)$`, and `$I(X_A,X_B;Y)$`, we explored the space of partial information allocations by introducing the auxiliary variables `$U_A` and `$U_B$`.
-Equivalently, we're searching through all possible lossy compressions of each source random variable to identify the information contained in each that is most predictive of the target.
+</div>
+
+Whereas a typical information theory treatment of this scenario might have looked at `$I(X_A;Y)$`, `$I(X_B;Y)$`, and `$I(X_A,X_B;Y)$`, we explored the space of partial information allocations by introducing the auxiliary variables `$U_A$` and `$U_B$`.
+We've searched through all possible lossy compressions of each source random variable to identify the information contained in each that is most predictive of the target.
 <!-- 
 **At a high level,** the variation in the sources (the weather of towns A and B) is not all equal in the amount of information it shares with the target variable (your town's weather).
 By mapping out the predictive error in all ways of selecting partial bits from the sources, the variation is sorted and we can "point" to the variation that is most shared with the target. 
 Because mutual information is just shared variation, we've localized the information shared between the sources and the target. -->
 
-#### Groups of pixels
+#### Optimization with machine learning
 
+Scenario description, exhaustive enumeration impractical
+
+----Sample board-----
+
+Since we are only interested in the Pareto front -- the information allocations that reduce the predictive error the most -- we can set this up as an optimization problem.
+Specifically, we'll pass the possible messages for town A through a variational encoder and those for town B through another one.
+We can penalize the transmitted information in the same way VAEs do: with the expected KL divergence with some arbitrary (but convenient) prior.
+Then the encodings, which will already have compressed away some information about the inputs, will be used for prediction of the target, and the whole setup can be trained end-to-end with gradient descent.
+
+-------Schematic of two encoders, XA XB UA UB and Y--------------
+
+Let's see how it does, by sweeping over the information penalty `$\beta$`.
+The prediction is shown to the right, and the trajectory of information allocations versus error is mapped out during training.
+
+<div class='pixel-game row'></div>
+
+<div class='train-dib-button'></div>
+
+So where is the information in the test results about `$Y$`? 
+We'll display the variation transmitted by the two encoders with a distinguishability matrix among values, using a measure of statistical similarity between posterior distributions for distinguishability.
+The one bit that is most shared between the sources and the target is shown below by the transmitted distinguishability for the two towns:
+
+------------Dist mat1, Dist mat 2--------------
+
+By sweeping the information penalty, we recover all of the optimal information allocations and can "point" to where the information about `$Y$` is most minimally stored.
+Beyond finding the optimal budget allocations, we can also tell town A where to focus its test resolution.
+
+<!-- 
 Occasionally the local board game clubs like to borrow the telegraph lines to play a cooperative game.
 The night before, all three clubs meet in one of the towns and draw out a board of light and dark squares, like the one below.
 
@@ -121,9 +151,7 @@ The aggregator uses the limited information to make a prediction about whether t
 After a series of rounds, the towns meet again to check the success of the predictions.
 
 For simplicity, we'll say towns A and B are the communicators.
-A selects a row at random and B selects a column at random.
-
-<div class='pixel-game row'></div>
+A selects a row at random and B selects a column at random. -->
 
 #### Information about bike rentals
 
@@ -143,16 +171,20 @@ Thanks to XYZ for their help with this piece.
 ### Footnotes
 
 <a class='footend' key='other-info-resources'></a>
-Two of my favorites are [this classic](https://colah.github.io/posts/2015-09-Visual-Information/) by Christopher Olah and 3blue1brown's [video about wordle](https://youtu.be/v68zYyaEmEA).
+Two great ones to check out are [this classic](https://colah.github.io/posts/2015-09-Visual-Information/) by Christopher Olah and 3blue1brown's [video about wordle](https://youtu.be/v68zYyaEmEA).
 
 <a class='footend' key='info-bottleneck'></a> 
-If you're familiar with the information bottleneck<a class='citestart' key='ib'></a>, that's essentially what we're talking about, except that it will be a distributed variant with more than one source variable.
+If you're familiar with the information bottleneck<a class='citestart' key='ib'></a>, that's exactly what we're talking about, except we'll have more than one source variable.
 
 <a class='footend' key='b-weather'></a> 
-And similar to town A, town B's weather is 50/50 split between calm and stormy and is unpredictable from one hour to the next.
+Town B's weather is, oddly enough, completely independent of town A's weather.  It's also a 50/50 split between calm and stormy.
 
 <a class='footend' key='y-not-info'></a> 
-We could have displayed the mutual information `$I(U_A,U_B;Y)$` instead of cross entropy error `$BCE=H(Y)-I(U_A,U_B;Y)$`, so that all quantities are mutual information terms, but sometimes we want to use other errors like RMSE, so we opted for consistency.
+The vertical axis could have displayed the mutual information `$I(U_A,U_B;Y)$` instead of cross entropy error `$BCE=H(Y)-I(U_A,U_B;Y)$`, so that all quantities are mutual information terms, but later we'll want to use other errors like RMSE, so we opted for consistency.
+
+<a class='footend' key='xor'></a>
+Look at the difference in error between half a bit from each town and one bit from either town. 
+The difference in error is large for XOR while it's almost nothing for the other logic gates. 
 
 <a class='footend' key='transmission-caveats'></a> 
 assuming there is some standard operating voltage
@@ -181,10 +213,10 @@ Tishby, N., Pereira, F. C., & Bialek, W. "The information bottleneck method." ar
 
 <script id='MathJax-script' async src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'></script>
 <script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/mathtex-script-type.min.js' integrity='sha384-jiBVvJ8NGGj5n7kJaiWwWp9AjC+Yh8rhZY3GtAX8yU28azcLgoRo4oukO87g7zDT' crossorigin='anonymous'></script>
-
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
 <script src='source/third_party/d3_.js'></script>
 <script src='source/third_party/d3-scale-chromatic.v1.min.js'></script>
-<script src='source/third_party/tfjsv3.18.0.js'></script>
+<!-- <script src='source/third_party/tfjsv3.18.0.js'></script> -->
 <script src='source/third_party/npyjs-global.js'></script>
 <script src='source/third_party/swoopy-drag.js'></script>
 
