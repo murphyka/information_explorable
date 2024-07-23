@@ -62,7 +62,7 @@ window.initTabular = async function(){
     state.distMatrices.push(parsedMat.reverse())
   }
 
-  state.compressionInd = 0
+  state.compressionInd = 14
   window.initDistinguishability({
     sel: d3.select('.distinguishability-mats'),
     state,
