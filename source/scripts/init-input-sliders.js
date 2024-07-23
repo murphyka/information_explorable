@@ -121,10 +121,26 @@ window.initNoiseSlider = function({sel, state, hasColor=true}){
 }
 
 window.initTrainDIB = function({sel, state}) {
-
   buttonSel = sel.append('div.button')//.style("position", "relative").style("margin-left", "800px"),
   buttonSel.html(`<input type="button" class="pbutton" value="Train">`)
   .on('click', function () {
     state.renderAll.trainDIB()
   })
+}
+
+window.initPixelButtons = function({sel, state}){
+
+    buttonSel = sel.append('div.button')
+    buttonSel.html(`<input type="button" class="pbutton" value="Random" id="random2">`)
+    .on('click', function () {
+
+      for (let i=0; i<state.originalDims[0]; i++) {
+        for (let j=0; j<state.originalDims[1]; j++) {
+          randValue = Math.floor(Math.random()*2)
+          state.boardValues[i][j] = randValue;
+          state.d3ReadableBoardValues[i*state.originalDims[0]+j] = [i, j, randValue];
+        }
+      }
+      state.renderAll.redraw()
+    })
 }

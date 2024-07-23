@@ -20,8 +20,8 @@ window.initInfoPlane = async function({sel, state, isBig=true, lossLabel, width=
   var rightMargin = 250 
   var topMargin = 25 
   var bottomMargin = 50
-  var actualHeight = isBig ? 300 : 30
-  var actualWidth = width || (isBig ? 442 : 50)
+  var actualHeight = isBig ? 225 : 30
+  var actualWidth = width || (isBig ? 450 : 50)
   var c = d3.conventions({
     sel: sel.html('').append('div'),
     width: actualWidth,
@@ -44,8 +44,8 @@ window.initInfoPlane = async function({sel, state, isBig=true, lossLabel, width=
   c.svg.select('.y').lower()  // z order
   // util.ggPlot(c)  // just makes a gray background and puts grid lines
 
-  c.svg.append('text.chart-title').at({y: -7, fontSize: 12, textAnchor: 'middle', x: c.width/2})
-    .text(title || 'Information decomposition')
+  // c.svg.append('text.chart-title').at({y: -7, fontSize: 16, textAnchor: 'middle', x: c.width/2})
+  //   .text(title || 'Information decomposition')
 
   util.addAxisLabel(c, 'Total information used by model (bits)', lossLabel, y2Text='Information per feature (bits)')
 

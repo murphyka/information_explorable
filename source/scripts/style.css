@@ -89,6 +89,10 @@ digits{
   padding: 0px 2px;
 }
 
+coloredText{
+  padding: 0px 1px;
+}
+
 animate{
 /*  background: red;*/
   outline: 1px solid #ccc;

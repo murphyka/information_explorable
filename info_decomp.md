@@ -44,7 +44,7 @@ That town's weather will be one of our "source" random variables, which we'll ca
 It has two equally probable outcomes (calm or stormy), so `$X_A$` has one bit of uncertainty (aka entropy)<a class='footstart' key='entropy'></a>.
 
 The message your town receives from the telegraph line will be our auxiliary random variable -- call it `$U_A$`.
-The mutual information between the two, `$I(X_A;U_A)$`, is the amount of information transmitted per message -- it's the amount that receiving a message reduces your uncertainty about town A's weather.
+The mutual information between the two, `$I(X_A;U_A)$`, is the amount of information transmitted per message -- it's the amount that receiving a message reduces your uncertainty about town A's weather<a class='footstart' key='mutual_info'></a>.
 The more money you spend on the telegraph line, the lower the noise in the line and the better you'll be able to infer the other town's weather.
 <div class="container">
   <div class='transmission-noise-slider'></div>
@@ -52,7 +52,7 @@ The more money you spend on the telegraph line, the lower the noise in the line 
 
 <div class='storm-telegraph-single row'></div>
 
-**Why is the transmitted information lower when the noise increases?**  As the distributions `$p(u|x=C)$` and `$p(u|x=S)$` overlap, there's a growing chance of receiving a low voltage signal (i.e., around `$0\text{V}$`), in which case you remain uncertain about whether the original signal was `$-1\text{V}$` or `$+1\text{V}$` even after receiving the message.  The transmitted information can **at most** reduce your uncertainty by one bit because that is the amount of uncertainty you started with, so as the chance of receiving ambiguous messages grows, the transmitted information necessarily drops.  
+**Why is the transmitted information lower when the noise increases?**  As the distributions `$p(u|x=C)$` <coloredText style="background:#D5E5F0;">(blue)</coloredText> and `$p(u|x=S)$` <coloredText style="background:#F7D1D2;">(red)</coloredText> overlap, there's a growing chance of receiving a low voltage signal (i.e., around `$0\text{V}$`), in which case you remain uncertain about whether the original signal was `$-1\text{V}$` or `$+1\text{V}$` even after receiving the message.  The transmitted information can **at most** reduce your uncertainty by one bit because that is the amount of uncertainty you started with, so as the chance of receiving ambiguous messages grows, the transmitted information necessarily drops.  
 
 #### Information from multiple sources
 
@@ -110,7 +110,7 @@ We've searched through all possible lossy compressions of each source random var
 By mapping out the predictive error in all ways of selecting partial bits from the sources, the variation is sorted and we can "point" to the variation that is most shared with the target. 
 Because mutual information is just shared variation, we've localized the information shared between the sources and the target. -->
 
-#### Optimization with machine learning
+#### Searching through the variation with machine learning
 
 Scenario description, exhaustive enumeration impractical
 
@@ -128,7 +128,12 @@ The prediction is shown to the right, and the trajectory of information allocati
 
 <div class='pixel-game row'></div>
 
-<div class='train-dib-button'></div>
+<div class='container'>
+  <div class='train-dib-button'></div>
+  <div class='pixel-buttons' id='buttons3'></div>
+</div>
+
+
 
 So where is the information in the test results about `$Y$`? 
 We'll display the variation transmitted by the two encoders with a distinguishability matrix among values, using a measure of statistical similarity between posterior distributions for distinguishability.
@@ -153,18 +158,68 @@ After a series of rounds, the towns meet again to check the success of the predi
 For simplicity, we'll say towns A and B are the communicators.
 A selects a row at random and B selects a column at random. -->
 
-#### Information about bike rentals
+#### Where is the information in the bikeshare dataset?
 
-<div class='tabular-decomp row'></div>
+We've focused on extremely small-scale examples so that we could visualize as much as possible.
+Let's move on to a real world dataset, one that has long been used for evaluating interpretable machine learning methods.
 
-text
+*Bikeshare*<a class='citestart' key='bikeshare'></a> is a dataset containing hourly bike rentals in Washington, D.C. in 2011 and 2012, combined with a handful of weather descriptors at each point in time.
+The goal is to predict the number of bikes rented given time and weather information, and to shed light on the learned relationship.
+
+<div class="container">
+  <figure>
+    <img src="data/bike.jpg" width="300" />
+    <!-- <figcaption>What's driving bike rentals?</figcaption> -->
+  </figure>
+</div>
+
+Our source variables are the time and weather descriptors.
+Some, like temperature and humidity, are continuous variables.
+Others are categorical, including the season and the hour of the day.
+We want to identify -- out of all of the variation in these descriptors -- the specific bits that are most connected with bike rentals.
+Where do you think the information resides?
+
+We ran the optimization offline, but you can run it yourself with the code on <a href="https://github.com/distributed-information-bottleneck/distributed-information-bottleneck.github.io">github</a>. 
 
 <div class='sticky-container'>
-<div class='mod-top-weights row x-sticky x-sticky-lower'></div>
+<div class='tabular-decomp row sticky'></div>
 
-### Credits
+The optimal information allocations are shown above, and there's a lot to note.
 
-Thanks to XYZ for their help with this piece.
+The <digits>hour</digits> feature is by far the most important, which is fairly intuitive. 
+The dataset includes rentals in the middle of the night, which are surely different than in the middle of the day. 
+<digits>temperature</digits> is important and contributes a growing share as the total information increases.
+By contrast, <digits>year</digits> and <digits>working day?</digits> contributed their partial bit and saturate. 
+<digits>wind</digits> and <digits>apparent temperature</digits> contribute almost nothing, with the latter presumably because we've already gotten information from the <digits>temperature</digits> feature.
+
+For reference, interpretable methods that are based on linear combinations of the features (e.g., Neural Additive Models<a class='citestart' key='nam'></a>) achieve RMSE of 100.
+For a fully nonlinear processing of the features, we need only 4 or 5 bits of information.
+We don't mind that the processing is opaque: our source of interpretability is the information in the features. 
+
+<!-- <div class='mod-top-weights row x-sticky x-sticky-lower'></div> -->
+
+**What are the specific bits of variation in the different features?**
+We show distinguishability matrices for the twelve features as a function of the total information extracted.
+The matrices are fundamentally the same as above in the ZZZ example: the auxiliary variables select the distinctions among feature values that are worth communicating to the predictive model.
+
+<div class='dist-mats row'></div>
+
+
+</div>
+#### Conclusion
+
+By using auxiliary variables to compress our source variables, we gain the ability to identify specific variation across all the sources that is most predictive of the target variable.
+Rather than measuring the mutual information between subsets of the sources and the target -- which can nevertheless be insightful -- we obtain a continuous spectrum of the important bits and a soft ramp to interpretability.
+
+If you find this manner of analysis intriguing and want to learn more, check out our recent papers on the topic:
+
+<a class="paper-title-link" href="https://arxiv.org/abs/2211.17264">Interpretability with full complexity by constraining feature information</a> ICLR 2023
+
+<a class="paper-title-link" href="https://www.pnas.org/doi/abs/10.1073/pnas.2312988121">Information decomposition in complex systems via machine learning</a> PNAS 2024
+
+### Acknowledgements
+
+We thank Sam Dillavou and XYZ for feedback on this post.
 
 <br>
 
@@ -175,6 +230,15 @@ Two great ones to check out are [this classic](https://colah.github.io/posts/201
 
 <a class='footend' key='info-bottleneck'></a> 
 If you're familiar with the information bottleneck<a class='citestart' key='ib'></a>, that's exactly what we're talking about, except we'll have more than one source variable.
+
+<a class='footend' key='weather-caveats'></a> 
+i.e., forecasting won't help you.
+
+<a class='footend' key='entropy'></a> 
+Formally, with `$X$` a random variable and `$p(x)$` the probability distribution over its outcomes, the entropy is the expected log probability value for any outcome, `$H(X)=\mathbb{E}_{x\sim p(x)} [- \log \ p(x)]$`.
+
+<a class='footend' key='mutual_info'></a> 
+Formally, with `$X$` and `$Y$` two random variables, the mutual information is `$I(X;Y)=H(X)-H(X|Y)=H(Y)-H(Y|X)$`.  It quantifies the amount of shared variation in the two random variables<a class='citestart' key='cover'></a>.
 
 <a class='footend' key='b-weather'></a> 
 Town B's weather is, oddly enough, completely independent of town A's weather.  It's also a 50/50 split between calm and stormy.
@@ -189,23 +253,19 @@ The difference in error is large for XOR while it's almost nothing for the other
 <a class='footend' key='transmission-caveats'></a> 
 assuming there is some standard operating voltage
 
-<a class='footend' key='weather-caveats'></a> 
-i.e., forecasting won't help you.
-
-
-<a class='footend' key='entropy'></a> 
-Formally, with `$X$` a random variable and `$p(x)$` the probability distribution over its outcomes, the entropy is the expected log probability value for any outcome, `$H(X)=\mathbb{E}_{x\sim p(x)} [- \log \ p(x)]$`.
-
-<a class='footend' key='mutual_info'></a> 
-Formally, with `$X$` and `$Y$` two random variables, the mutual information is `$I(X;Y)=H(X)-H(X|Y)=H(Y)-H(Y|X)$`.  It quantifies the amount of shared variation in the two random variables<a class='citestart' key='cover'></a>.
-
 ### References
 
 <a class='citeend' key='ib'></a> Elements of Information Theory
 Cover, T. & Thomas, J. (1991). John Wiley & Sons, Inc.
 
 <a class='citeend' key='cover'></a> [The information bottleneck method](https://arxiv.org/abs/physics/0004057)
-Tishby, N., Pereira, F. C., & Bialek, W. "The information bottleneck method." arXiv preprint physics/0004057 (2000).
+Tishby, N., Pereira, F. C., & Bialek, W. arXiv preprint physics/0004057 (2000).
+
+<a class='citeend' key='bikeshare'></a> [UCI machine learning repository](https://archive.ics.uci.edu/)
+Dua, D., & Graff, C. (2017).
+
+<a class='citeend' key='nam'></a> [Neural additive models: Interpretable machine learning with neural nets](https://archive.ics.uci.edu/)
+Agarwal, R., Melnick, L., Frosst, N., Zhang, X., Lengerich, B., Caruana, R., & Hinton, G. (NeurIPS 2021).
 
 <link rel='stylesheet' href='source/third_party/footnote_v2.css'>
 <link rel='stylesheet' href='source/third_party/citation_v2.css'>

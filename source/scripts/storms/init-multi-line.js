@@ -202,14 +202,20 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
       [state.p00, state.p01],
       [state.p10, state.p11]])
 
-  p_xy_channeled = tf.stack([tf.sub(tf.ones([2, 2]), p_xy_channeled), p_xy_channeled], -1)
+  p_xy_channeled = tf.tidy(() => {
+    return tf.stack([tf.sub(tf.ones([2, 2]), p_xy_channeled), p_xy_channeled], -1)
+  })
 
-  p_xy_channeled = tf.div(p_xy_channeled, tf.sum(p_xy_channeled))
+  p_xy_channeledNormalized = tf.tidy(() => {
+    return tf.div(p_xy_channeled, tf.sum(p_xy_channeled))
+  })
 
   var p_xy = tf.reshape(p_xy_channeled, [-1, 2])
 
   var p_y = tf.sum(p_xy, axis=0)
-  var ent_y = tf.div(tf.sum(tf.mul(tf.neg(p_y), tf.log(p_y))), tf.log(2))
+  var ent_y = tf.tidy(() => {
+    return tf.div(tf.sum(tf.mul(tf.neg(p_y), tf.log(p_y))), tf.log(2))
+  })
   noise_vals = [1, 0.577, 0.452, 0.371, 0.310, 0.262, 0.222, 0.189, 0.160, 0.135, 0.113, 0.093, 0.076, 0.061, 0.047, 0.034, 0.0235, 0.0140, 0.006, 1e-8]
   info_vals = [0, 0.053, 0.105, 0.158, 0.211, 0.263, 0.316, 0.368, 0.421, 0.474, 0.526, 0.579, 0.632, 0.684, 0.737, 0.789, 0.842, 0.895, 0.947, 1]
   noise_vectors = tf.reshape(tf.stack(tf.meshgrid(noise_vals, noise_vals,  {'indexing': 'ij'}), -1), [-1, 2])
@@ -448,6 +454,7 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
     p_y,
     p_xy,
     p_xy_channeled,
+    p_xy_channeledNormalized,
     ])
   console.log(tf.memory().numBytes, tf.memory().numTensors, tf.memory().unreliable)
 

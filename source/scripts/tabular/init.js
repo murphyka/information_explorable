@@ -46,9 +46,8 @@ window.initTabular = async function(){
   window.initInfoPlane({
     sel: d3.select('.tabular-decomp'),
     state,
-    width: 600,
     lossLabel: "RMSE",
-    title: `Information decomposition on ${state.dataset}`
+    // title: `Information decomposition on ${state.dataset}`
   })
 
   // init annotations quickly to avoid pop in

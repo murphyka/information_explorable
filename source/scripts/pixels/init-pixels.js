@@ -1,6 +1,6 @@
 
 window.initPixelGame = async function({sel, state, isBig=true}){
-  state.renderAll = util.initRenderAll(['trainDIB']);
+  state.renderAll = util.initRenderAll(['redraw', 'trainDIB']);
   numTrainingSteps = 1000
   displayEvery = 5
   batchSize = 1024
@@ -15,14 +15,16 @@ window.initPixelGame = async function({sel, state, isBig=true}){
   // sel.append("p").style("align-items", "center")
 
   state.boardValues = [[1, 0, 0, 0], [0, 1, 1, 1], [1, 0, 0, 0], [1, 1, 1, 1]]
-  originalDims = [state.boardValues.length, state.boardValues[0].length]
+  state.originalDims = [state.boardValues.length, state.boardValues[0].length]
 
-  d3ReadableBoardValues = []
+  state.d3ReadableBoardValues = []
   d3zeroedBoardValues = []
+  rowLabels = ['A', 'B', 'C', 'D']
+  colLabels = ['a', 'b', 'c', 'd']
   for (let i=0; i<state.boardValues.length; i++){
     for (let j=0; j<state.boardValues[0].length; j++){
-      d3ReadableBoardValues.push([i, j, state.boardValues[i][j]])
-      d3zeroedBoardValues.push([i, j, 0.5])
+      state.d3ReadableBoardValues.push([rowLabels[i], colLabels[j], state.boardValues[i][j]])
+      d3zeroedBoardValues.push([rowLabels[i], colLabels[j], 0.5])
     }
   }
   state.reconstructions = []
@@ -38,7 +40,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
   .style("overflow", "auto")
   .style("height", "100%")
 
-  pdf_margin = {left: 10, right: 10, top: 10, bottom: 10}
+  pdf_margin = {left: 20, right: 20, top: 20, bottom: 20}
   pdf_width = 100
   clickableBoardSVG = boardSel
   .append("svg")
@@ -51,24 +53,48 @@ window.initPixelGame = async function({sel, state, isBig=true}){
   // Build X scales and axis:
   clickableBoardX = d3.scaleBand()
     .range([ 0, pdf_width ])
-    .domain(d3.range(state.boardValues.length))
+    // .domain(d3.range(state.boardValues.length))
+    .domain(rowLabels)
     .padding(0.01)
 
-  pdfxOffset = 40
-  pdfyOffset = -20
+  clickableBoardSVG.append("g")
+      .attr("transform", "translate(0," + (pdf_width-5) + ")")
+      .call(d3.axisBottom(clickableBoardX))
+      .selectAll("text")
+        .style("text-anchor", "middle")
+        .style("font-size", 14)
+        .style("font-weight", "bold")
+        .style("fill", function(d, i) {
+          return util.colors.features[i]
+        })
+
 
   // Build X scales and axis:
   clickableBoardY = d3.scaleBand()
     .range([ pdf_width, 0 ])
-    .domain(d3.range(state.boardValues[0].length))
+    // .domain(d3.range(state.boardValues[0].length))
+    .domain(colLabels)
     .padding(0.01)
 
+  clickableBoardSVG.append("g")
+      .call(d3.axisLeft(clickableBoardY))
+      .selectAll("text")
+        .attr("transform", "translate(-10,-10)rotate(-90)")
+        .style("text-anchor", "middle")
+        .style("font-size", 14)
+        .style("font-weight", "bold")
+        .style("fill", function(d, i) {
+          return util.colors.features[i+state.originalDims[0]]
+        })
+
+
+       
   clickableBoardSVG.selectAll("path,line").remove();
 
   // Build color scale
-  var heatmapColor = d3.scaleSequential(d3.interpolateRdBu).domain([-0.3, 1.3]);
+  var heatmapColor = d3.scaleSequential(d3.interpolateBrBG).domain([-0.3, 1.3]);
   clickableBoardSVG.selectAll()
-      .data(d3ReadableBoardValues)
+      .data(state.d3ReadableBoardValues)
       .enter()
       .append("rect")
       .attr("x", function(d) {return clickableBoardX(d[0]) })
@@ -77,21 +103,19 @@ window.initPixelGame = async function({sel, state, isBig=true}){
       .attr("height", clickableBoardY.bandwidth() )
       .style("fill", function(d) { return heatmapColor(d[2])} )
       .on("click", function(d, i) { 
-        state.boardValues[d[0]][d[1]] = 1-d[2];
-        d3ReadableBoardValues[i] = [d[0], d[1], 1-d[2]];
-        redrawBoard()
+        state.boardValues[Math.floor(i/state.originalDims[0])][i%state.originalDims[0]] = 1-d[2];
+        state.d3ReadableBoardValues[i] = [d[0], d[1], 1-d[2]];
+        state.renderAll.redraw()
       })
 
   async function redrawBoard() {
     clickableBoardSVG.selectAll("rect")
-      .data(d3ReadableBoardValues)
+      .data(state.d3ReadableBoardValues)
       .style("fill", function(d) { return heatmapColor(d[2])} )
   }
-
+  state.renderAll.redraw?.fns.push(redrawBoard)
   // now draw the fitted board
 
-  pdf_margin = {left: 10, right: 10, top: 10, bottom: 10}
-  pdf_width = 100
   fittedBoardSVG = boardSel
   .append("svg")
     .attr("width", pdf_width + pdf_margin.left + pdf_margin.right)
@@ -102,19 +126,39 @@ window.initPixelGame = async function({sel, state, isBig=true}){
           "translate(" + pdf_margin.left + "," + pdf_margin.top + ")")
 
   // Build X scales and axis:
-  fittableBoardX = d3.scaleBand()
+  fittedBoardX = d3.scaleBand()
     .range([ 0, pdf_width ])
-    .domain(d3.range(state.boardValues.length))
+    .domain(rowLabels)
     .padding(0.01)
 
-  pdfxOffset = 40
-  pdfyOffset = -20
+  fittedBoardSVG.append("g")
+      .attr("transform", "translate(0," + (pdf_width-5) + ")")
+      .call(d3.axisBottom(fittedBoardX))
+      .selectAll("text")
+        .style("text-anchor", "middle")
+        .style("font-size", 14)
+        .style("font-weight", "bold")
+        .style("fill", function(d, i) {
+          return util.colors.features[i]
+        })
 
   // Build X scales and axis:
-  fittableBoardY = d3.scaleBand()
+  fittedBoardY = d3.scaleBand()
     .range([ pdf_width, 0 ])
-    .domain(d3.range(state.boardValues[0].length))
+    .domain(colLabels)
     .padding(0.01)
+
+  fittedBoardSVG.append("g")
+      .call(d3.axisLeft(fittedBoardY))
+      .selectAll("text")
+        .attr("transform", "translate(-10,-10)rotate(-90)")
+        .style("text-anchor", "middle")
+        .style("font-size", 14)
+        .style("font-weight", "bold")
+        .style("fill", function(d, i) {
+          return util.colors.features[i+state.originalDims[0]]
+        })
+
 
   fittedBoardSVG.selectAll("path,line").remove();
 
@@ -122,10 +166,10 @@ window.initPixelGame = async function({sel, state, isBig=true}){
       .data(d3zeroedBoardValues)
       .enter()
       .append("rect")
-      .attr("x", function(d) {return fittableBoardX(d[0]) })
-      .attr("y", function(d) { return fittableBoardY(d[1]) })
-      .attr("width", fittableBoardX.bandwidth() )
-      .attr("height", fittableBoardY.bandwidth() )
+      .attr("x", function(d) {return fittedBoardX(d[0]) })
+      .attr("y", function(d) { return fittedBoardY(d[1]) })
+      .attr("width", fittedBoardX.bandwidth() )
+      .attr("height", fittedBoardY.bandwidth() )
       .style("fill", function(d) { return heatmapColor(d[2])} )
 
   ////////////////////////////////////// Display the information allocation
@@ -210,6 +254,11 @@ window.initPixelGame = async function({sel, state, isBig=true}){
     .at({d: line.y(d => c.y2(d[1]))(dummyData2)}))
   }
 
+  window.initPixelButtons({
+    sel: d3.select('#buttons3').html(''),
+    state,
+  });
+
 
   //////////////////////////// Show the latent spaces
   var leftMargin = 40
@@ -249,9 +298,9 @@ window.initPixelGame = async function({sel, state, isBig=true}){
             .x(d => state.cs[latentInd].x(d[0]))
             .y(d => state.cs[latentInd].y(d[1]))})
 
-      for (let inputInd=0; inputInd<originalDims[latentInd]; inputInd++) {
+      for (let inputInd=0; inputInd<state.originalDims[latentInd]; inputInd++) {
         state.latentCurves.push(state.cs[latentInd].svg.append('path').datum(priorData)
-          .at({strokeWidth: 2, stroke: util.colors.features[inputInd], fill: 'none'})
+          .at({strokeWidth: 2, stroke: util.colors.features[inputInd+latentInd*state.originalDims[0]], fill: 'none'})
           .at({d: d3.line()
             .x(d => state.cs[latentInd].x(d[0]))
             .y(d => state.cs[latentInd].y(d[1]))}))
@@ -274,7 +323,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
     tensorBoard = tf.tensor2d(state.boardValues).cast('float32')
     const latentDim = 1
     for (let k=0; k<2; k++) {
-      encoderInputs = tf.input({shape: [originalDims[k]]})
+      encoderInputs = tf.input({shape: [state.originalDims[k]]})
       const zMean = tf.layers.dense({units: latentDim, useBias: false, kernelInitializer: 'glorotNormal'}).apply(encoderInputs)
       const zLogVar = tf.layers.dense({units: latentDim, useBias: false, kernelInitializer: 'glorotNormal'}).apply(encoderInputs)
       const z = new sampleLayer().apply([zMean, zLogVar])
@@ -314,25 +363,35 @@ window.initPixelGame = async function({sel, state, isBig=true}){
 
     optimizer = tf.train.adam(learningRate)
 
-    numberAveragingRepeats = 128
-    inds1Exhaustive = tf.range(0, originalDims[0], 1, dtype='float32')
-    .expandDims(1).tile([1, originalDims[1]]).reshape([-1])
-    inds2Exhaustive = tf.range(0, originalDims[1], 1, dtype='float32')
-    .expandDims(0).tile([originalDims[0], 1]).reshape([-1])
+    numberAveragingRepeats = 256
+    inds1Exhaustive = tf.tidy(() => {
+      return tf.range(0, state.originalDims[0], 1, dtype='float32')
+        .expandDims(1).tile([1, state.originalDims[1]]).reshape([-1])
+    })
+    inds2Exhaustive = tf.tidy(() => {
+      return tf.range(0, state.originalDims[1], 1, dtype='float32')
+      .expandDims(0).tile([state.originalDims[0], 1]).reshape([-1])
+    })
 
-    inps1Exhaustive = tf.oneHot(tf.range(0, originalDims[0], 1, dtype='int32'), originalDims[0])
-    .expandDims(1).tile([1, originalDims[1], 1]).reshape([-1, originalDims[0]]).tile([numberAveragingRepeats, 1])
-    inps2Exhaustive = tf.oneHot(tf.range(0, originalDims[1], 1, dtype='int32'), originalDims[1])
-    .expandDims(0).tile([originalDims[0], 1, 1]).reshape([-1, originalDims[1]]).tile([numberAveragingRepeats, 1])
-    tensorBoardTiled = tensorBoard.expandDims(0).tile([numberAveragingRepeats, 1, 1])
+    inps1Exhaustive = tf.tidy(() => {
+      return tf.oneHot(tf.range(0, state.originalDims[0], 1, dtype='int32'), state.originalDims[0])
+      .expandDims(1).tile([1, state.originalDims[1], 1]).reshape([-1, state.originalDims[0]]).tile([numberAveragingRepeats, 1])
+    })
+    inps2Exhaustive = tf.tidy(() => {
+      return tf.oneHot(tf.range(0, state.originalDims[1], 1, dtype='int32'), state.originalDims[1])
+      .expandDims(0).tile([state.originalDims[0], 1, 1]).reshape([-1, state.originalDims[1]]).tile([numberAveragingRepeats, 1])
+    })
+    tensorBoardTiled = tf.tidy(() => {
+      return tensorBoard.expandDims(0).tile([numberAveragingRepeats, 1, 1])
+    })
 
     tensorBoardOneHot = tf.oneHot(tensorBoard.cast('int32'), 2)
     function generateBatch() {
       return tf.tidy(() => {
-        const inds1 = tf.randomUniformInt([batchSize], 0, originalDims[0])
-        const inds2 = tf.randomUniformInt([batchSize], 0, originalDims[1])
-        const inps1 = tf.oneHot(inds1, originalDims[0])
-        const inps2 = tf.oneHot(inds2, originalDims[1])
+        const inds1 = tf.randomUniformInt([batchSize], 0, state.originalDims[0])
+        const inds2 = tf.randomUniformInt([batchSize], 0, state.originalDims[1])
+        const inps1 = tf.oneHot(inds1, state.originalDims[0])
+        const inps2 = tf.oneHot(inds2, state.originalDims[1])
         const gatheredBoardValues = tf.gatherND(tensorBoard, tf.stack([inds1, inds2], -1)).reshape([-1, 1])  // for mse
         // gatheredBoardValues = tf.gatherND(tensorBoardOneHot, tf.stack([inds1, inds2], -1)).reshape([-1, 2])  // for xent
         return [inps1, inps2, gatheredBoardValues]
@@ -363,43 +422,44 @@ window.initPixelGame = async function({sel, state, isBig=true}){
         // get the output
         let [zMean1, zLogVar1, zMean2, zLogVar2, outputs] = callModels(encoders[0], encoders[1], decoder)
 
-        outputs = tf.tidy(() => {
-          return outputs.reshape([numberAveragingRepeats, originalDims[0], originalDims[1]])
+        outputsShaped = tf.tidy(() => {
+          return outputs.reshape([numberAveragingRepeats, state.originalDims[0], state.originalDims[1]])
         })
         rmse = tf.tidy(() => {
-          return outputs.sub(tensorBoardTiled).square().mean().sqrt()
+          return outputsShaped.sub(tensorBoardTiled).square().mean().sqrt()
         })
 
         rmse.array().then(val => {
           losses.push(rmse)
         })
         
-        tf.stack([inds1Exhaustive, inds2Exhaustive, outputs.mean(0).reshape([-1])], -1).array().then(d3ReadableBoardValues => {
+        boardVals = tf.tidy(() => {
+          return tf.stack([inds1Exhaustive, inds2Exhaustive, outputsShaped.mean(0).reshape([-1])], -1)
+        })
+        boardVals.array().then(vals => {
           fittedBoardSVG.selectAll("rect")
-          .data(d3ReadableBoardValues)
+          .data(vals)
           .style("fill", function(d) { return heatmapColor(d[2])} )
         })
 
-        tf.dispose([outputs])
-        
         // update the latent vecs
-        zMean1 = tf.tidy(() => {
-          return zMean1.reshape([numberAveragingRepeats, originalDims[0], originalDims[1]]).mean(0).mean(1)
+        zMean1Scalar = tf.tidy(() => {
+          return zMean1.reshape([numberAveragingRepeats, state.originalDims[0], state.originalDims[1]]).mean(0).mean(1)
         })
-        zLogVar1 = tf.tidy(() => {
-          return zLogVar1.reshape([numberAveragingRepeats, originalDims[0], originalDims[1]]).mean(0).mean(1)
+        zLogVar1Scalar = tf.tidy(() => {
+          return zLogVar1.reshape([numberAveragingRepeats, state.originalDims[0], state.originalDims[1]]).mean(0).mean(1)
         })
-        zMean2 = tf.tidy(() => {
-          return zMean2.reshape([numberAveragingRepeats, originalDims[0], originalDims[1]]).mean(0).mean(0)
+        zMean2Scalar = tf.tidy(() => {
+          return zMean2.reshape([numberAveragingRepeats, state.originalDims[0], state.originalDims[1]]).mean(0).mean(0)
         })
-        zLogVar2 = tf.tidy(() => {
-          return zLogVar2.reshape([numberAveragingRepeats, originalDims[0], originalDims[1]]).mean(0).mean(0)
+        zLogVar2Scalar = tf.tidy(() => {
+          return zLogVar2.reshape([numberAveragingRepeats, state.originalDims[0], state.originalDims[1]]).mean(0).mean(0)
         })
 
         pdfData1 = tf.tidy(() => {
           res = tf.exp(xxLatentInputs.expandDims(0)
-            .sub(zMean1.expandDims(1))
-            .div(zLogVar1.expandDims(1)
+            .sub(zMean1Scalar.expandDims(1))
+            .div(zLogVar1Scalar.expandDims(1)
               .div(2)
               .exp())
             .square().neg().div(2))
@@ -408,7 +468,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
         })
 
         pdfData1.array().then(vals => {
-          for (let inputInd=0; inputInd<originalDims[0]; inputInd++) {
+          for (let inputInd=0; inputInd<state.originalDims[0]; inputInd++) {
             plotData = []
             vals[inputInd].forEach((v, i) => plotData.push([xxLatentInputsJS[i], v]))
             state.latentCurves[inputInd]//.data(plotData)
@@ -425,12 +485,14 @@ window.initPixelGame = async function({sel, state, isBig=true}){
         })
 
         info1 = tf.tidy(() => {
-          return tf.where(pmfData1.greater(1e-6), pmfData1.div(jointpmf1).log(), tf.zerosLike(pmfData1)).mul(pmfData1).sum(1).mean().div(Math.log(2))
+          return tf.where(pmfData1.greater(1e-6), 
+            pmfData1.div(jointpmf1).log(), 
+            tf.zerosLike(pmfData1)).mul(pmfData1).sum(1).mean().div(Math.log(2))
         })
         pdfData2 = tf.tidy(() => {
           res = tf.exp(xxLatentInputs.expandDims(0)
-            .sub(zMean2.expandDims(1))
-            .div(zLogVar2.expandDims(1)
+            .sub(zMean2Scalar.expandDims(1))
+            .div(zLogVar2Scalar.expandDims(1)
               .div(2)
               .exp())
             .square().neg().div(2))
@@ -439,10 +501,10 @@ window.initPixelGame = async function({sel, state, isBig=true}){
         })
 
         pdfData2.array().then(vals => {
-          for (let inputInd=0; inputInd<originalDims[1]; inputInd++) {
+          for (let inputInd=0; inputInd<state.originalDims[1]; inputInd++) {
             plotData = []
             vals[inputInd].forEach((v, i) => plotData.push([xxLatentInputsJS[i], v]))
-            state.latentCurves[originalDims[0]+inputInd]//.data(plotData)
+            state.latentCurves[state.originalDims[0]+inputInd]//.data(plotData)
               .at({d: d3.line()
                 .x(d => state.cs[1].x(d[0]))
                 .y(d => state.cs[1].y(d[1]))(plotData)})
@@ -459,19 +521,22 @@ window.initPixelGame = async function({sel, state, isBig=true}){
         info2 = tf.tidy(() => {
           return tf.where(pmfData2.greater(1e-6), pmfData2.div(jointpmf2).log(), tf.zerosLike(pmfData2)).mul(pmfData2).sum(1).mean().div(Math.log(2))
         })
-        tf.stack([info1, info2, rmse]).array().then(vals => {
+        plotVals = tf.tidy(() => {
+          return tf.stack([info1, info2, rmse])
+        })
+        plotVals.array().then(vals => {
           i1 = vals[0]
           i2 = vals[1]
           rmseVal = vals[2]
           totalInfo = i1+i2 
           display.push([totalInfo, rmseVal])
 
-          if (display.length > 10) {
+          if ((display.length > 10) && (!turnAround)) {
             lastInfoDiffs = 0
             for (let m=2; m<5; m++) {
               lastInfoDiffs += display.slice(-m, -m+1)[0][0]-display.slice(-m-1, -m)[0][0]
             }
-            if ((!turnAround) && (lastInfoDiffs < 0)) {
+            if (lastInfoDiffs < 0) {
               turnAroundInd = display.length
               turnAround = true
             }
@@ -522,7 +587,28 @@ window.initPixelGame = async function({sel, state, isBig=true}){
           }
           
         })
-        tf.dispose([zMean1, zMean2, zLogVar1, zLogVar2, pdfData1, pdfData2, pmfData1, pmfData2, jointpmf1, jointpmf2, rmse])
+        tf.dispose([
+          zMean1, 
+          zMean2, 
+          zLogVar1, 
+          zLogVar2, 
+          zMean1Scalar, 
+          zMean2Scalar, 
+          zLogVar1Scalar, 
+          zLogVar2Scalar, 
+          pdfData1, 
+          pdfData2, 
+          pmfData1, 
+          pmfData2, 
+          jointpmf1, 
+          jointpmf2, 
+          rmse,
+          boardVals,
+          plotVals,
+          outputs,
+          outputsShaped,
+          info1,
+          info2])
         // console.timeEnd()
       } 
       
@@ -542,7 +628,8 @@ window.initPixelGame = async function({sel, state, isBig=true}){
       inps1Exhaustive, 
       inps2Exhaustive, 
       inds1Exhaustive, 
-      inds2Exhaustive])
+      inds2Exhaustive,
+      ])
     console.log(tf.memory().numBytes, tf.memory().numTensors, tf.memory().unreliable)
   }
 
