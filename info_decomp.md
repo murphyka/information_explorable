@@ -169,7 +169,6 @@ The goal is to predict the number of bikes rented given time and weather informa
 <div class="container">
   <figure>
     <img src="data/bike.jpg" width="300" />
-    <!-- <figcaption>What's driving bike rentals?</figcaption> -->
   </figure>
 </div>
 
@@ -196,14 +195,14 @@ For reference, interpretable methods that are based on linear combinations of th
 For a fully nonlinear processing of the features, we need only 4 or 5 bits of information.
 We don't mind that the processing is opaque: our source of interpretability is the information in the features. 
 
-<!-- <div class='mod-top-weights row x-sticky x-sticky-lower'></div> -->
 
 **What are the specific bits of variation in the different features?**
 We show distinguishability matrices for the twelve features as a function of the total information extracted.
 The matrices are fundamentally the same as above in the ZZZ example: the auxiliary variables select the distinctions among feature values that are worth communicating to the predictive model.
-
-<div class='dist-mats row'></div>
-
+<div class="container">
+  <div class='compression-level-slider'></div>
+</div>
+<div class='distinguishability-mats row' width="50"></div>
 
 </div>
 #### Conclusion
@@ -287,14 +286,16 @@ Agarwal, R., Melnick, L., Frosst, N., Zhang, X., Lengerich, B., Caruana, R., & H
 <script src='source/scripts/init-input-sliders.js'></script>
 
 <link rel='stylesheet' href='source/scripts/tabular/style.css'>
-<script src='source/scripts/tabular/init-waves.js'></script>
 <script src='source/scripts/tabular/init.js'></script>
+<script src='source/scripts/tabular/init-distinguishability.js'></script>
 
 <link rel='stylesheet' href='source/scripts/storms/style.css'>
 <script src='source/scripts/storms/init-single-line.js'></script>
 <script src='source/scripts/storms/init-multi-line.js'></script>
 
 <script src='source/scripts/pixels/init-pixels.js'></script>
+<link rel='stylesheet' href='source/scripts/pixels/style.css'>
+
 
 <script src='source/scripts/init-info-plane.js'></script>
 <script src='source/scripts/init-storms.js'></script>

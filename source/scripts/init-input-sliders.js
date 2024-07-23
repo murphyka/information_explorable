@@ -122,13 +122,41 @@ window.initNoiseSlider = function({sel, state, hasColor=true}){
 
 window.initTrainDIB = function({sel, state}) {
   buttonSel = sel.append('div.button')//.style("position", "relative").style("margin-left", "800px"),
-  buttonSel.html(`<input type="button" class="pbutton" value="Train">`)
+  buttonSel.html(`<input type="button" class="pbutton" value="Train" id="train">`)
   .on('click', function () {
     state.renderAll.trainDIB()
   })
 }
 
 window.initPixelButtons = function({sel, state}){
+
+    buttonSel = sel.append('div.button')
+    buttonSel.html(`<input type="button" class="pbutton" value="Checker">`)
+    .on('click', function () {
+
+      for (let i=0; i<state.originalDims[0]; i++) {
+        for (let j=0; j<state.originalDims[1]; j++) {
+          val = (i+j)%2
+          state.boardValues[i][j] = val;
+          state.d3ReadableBoardValues[i*state.originalDims[0]+j] = [state.rowLabels[i], state.colLabels[j], val];
+        }
+      }
+      state.renderAll.redraw()
+    })
+
+    buttonSel = sel.append('div.button')
+    buttonSel.html(`<input type="button" class="pbutton" value="In/Out">`)
+    .on('click', function () {
+
+      for (let i=0; i<state.originalDims[0]; i++) {
+        for (let j=0; j<state.originalDims[1]; j++) {
+          val = (i==0) || (i==state.originalDims[0]-1) || (j==0) || (j==state.originalDims[1]-1)
+          state.boardValues[i][j] = val;
+          state.d3ReadableBoardValues[i*state.originalDims[0]+j] = [state.rowLabels[i], state.colLabels[j], val];
+        }
+      }
+      state.renderAll.redraw()
+    })
 
     buttonSel = sel.append('div.button')
     buttonSel.html(`<input type="button" class="pbutton" value="Random" id="random2">`)
@@ -138,9 +166,40 @@ window.initPixelButtons = function({sel, state}){
         for (let j=0; j<state.originalDims[1]; j++) {
           randValue = Math.floor(Math.random()*2)
           state.boardValues[i][j] = randValue;
-          state.d3ReadableBoardValues[i*state.originalDims[0]+j] = [i, j, randValue];
+          state.d3ReadableBoardValues[i*state.originalDims[0]+j] = [state.rowLabels[i], state.colLabels[j], randValue];
         }
       }
       state.renderAll.redraw()
     })
+}
+
+window.initCompressionLevelSlider = function({sel, state}){
+  var slider = {
+    sel: sel.append('div.slider'),
+    getVal: _ => state.compressionInd,
+    setVal: d => state.compressionInd = d
+  }
+  
+  slider.sel.html(`
+    <div>
+      Total information (bits): <val></val>
+    </div>
+    <div>
+      <input type=range min=0 max=${state.infoLevels.length-2} value=0></input>
+    </div>
+  `)
+
+  slider.sel.select('input[type="range"]')
+    .on('input', function () {
+      slider.setVal(this.value)
+      slider.sel.select('input').node().value = this.value
+      state.renderAll.compressionLevel()
+    })
+  slider.sel.select('val').text(parseFloat(state.infoLevels[slider.getVal()]).toFixed(2))
+  state.renderAll.compressionLevel.fns.push(() => {
+    var value = slider.getVal()
+    slider.sel.select('val').text(parseFloat(state.infoLevels[value]).toFixed(2))
+    slider.sel.select('input').node().value = value
+  })
+
 }

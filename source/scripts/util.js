@@ -159,7 +159,22 @@ window.util = (function(){
     })
   }
 
-  return {getFile, color, colors, addAxisLabel, ggPlot, ggPlotUpdate, sleep, npy2tfSlice, transpose, initRenderAll, titleFmt, keyFmt, addAria}
+  function indexOfMinDistance(arr, val) {
+    var minDist = 100;
+    var minIndex = 0;
+
+    for (var i = 1; i < arr.length; i++) {
+        dist = Math.abs(arr[i]-val)
+        if (dist < minDist) {
+            minIndex = i;
+            minDist = dist
+        }
+    }
+
+    return minIndex;
+}
+
+  return {indexOfMinDistance, getFile, color, colors, addAxisLabel, ggPlot, ggPlotUpdate, sleep, npy2tfSlice, transpose, initRenderAll, titleFmt, keyFmt, addAria}
 
 })()
 

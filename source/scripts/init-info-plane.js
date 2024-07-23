@@ -1,19 +1,3 @@
-/* Copyright 2023 Google LLC. All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-==============================================================================*/
-
-
 window.initInfoPlane = async function({sel, state, isBig=true, lossLabel, width=null, title=null}){
   // Plot the frame
   var leftMargin = 50
@@ -59,6 +43,7 @@ window.initInfoPlane = async function({sel, state, isBig=true, lossLabel, width=
       .attr("y", 0)
 
   var line = d3.line().x(d => c.x(d[d.length-2]))
+
 
   // Create the data curves
   var distortionPathSel = c.svg.append('path')
@@ -108,6 +93,17 @@ window.initInfoPlane = async function({sel, state, isBig=true, lossLabel, width=
 
 
   c.svg.on('mouseleave', () => {state.curveHighlighter = -1; state.renderAll.curveHighlighter() })
+  state.compressionLevelSVGX = c.x
+  state.compressionLevelSVG = c.svg.append("line")
+    .attr("x1", c.x(2))
+    .attr("y1", 0)
+    .attr("x2", c.x(2))
+    .attr("y2", actualHeight)
+    .style("stroke-width", 4)
+    .style("stroke", "black")
+    .style("fill", "none")
+    .style("stroke-dasharray", ("6, 6"))
+    .style("opacity", 0.5)
 
   function drawData(featureIndex) {
     var sel = d3.select(this)
@@ -120,7 +116,7 @@ window.initInfoPlane = async function({sel, state, isBig=true, lossLabel, width=
   function placeText(featureIndex) {
     var sel = d3.select(this)
     sel.at({x: c.width + 50, y: c.height/2 - 100 + featureIndex*20}) //, dy: '.33em'})
-    sel.text(state.feature_labels[featureIndex])
+    sel.text(state.featureLabels[featureIndex])
   }
 
 }

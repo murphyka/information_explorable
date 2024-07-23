@@ -19,12 +19,12 @@ window.initPixelGame = async function({sel, state, isBig=true}){
 
   state.d3ReadableBoardValues = []
   d3zeroedBoardValues = []
-  rowLabels = ['A', 'B', 'C', 'D']
-  colLabels = ['a', 'b', 'c', 'd']
+  state.rowLabels = ['A', 'B', 'C', 'D']
+  state.colLabels = ['a', 'b', 'c', 'd']
   for (let i=0; i<state.boardValues.length; i++){
     for (let j=0; j<state.boardValues[0].length; j++){
-      state.d3ReadableBoardValues.push([rowLabels[i], colLabels[j], state.boardValues[i][j]])
-      d3zeroedBoardValues.push([rowLabels[i], colLabels[j], 0.5])
+      state.d3ReadableBoardValues.push([state.rowLabels[i], state.colLabels[j], state.boardValues[i][j]])
+      d3zeroedBoardValues.push([state.rowLabels[i], state.colLabels[j], 0.5])
     }
   }
   state.reconstructions = []
@@ -54,7 +54,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
   clickableBoardX = d3.scaleBand()
     .range([ 0, pdf_width ])
     // .domain(d3.range(state.boardValues.length))
-    .domain(rowLabels)
+    .domain(state.rowLabels)
     .padding(0.01)
 
   clickableBoardSVG.append("g")
@@ -73,7 +73,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
   clickableBoardY = d3.scaleBand()
     .range([ pdf_width, 0 ])
     // .domain(d3.range(state.boardValues[0].length))
-    .domain(colLabels)
+    .domain(state.colLabels)
     .padding(0.01)
 
   clickableBoardSVG.append("g")
@@ -128,7 +128,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
   // Build X scales and axis:
   fittedBoardX = d3.scaleBand()
     .range([ 0, pdf_width ])
-    .domain(rowLabels)
+    .domain(state.rowLabels)
     .padding(0.01)
 
   fittedBoardSVG.append("g")
@@ -145,7 +145,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
   // Build X scales and axis:
   fittedBoardY = d3.scaleBand()
     .range([ pdf_width, 0 ])
-    .domain(colLabels)
+    .domain(state.colLabels)
     .padding(0.01)
 
   fittedBoardSVG.append("g")
