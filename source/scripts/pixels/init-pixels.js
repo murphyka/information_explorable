@@ -40,7 +40,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
   .style("overflow", "auto")
   .style("height", "100%")
 
-  pdf_margin = {left: 20, right: 20, top: 20, bottom: 20}
+  pdf_margin = {left: 40, right: 20, top: 0, bottom: 40}
   pdf_width = 100
   clickableBoardSVG = boardSel
   .append("svg")
@@ -87,7 +87,19 @@ window.initPixelGame = async function({sel, state, isBig=true}){
           return util.colors.features[i+state.originalDims[0]]
         })
 
+    clickableBoardSVG
+      .append('g')
+      .translate([-23, pdf_width/2])
+      .append('text.axis-label')
+      .text('Town 2')
+      .at({textAnchor: 'middle', fill: '#000', transform: 'rotate(-90)'})
 
+    clickableBoardSVG
+      .append('g')
+      .translate([pdf_width/2, pdf_width +33])
+      .append('text.axis-label')
+      .text('Town 1')
+      .at({textAnchor: 'middle', fill: '#000'})
        
   clickableBoardSVG.selectAll("path,line").remove();
 
@@ -171,6 +183,20 @@ window.initPixelGame = async function({sel, state, isBig=true}){
       .attr("width", fittedBoardX.bandwidth() )
       .attr("height", fittedBoardY.bandwidth() )
       .style("fill", function(d) { return heatmapColor(d[2])} )
+
+  fittedBoardSVG
+      .append('g')
+      .translate([-23, pdf_width/2])
+      .append('text.axis-label')
+      .text('Town 2')
+      .at({textAnchor: 'middle', fill: '#000', transform: 'rotate(-90)'})
+
+    fittedBoardSVG
+      .append('g')
+      .translate([pdf_width/2, pdf_width +33])
+      .append('text.axis-label')
+      .text('Town 1')
+      .at({textAnchor: 'middle', fill: '#000'})
 
   ////////////////////////////////////// Display the information allocation
   var leftMargin = 60
@@ -285,11 +311,18 @@ window.initPixelGame = async function({sel, state, isBig=true}){
         margin: {left: leftMargin, right: rightMargin, top: topMargin, bottom: bottomMargin}
       }))
       state.cs[latentInd].x.domain([-4, 4])
-      state.cs[latentInd].y.domain([0, 1])  
+      state.cs[latentInd].y.domain([0, 1])
 
       state.cs[latentInd].yAxis.ticks(isBig ? 5 : 3)
       // state.cs[latentInd].svg.attr({"float": "left"})
       d3.drawAxis(state.cs[latentInd])
+
+      state.cs[latentInd].svg.append("text")
+        .attr("x", (latentWidth / 2))             
+        .attr("y", 0 - (topMargin / 2))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "16px") 
+        .text(`Latent space, Town ${latentInd+1}`);
 
       // Draw the prior
       state.cs[latentInd].svg.append('path').datum(priorData)

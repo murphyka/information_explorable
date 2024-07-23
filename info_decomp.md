@@ -39,12 +39,12 @@ A town sends a binary signal to tell about their weather conditions locally, usi
   </figure>
 </div>
 
-Let's say the weather in a neighboring town (town A) is completely unpredictable one hour to the next<a class='footstart' key='weather-caveats'></a>, and it's calm half the time, stormy the other half of the time.
-That town's weather will be one of our "source" random variables, which we'll call `$X_A$`.
-It has two equally probable outcomes (calm or stormy), so `$X_A$` has one bit of uncertainty (aka entropy)<a class='footstart' key='entropy'></a>.
+Let's say the weather in a neighboring town (town 1) is completely unpredictable one hour to the next<a class='footstart' key='weather-caveats'></a>, and it's calm half the time, stormy the other half of the time.
+That town's weather will be one of our "source" random variables, which we'll call `$X_1$`.
+It has two equally probable outcomes (calm or stormy), so `$X_1$` has one bit of uncertainty (aka entropy)<a class='footstart' key='entropy'></a>.
 
-The message your town receives from the telegraph line will be our auxiliary random variable -- call it `$U_A$`.
-The mutual information between the two, `$I(X_A;U_A)$`, is the amount of information transmitted per message -- it's the amount that receiving a message reduces your uncertainty about town A's weather<a class='footstart' key='mutual_info'></a>.
+The message your town receives from the telegraph line will be our auxiliary random variable -- call it `$U_1$`.
+The mutual information between the two, `$I(X_1;U_1)$`, is the amount of information transmitted per message -- it's the amount that receiving a message reduces your uncertainty about town 1's weather<a class='footstart' key='mutual_info'></a>.
 The more money you spend on the telegraph line, the lower the noise in the line and the better you'll be able to infer the other town's weather.
 <div class="container">
   <div class='transmission-noise-slider'></div>
@@ -52,19 +52,19 @@ The more money you spend on the telegraph line, the lower the noise in the line 
 
 <div class='storm-telegraph-single row'></div>
 
-**Why is the transmitted information lower when the noise increases?**  As the distributions `$p(u|x=C)$` <coloredText style="background:#D5E5F0;">(blue)</coloredText> and `$p(u|x=S)$` <coloredText style="background:#F7D1D2;">(red)</coloredText> overlap, there's a growing chance of receiving a low voltage signal (i.e., around `$0\text{V}$`), in which case you remain uncertain about whether the original signal was `$-1\text{V}$` or `$+1\text{V}$` even after receiving the message.  The transmitted information can **at most** reduce your uncertainty by one bit because that is the amount of uncertainty you started with, so as the chance of receiving ambiguous messages grows, the transmitted information necessarily drops.  
+**Why is the transmitted information lower when the noise increases?**  As the distributions `$p(u_1|x_1=\text{calm})$` <coloredText style="background:#D5E5F0;">(blue)</coloredText> and `$p(u_1|x_1=\text{stormy})$` <coloredText style="background:#F7D1D2;">(red)</coloredText> overlap, there's a growing chance of receiving a low voltage signal (i.e., around `$0\text{V}$`), in which case you remain uncertain about whether the original signal was `$-1\text{V}$` or `$+1\text{V}$` even after receiving the message.  The transmitted information can **at most** reduce your uncertainty by one bit because that is the amount of uncertainty you started with, so as the chance of receiving ambiguous messages grows, the transmitted information necessarily drops.  
 
 #### Information from multiple sources
 
-Now let's say there are two neighboring towns (A and B<a class='footstart' key='b-weather'></a>) with which to build telegraph lines, and you have a fixed budget for the whole project. How much money should you allocate for each line?  
+Now let's say there are two neighboring towns (1 and 2<a class='footstart' key='b-weather'></a>) with which to build telegraph lines, and you have a fixed budget for the whole project. How much money should you allocate for each line?  
 
 
 Due to the surrounding landscape, the weather is not trivially related between their towns and yours.  
-A dataset has been collected (using the random variable `$Y$` to describe the weather in your town), shown below in terms of the conditional distributions `$p(y=\text{stormy} |x_\text{A}, x_\text{B})$`.
+A dataset has been collected (using the random variable `$Y$` to describe the weather in your town), shown below in terms of the conditional distributions `$p(y=\text{stormy} |x_\text{1}, x_\text{2})$`.
 
 <div class='storm-heatmap' align='center'></div>
 
-To get the most value out of the telegraph lines, we need to localize the information contained in the sources `$X_A$` and `$X_B$` about the target `$Y$`.
+To get the most value out of the telegraph lines, we need to localize the information contained in the sources `$X_1$` and `$X_2$` about the target `$Y$`.
 In order to do that, we'll look at all the possible ways to communicate information about the sources -- effectively simulating every possible budget allocation.
 
 <div class='sticky-container'>
@@ -73,7 +73,7 @@ In order to do that, we'll look at all the possible ways to communicate informat
 
 Each dot in plot above represents a different information allocation between the two towns, and each one lowers your error in predicting `$Y$` (your town's weather) a different amount<a class='footstart' key='y-not-info'></a>.
 In the top left, you don't receive any information from the other towns and your error is maximal. 
-In the bottom right, you receive one bit of information from each town, and the error is as low as you can go (which is set by the total mutual information between sources and target `$I(X_A,X_B;Y)$`).
+In the bottom right, you receive one bit of information from each town, and the error is as low as you can go (which is set by the total mutual information between sources and target `$I(X_1,X_2;Y)$`).
 
 What we've done is laid out all the ways to select variation from the source variables.
 Localizing the information the sources contain about the target means identifying the variation that lowers the error the most.
@@ -86,8 +86,8 @@ Let's display these optimal information allocations by clicking the button below
 </label> *Display optimal information allocations*
 
 The right vertical axis now displays the optimal amount of information to receive from each town.
-If your budget only allows for one total bit of transmitted information, it's best to get about 3/4 of a bit from town A and 1/4 of a bit from town B.
-Phrased more generally, given the statistical relationship observed in the dataset, we've found a spectrum of the most informative variation in `$X_A$` and `$X_B$` about `$Y$`.
+If your budget only allows for one total bit of transmitted information, it's best to get about 3/4 of a bit from town 1 and 1/4 of a bit from town 2.
+Phrased more generally, given the statistical relationship observed in the dataset, we've found a spectrum of the most informative variation in `$X_1$` and `$X_2$` about `$Y$`.
 
 Let's change the statistical relationship between the towns' weather. 
 Adjust the sliders or click on the buttons below, and watch for changes in the optimal information allocations. 
@@ -97,13 +97,13 @@ Adjust the sliders or click on the buttons below, and watch for changes in the o
   <div class='storm-probability-buttons' id='buttons2'></div>
 </div>
 
-When mirroring town A's weather (<digits>MirrorA</digits>), we see that there is no information in B as it does nothing to reduce our predictive error.
+When mirroring town 1's weather (<digits>Mirror1</digits>), we see that there is no information in town 2 as it does nothing to reduce our predictive error.
 With the logic gates, we see that both towns contain relevant information because the optimal allocation is an equal split.
 <digits>XOR</digits> is unique among the logic gates in that the error is slow to decrease in the low-information regime, and in the greater discrepancy between optimal and suboptimal information allocations<a class='footstart' key='xor'></a>. 
 
 </div>
 
-Whereas a typical information theory treatment of this scenario might have looked at `$I(X_A;Y)$`, `$I(X_B;Y)$`, and `$I(X_A,X_B;Y)$`, we explored the space of partial information allocations by introducing the auxiliary variables `$U_A$` and `$U_B$`.
+Whereas a typical information theory treatment of this scenario might have looked at `$I(X_1;Y)$`, `$I(X_2;Y)$`, and `$I(X_1,X_2;Y)$`, we explored the space of partial information allocations by introducing the auxiliary variables `$U_1$` and `$U_2$`.
 We've searched through all possible lossy compressions of each source random variable to identify the information contained in each that is most predictive of the target.
 <!-- 
 **At a high level,** the variation in the sources (the weather of towns A and B) is not all equal in the amount of information it shares with the target variable (your town's weather).
@@ -113,15 +113,15 @@ Because mutual information is just shared variation, we've localized the informa
 #### Searching through the sea of variation with machine learning
 
 Having proven yourself with the economical storm warning system, the three towns have tasked you with building another communication system.
-Your town is home to the largest hospital in the region, but towns A and B contain specialized testing devices that your hospital regularly needs.
-A blood sample is sent off to town A, and their device measures one of four results; another sample is sent to B and its (different) device can also output one of four results.
-Whether or not to administer a full dose of a particular drug depends on the results from A and B.
+Your town is home to the largest hospital in the region, but towns 1 and 2 contain specialized testing devices that your hospital regularly needs.
+A blood sample is sent off to town 1, and their device measures one of four results; another sample is sent to town 2 and its (different) device can also output one of four results.
+Whether or not to administer a full dose of a particular drug depends on the results from town 1 and town 2.
 **Where, in each of the test results, is the information about whether to administer the drug?**
 
 Since we are only interested in the Pareto front -- the information allocations that maximize predictive power -- we can set this up as an optimization problem.
-Specifically, we'll pass the possible messages for town A through a variational encoder and those for town B through a second one.
-These variational encoders look just like the front half of a variational autoencoder (VAE)<a class='citestart' key='vae'></a>
-We can penalize the transmitted information in the same way VAEs do: with the expected KL divergence with some arbitrary (but convenient) prior.
+Specifically, we'll pass the possible messages for town 1 through a variational encoder and those for town 2 through a second one.
+These variational encoders look just like the front half of a variational autoencoder (VAE)<a class='citestart' key='vae'></a>, where the inputs are transformed to posterior distributions in a latent space.
+We can penalize the transmitted information in the same way VAEs do: with the expected KL divergence with some arbitrary (but convenient) prior<a class='footstart' key='dvib'></a>.
 Then the encodings, which will already have compressed away some information about the inputs, will be used for prediction of the target, and the whole setup can be trained end-to-end with gradient descent.
 
 <div class="container">
@@ -140,7 +140,7 @@ The trajectory of information allocations versus error is mapped out during trai
 </div>
 
 Note, the training process is happening in your browser, so the models are lightweight and the learning rate is high.
-The model will occasionally fail to fit the simple distribution.
+The model will occasionally fail to fit the simple distribution; just try training again.
 
 Underneath the information plane are the one dimensional latent spaces corresponding to `$U_1$` and `$U_2$`.
 The colored Gaussians are the representations of the specific test outcomes, while the gray Gaussian is the prior to which all embeddings must conform when the information penalty is high.
@@ -209,11 +209,14 @@ The auxiliary variables select the distinctions among feature values that are wo
 By using auxiliary variables to compress our source variables, we gain the ability to identify specific variation across all the sources that is most predictive of the target variable.
 Rather than measuring the mutual information between subsets of the sources and the target -- which can nevertheless be insightful -- we obtain a continuous spectrum of the important bits and a soft ramp to interpretability.
 
-If you find this manner of analysis intriguing and want to learn more, check out our recent papers on the topic:
+If you find this manner of analysis intriguing and want to learn more, check out our papers on the topic:
 
-<a class="paper-title-link" href="https://arxiv.org/abs/2211.17264">Interpretability with full complexity by constraining feature information</a> ICLR 2023
+<a class="paper-title-link" href="https://arxiv.org/abs/2211.17264">Interpretability with full complexity by constraining feature information (ICLR 2023)</a> 
 
-<a class="paper-title-link" href="https://www.pnas.org/doi/abs/10.1073/pnas.2312988121">Information decomposition in complex systems via machine learning</a> PNAS 2024
+<a class="paper-title-link" href="https://www.pnas.org/doi/abs/10.1073/pnas.2312988121">Information decomposition in complex systems via machine learning (PNAS 2024)</a> 
+
+If you have any feedback or thoughts, we'd love to hear them!
+Please email kieranm@seas.upenn.edu.
 
 ### Acknowledgements
 
@@ -239,10 +242,10 @@ Formally, with `$X$` a random variable and `$p(x)$` the probability distribution
 Formally, with `$X$` and `$Y$` two random variables, the mutual information is `$I(X;Y)=H(X)-H(X|Y)=H(Y)-H(Y|X)$`.  It quantifies the amount of shared variation in the two random variables<a class='citestart' key='cover'></a>.
 
 <a class='footend' key='b-weather'></a> 
-Town B's weather is, oddly enough, completely independent of town A's weather.  It's also a 50/50 split between calm and stormy.
+Town 2's weather is, oddly enough, completely independent of town 1's weather.  It's also a 50/50 split between calm and stormy.
 
 <a class='footend' key='y-not-info'></a> 
-The vertical axis could have displayed the mutual information `$I(U_A,U_B;Y)$` instead of cross entropy error `$BCE=H(Y)-I(U_A,U_B;Y)$`, so that all quantities are mutual information terms, but later we'll want to use other errors like RMSE, so we opted for consistency.
+The vertical axis could have displayed the mutual information `$I(U_1,U_2;Y)$` instead of cross entropy error `$BCE=H(Y)-I(U_1,U_2;Y)$`, so that all quantities are mutual information terms, but later we'll want to use other errors like RMSE, so we opted for consistency.
 
 <a class='footend' key='xor'></a>
 Look at the difference in error between half a bit from each town and one bit from either town. 
@@ -250,6 +253,9 @@ The difference in error is large for XOR while it's almost nothing for the other
 
 <a class='footend' key='bhat'></a> 
 Specifically, we use the Bhattacharyya coefficient between the posterior distributions, which is one when they perfectly overlap and zero when they have no overlap.
+
+<a class='footend' key='dvib'></a> 
+This way of restricting information is more general than VAEs; see the deep variational information bottleneck<a class='citestart' key='dvib'></a>.
 
 ### References
 
@@ -259,10 +265,10 @@ Cover, T. & Thomas, J. (1991). John Wiley & Sons, Inc.
 <a class='citeend' key='cover'></a> [The information bottleneck method](https://arxiv.org/abs/physics/0004057)
 Tishby, N., Pereira, F. C., & Bialek, W. arXiv preprint physics/0004057 (2000).
 
-<a class='citestart' key='vae'></a> [Auto-encoding variational Bayes](https://arxiv.org/abs/1312.6114)
+<a class='citeend' key='vae'></a> [Auto-encoding variational Bayes](https://arxiv.org/abs/1312.6114)
 Kingma, D. & Welling, M. arXiv preprint arXiv:1312.6114 (2013).
 
-<a class='citestart' key='dvib'></a> [Deep variational information bottleneck](https://arxiv.org/abs/1612.00410)
+<a class='citeend' key='dvib'></a> [Deep variational information bottleneck](https://arxiv.org/abs/1612.00410)
 Alemi, A. A., Fischer, I., Dillon, J. V., Murphy, K. (ICLR 2017).
 
 <a class='citeend' key='bikeshare'></a> [UCI machine learning repository](https://archive.ics.uci.edu/)

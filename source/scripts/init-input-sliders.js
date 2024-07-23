@@ -38,8 +38,8 @@ window.initProbabilityButtons = function({sel, state, columnIndex}){
   ['OR', [0, 1, 1, 1]],
   ['XOR', [0, 1, 1, 0]],
   ['NAND', [1, 1, 1, 0]],
-  ['MirrorA', [0, 0, 1, 1]],
-  ['MirrorB', [0, 1, 0, 1]],
+  ['Mirror1', [0, 0, 1, 1]],
+  ['Mirror2', [0, 1, 0, 1]],
   ]
   if (columnIndex == 2) {
     gateButtons.slice(0, 4).forEach(stuff => {

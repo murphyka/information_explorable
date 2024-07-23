@@ -54,24 +54,24 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
         .style("font-size", 14)
 
   pdfxOffset = 40
-  pdfyOffset = -20
+  pdfyOffset = -23
   state.pdf_svgs[j].append('g')
       .translate([pdf_width/2, pdf_width + pdfxOffset])
       .append('text.axis-label')
-      .text('A')
-      .at({textAnchor: 'middle', fill: '#000', "font-weight": "bold"})
+      .text('Town 1')
+      .at({textAnchor: 'middle', fill: '#000'})
 
   state.pdf_svgs[j]
       .append('g')
       .translate([pdfyOffset, pdf_width/2])
       .append('text.axis-label')
-      .text('B')
-      .at({textAnchor: 'middle', fill: '#000', transform: 'rotate(-90)', "font-weight": "bold"})
+      .text('Town 2')
+      .at({textAnchor: 'middle', fill: '#000', transform: 'rotate(-90)'})
 
   state.pdf_svgs[j].append('g')
       .translate([pdf_width/2, -10])
       .append('text.axis-label')
-      .text('p(stormy|A,B)')
+      .text('p(stormy|x1,x2)')
       .at({textAnchor: 'middle', fill: '#000'})
 
   // Build X scales and axis:
@@ -84,9 +84,9 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
     .selectAll("text")
       .attr("transform", "translate(-10,-25)rotate(-90)")
       .style("text-anchor", "end")
-      .style("font-size", 14)
+      .style("font-size", 14)  
 
-  state.pdf_svgs[j].selectAll("path,line").remove();
+  state.pdf_svgs[j].selectAll("path,line").remove()
 
   // Build color scale
   var heatmapColor = d3.scaleLinear()
@@ -104,6 +104,8 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
       .attr("height", state.pdfys[j].bandwidth() )
       .style("fill", function(d) { return heatmapColor(d.value)} )
   }
+
+
 
   var c = d3.conventions({
     sel: selRow.append('div'),
@@ -138,7 +140,7 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
 
   state.barx = d3.scaleBand()
   .range([ 0, bars_width ])
-  .domain(['townA', 'townB'])
+  .domain(['town1', 'town2'])
   .padding(0.2);
 
   bars_svg.append("g")
@@ -157,7 +159,7 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
     .call(d3.axisLeft(state.bary));
 
   // Bars
-  barkeys = ['townA', 'townB']
+  barkeys = ['town1', 'town2']
   dummyData = [0.5, 0.75]
   state.bars = bars_svg.selectAll("mybar")
     .data(dummyData)
