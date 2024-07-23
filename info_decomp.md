@@ -23,7 +23,7 @@ You might mention the overall size or something about the rear, understanding th
 The goal of this post is to build intuition around localizing information, something we naturally do to make sense of the world, and show how it can be formulated with machine learning as a route to interpretability.
 The long and short (**TL;DR**) is that we can view the information in data as specific distinctions worth making, in that these distinctions tell us the most about some other quantity we care about.
 
-This post presents a slightly different take on mutual information than other intros to information theory<a class='footstart' key='other-info-resources'></a>.
+This post presents a different take on mutual information than other intros to information theory<a class='footstart' key='other-info-resources'></a>.
 Rather than talking about the mutual information between two variables as something fixed in stone, we will introduce auxiliary variables that encapsulate some variation in a variable and compress away the rest.
 The auxiliary variables can be thought of as messages sent by one party who observes the original "source" variable, to another party who will use the information to predict a "target" variable<a class='footstart' key='info-bottleneck'></a>.
 
@@ -110,21 +110,27 @@ We've searched through all possible lossy compressions of each source random var
 By mapping out the predictive error in all ways of selecting partial bits from the sources, the variation is sorted and we can "point" to the variation that is most shared with the target. 
 Because mutual information is just shared variation, we've localized the information shared between the sources and the target. -->
 
-#### Searching through the variation with machine learning
+#### Searching through the sea of variation with machine learning
 
-Scenario description, exhaustive enumeration impractical
+Having proven yourself with the economical storm warning system, the three towns have tasked you with building another communication system.
+Your town is home to the largest hospital in the region, but towns A and B contain specialized testing devices that your hospital regularly needs.
+A blood sample is sent off to town A, and their device measures one of four results; another sample is sent to B and its (different) device can also output one of four results.
+Whether or not to administer a full dose of a particular drug depends on the results from A and B.
+**Where, in each of the test results, is the information about whether to administer the drug?**
 
-----Sample board-----
-
-Since we are only interested in the Pareto front -- the information allocations that reduce the predictive error the most -- we can set this up as an optimization problem.
-Specifically, we'll pass the possible messages for town A through a variational encoder and those for town B through another one.
+Since we are only interested in the Pareto front -- the information allocations that maximize predictive power -- we can set this up as an optimization problem.
+Specifically, we'll pass the possible messages for town A through a variational encoder and those for town B through a second one.
+These variational encoders look just like the front half of a variational autoencoder (VAE)<a class='citestart' key='vae'></a>
 We can penalize the transmitted information in the same way VAEs do: with the expected KL divergence with some arbitrary (but convenient) prior.
 Then the encodings, which will already have compressed away some information about the inputs, will be used for prediction of the target, and the whole setup can be trained end-to-end with gradient descent.
 
--------Schematic of two encoders, XA XB UA UB and Y--------------
+<div class="container">
+  <img src="data/schematic.svg" width="300" />
+</div>
 
-Let's see how it does, by sweeping over the information penalty `$\beta$`.
-The prediction is shown to the right, and the trajectory of information allocations versus error is mapped out during training.
+Let's see how it does, by sweeping over the cost of transmitting information.
+On the left is the distribution to model with the predictive models' reconstruction below it.
+The trajectory of information allocations versus error is mapped out during training, with the trajectory greyed out during the first stage -- where the relationship between `$X_1$`, `$X_2$`, and `$Y$` are learned with effectively no information cost -- and full color during the second.
 
 <div class='pixel-game row'></div>
 
@@ -133,35 +139,26 @@ The prediction is shown to the right, and the trajectory of information allocati
   <div class='pixel-buttons' id='buttons3'></div>
 </div>
 
+Note, the training process is happening in your browser, so the models are lightweight and the learning rate is high.
+The model will occasionally fail to fit the simple distribution.
 
+Underneath the information plane are the one dimensional latent spaces corresponding to `$U_1$` and `$U_2$`.
+The colored Gaussians are the representations of the specific test outcomes, while the gray Gaussian is the prior to which all embeddings must conform when the information penalty is high.
 
-So where is the information in the test results about `$Y$`? 
-We'll display the variation transmitted by the two encoders with a distinguishability matrix among values, using a measure of statistical similarity between posterior distributions for distinguishability.
-The one bit that is most shared between the sources and the target is shown below by the transmitted distinguishability for the two towns:
+Try the <digits>checker</digits> pattern.
+The information about `$Y$` is quite apparent in the latent spaces.
+Outcomes A and C collapse, as do B and D; the same happens for `$U_2$`.
+Evidently the distinction between test results (A or C) and (B or D) is the one bit of relevance to `$Y$`.
+The other bit is irrelevant.
 
-------------Dist mat1, Dist mat 2--------------
-
-By sweeping the information penalty, we recover all of the optimal information allocations and can "point" to where the information about `$Y$` is most minimally stored.
-Beyond finding the optimal budget allocations, we can also tell town A where to focus its test resolution.
-
-<!-- 
-Occasionally the local board game clubs like to borrow the telegraph lines to play a cooperative game.
-The night before, all three clubs meet in one of the towns and draw out a board of light and dark squares, like the one below.
-
-Then, roles are assigned.
-Two towns will be communicators and the third will aggregate information.
-After working together on communication schemes, the clubs go home and play the following day.
-The game proceeds as follows: a square on the board is chosen at random by the two communicator towns, and its position must be communicated to the aggregator via the information-limited telegraph lines.
-The aggregator uses the limited information to make a prediction about whether the selected square was light or dark.
-After a series of rounds, the towns meet again to check the success of the predictions.
-
-For simplicity, we'll say towns A and B are the communicators.
-A selects a row at random and B selects a column at random. -->
+By sweeping the information penalty, we use machine learning to search through compression schemes and find the optimal information allocations.
+This allows us to "point" to where the information about `$Y$` is most economically stored.
+Beyond finding the optimal budget allocations, we can also tell the two towns where to focus their test resolution, say for new versions of their test devices.
 
 #### Where is the information in the bikeshare dataset?
 
-We've focused on extremely small-scale examples so that we could visualize as much as possible.
-Let's move on to a real world dataset, one that has long been used for evaluating interpretable machine learning methods.
+We've focused on small-scale examples so that we could visualize as much as possible.
+Let's move on to a real world dataset, a classic for evaluating interpretable machine learning methods.
 
 *Bikeshare*<a class='citestart' key='bikeshare'></a> is a dataset containing hourly bike rentals in Washington, D.C. in 2011 and 2012, combined with a handful of weather descriptors at each point in time.
 The goal is to predict the number of bikes rented given time and weather information, and to shed light on the learned relationship.
@@ -172,7 +169,7 @@ The goal is to predict the number of bikes rented given time and weather informa
   </figure>
 </div>
 
-Our source variables are the time and weather descriptors.
+Our source variables `$X_i$` are the time and weather descriptors.
 Some, like temperature and humidity, are continuous variables.
 Others are categorical, including the season and the hour of the day.
 We want to identify -- out of all of the variation in these descriptors -- the specific bits that are most connected with bike rentals.
@@ -195,16 +192,18 @@ For reference, interpretable methods that are based on linear combinations of th
 For a fully nonlinear processing of the features, we need only 4 or 5 bits of information.
 We don't mind that the processing is opaque: our source of interpretability is the information in the features. 
 
-
 **What are the specific bits of variation in the different features?**
-We show distinguishability matrices for the twelve features as a function of the total information extracted.
-The matrices are fundamentally the same as above in the ZZZ example: the auxiliary variables select the distinctions among feature values that are worth communicating to the predictive model.
+Below are distinguishability matrices for the twelve features as a function of the total information extracted.
+The matrices visualize the distinctions between feature values that are passed along to the predictve model, and are agnostic to the dimensionality of the latent space.
+The matrix entries are white if the feature values are indistinguishable (same as when the posterior distributions coincided in the above example) and blue depending on the degree of distinguishability<a class='footstart' key='bhat'></a>.
+The auxiliary variables select the distinctions among feature values that are worth communicating to the predictive model.
 <div class="container">
   <div class='compression-level-slider'></div>
 </div>
 <div class='distinguishability-mats row' width="50"></div>
 
 </div>
+
 #### Conclusion
 
 By using auxiliary variables to compress our source variables, we gain the ability to identify specific variation across all the sources that is most predictive of the target variable.
@@ -249,8 +248,8 @@ The vertical axis could have displayed the mutual information `$I(U_A,U_B;Y)$` i
 Look at the difference in error between half a bit from each town and one bit from either town. 
 The difference in error is large for XOR while it's almost nothing for the other logic gates. 
 
-<a class='footend' key='transmission-caveats'></a> 
-assuming there is some standard operating voltage
+<a class='footend' key='bhat'></a> 
+Specifically, we use the Bhattacharyya coefficient between the posterior distributions, which is one when they perfectly overlap and zero when they have no overlap.
 
 ### References
 
@@ -259,6 +258,12 @@ Cover, T. & Thomas, J. (1991). John Wiley & Sons, Inc.
 
 <a class='citeend' key='cover'></a> [The information bottleneck method](https://arxiv.org/abs/physics/0004057)
 Tishby, N., Pereira, F. C., & Bialek, W. arXiv preprint physics/0004057 (2000).
+
+<a class='citestart' key='vae'></a> [Auto-encoding variational Bayes](https://arxiv.org/abs/1312.6114)
+Kingma, D. & Welling, M. arXiv preprint arXiv:1312.6114 (2013).
+
+<a class='citestart' key='dvib'></a> [Deep variational information bottleneck](https://arxiv.org/abs/1612.00410)
+Alemi, A. A., Fischer, I., Dillon, J. V., Murphy, K. (ICLR 2017).
 
 <a class='citeend' key='bikeshare'></a> [UCI machine learning repository](https://archive.ics.uci.edu/)
 Dua, D., & Graff, C. (2017).
