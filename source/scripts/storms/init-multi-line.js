@@ -28,6 +28,7 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
   state.pdf_svgs = []
   state.pdfxs = []
   state.pdfys = []
+  state.valuesText = []
   for (let j=0; j<2; j++) {
     sels[j].append("p").style("align-items", "center")
 
@@ -102,7 +103,22 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
         .attr("y", function(d) { return state.pdfys[j](d.B) })
         .attr("width", state.pdfxs[j].bandwidth() )
         .attr("height", state.pdfys[j].bandwidth() )
+        // .attr("opacity", 0.5)
         .style("fill", function(d) { return heatmapColor(d.value)} )
+
+        
+    state.valuesText.push(state.pdf_svgs[j].selectAll(".valuesText")
+    .data(pdf_data)
+    .enter()
+    .append("text"))
+
+    state.valuesText[j].attr("text-anchor", "middle")
+        .attr("dominant-baseline", "central")
+        .attr("x", function(d, i){ return state.pdfxs[j](d.A)+pdfWidth/4})
+        .attr("y", function(d, i){ return state.pdfys[j](d.B)+pdfWidth/4})
+        .text(function(d){ return parseFloat(d.value).toFixed(2)})
+        .attr("class", "parentText");
+    // cards.select("title").text((d) => d.value);
   }
 
 
@@ -305,6 +321,9 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
       state.pdf_svgs[i].selectAll("rect")
         .data(pdf_data)
         .style("fill", function(d) { return heatmapColor(d.value)} )
+      state.valuesText[i]
+      .data(pdf_data)
+      .text(function(d){ return parseFloat(d.value).toFixed(2)})
     }
     p_xy_channeled = tf.tidy(() => {
       return tf.stack([tf.sub(tf.ones([2, 2]), p_xy_channeled), p_xy_channeled], -1)

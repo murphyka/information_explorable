@@ -25,7 +25,7 @@ The long and short (**TL;DR**) is that we can view the information in data as sp
 
 This post presents a different take on mutual information than other intros to information theory<a class='footstart' key='other-info-resources'></a>.
 Rather than talking about the mutual information between two variables as something fixed in stone, we will introduce auxiliary variables that encapsulate some variation in a variable and compress away the rest.
-The auxiliary variables can be thought of as messages sent by one party who observes the original "source" variable, to another party who will use the information to predict a "target" variable<a class='footstart' key='info-bottleneck'></a>.
+The auxiliary variables can be thought of as messages sent by one party who observes the original "source" variable to another party who will use the information to predict a "target" variable<a class='footstart' key='info-bottleneck'></a>.
 
 ### Communicating information
 
@@ -230,16 +230,19 @@ We thank Sam Dillavou and XYZ for feedback on this post.
 Two great ones to check out are [this classic](https://colah.github.io/posts/2015-09-Visual-Information/) by Christopher Olah and 3blue1brown's [video about wordle](https://youtu.be/v68zYyaEmEA).
 
 <a class='footend' key='info-bottleneck'></a> 
-If you're familiar with the information bottleneck<a class='citestart' key='ib'></a>, that's exactly what we're talking about, except we'll have more than one source variable.
+If you're familiar with the information bottleneck<a class='citestart' key='ib'></a>, that's what we're talking about except there will generally be more than one source variable.
 
 <a class='footend' key='weather-caveats'></a> 
 i.e., forecasting won't help you.
 
 <a class='footend' key='entropy'></a> 
+Entropy is just a way to quantify how much uncertainty a probability distribution describes.
 Formally, with `$X$` a random variable and `$p(x)$` the probability distribution over its outcomes, the entropy is the expected log probability value for any outcome, `$H(X)=\mathbb{E}_{x\sim p(x)} [- \log \ p(x)]$`.
 
 <a class='footend' key='mutual_info'></a> 
-Formally, with `$X$` and `$Y$` two random variables, the mutual information is `$I(X;Y)=H(X)-H(X|Y)=H(Y)-H(Y|X)$`.  It quantifies the amount of shared variation in the two random variables<a class='citestart' key='cover'></a>.
+Mutual information quantifies how much shared entropy there is in two random variables.
+It can be helpful to think of mutual information as a generalization of correlation, where instead of measuring the degree to which a linear function of one variable can describe the other, mutual information measures the best that *any function* of one variable can describe the other.
+Say `$X$` and `$Y$` are two random variables, the mutual information  between them is `$I(X;Y)=H(X)-H(X|Y)=H(Y)-H(Y|X)$`<a class='citestart' key='cover'></a>.
 
 <a class='footend' key='b-weather'></a> 
 Town 2's weather is, oddly enough, completely independent of town 1's weather.  It's also a 50/50 split between calm and stormy.
