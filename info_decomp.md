@@ -86,7 +86,7 @@ Let's display these optimal information allocations by clicking the button below
 </label> *Display optimal information allocations*
 
 The right vertical axis now displays the optimal amount of information to receive from each town.
-If your budget only allows for one total bit of transmitted information, it's best to get about 3/4 of a bit from town 1 and 1/4 of a bit from town 2.
+If your budget only allows for one total bit of transmitted information, it's best to get about 0.7 bits from town 1 and 0.3 bits from town 2.
 Phrased more generally, given the statistical relationship observed in the dataset, we've found a spectrum of the most informative variation in `$X_1$` and `$X_2$` about `$Y$`.
 
 Let's change the statistical relationship between the towns' weather. 
@@ -118,6 +118,7 @@ A blood sample is sent off to town 1, and their device measures one of four resu
 Whether or not to administer a full dose of a particular drug depends on the results from town 1 and town 2.
 **Where, in each of the test results, is the information about whether to administer the drug?**
 
+The space of lossy compressions grows extremely quickly: it's already impractical to chart out all possibilities in this scenario.
 Since we are only interested in the Pareto front -- the information allocations that maximize predictive power -- we can set this up as an optimization problem.
 Specifically, we'll pass the possible messages for town 1 through a variational encoder and those for town 2 through a second one.
 These variational encoders look just like the front half of a variational autoencoder (VAE)<a class='citestart' key='vae'></a>, where the inputs are transformed to posterior distributions in a latent space.
@@ -248,7 +249,8 @@ Say `$X$` and `$Y$` are two random variables, the mutual information  between th
 Town 2's weather is, oddly enough, completely independent of town 1's weather.  It's also a 50/50 split between calm and stormy.
 
 <a class='footend' key='y-not-info'></a> 
-The vertical axis could have displayed the mutual information `$I(U_1,U_2;Y)$` instead of cross entropy error `$BCE=H(Y)-I(U_1,U_2;Y)$`, so that all quantities are mutual information terms, but later we'll want to use other errors like RMSE, so we opted for consistency.
+The vertical axis could have displayed the mutual information `$I(U_1,U_2;Y)$` instead of cross entropy error `$BCE=H(Y)-I(U_1,U_2;Y)$` so that all quantities are mutual information terms.
+However, later we'll want to use other errors like RMSE, so we opted for consistency.
 
 <a class='footend' key='xor'></a>
 Look at the difference in error between half a bit from each town and one bit from either town. 
@@ -258,7 +260,7 @@ The difference in error is large for XOR while it's almost nothing for the other
 Specifically, we use the Bhattacharyya coefficient between the posterior distributions, which is one when they perfectly overlap and zero when they have no overlap.
 
 <a class='footend' key='dvib'></a> 
-This way of restricting information is more general than VAEs; see the deep variational information bottleneck<a class='citestart' key='dvib'></a>.
+This way of restricting information is more general than VAEs; see Alemi et al. on the variational information bottleneck<a class='citestart' key='dvib'></a>.
 
 ### References
 
