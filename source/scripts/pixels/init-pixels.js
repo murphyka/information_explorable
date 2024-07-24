@@ -282,10 +282,14 @@ window.initPixelGame = async function({sel, state, isBig=true}){
     .at({d: line.y(d => c.y2(d[1]))(dummyData2)}))
   }
 
-  window.initPixelButtons({
-    sel: d3.select('#buttons3').html(''),
-    state,
-  });
+  for (let columnIndex=3; columnIndex<=5; columnIndex++) {
+    window.initPixelButtons({
+      sel: d3.select(`#buttons${columnIndex}`).html(''),
+      state,
+      columnIndex,
+    });
+  }
+  
 
 
   //////////////////////////// Show the latent spaces
@@ -319,12 +323,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
       // state.cs[latentInd].svg.attr({"float": "left"})
       d3.drawAxis(state.cs[latentInd])
 
-      state.cs[latentInd].svg.append("text")
-        .attr("x", (latentWidth / 2))             
-        .attr("y", 0 - (topMargin / 2))
-        .attr("text-anchor", "middle")  
-        .style("font-size", "16px") 
-        .text(`Latent space, Town ${latentInd+1}`);
+      
 
       // Draw the prior
       state.cs[latentInd].svg.append('path').datum(priorData)
@@ -340,6 +339,12 @@ window.initPixelGame = async function({sel, state, isBig=true}){
             .x(d => state.cs[latentInd].x(d[0]))
             .y(d => state.cs[latentInd].y(d[1]))}))
       }
+      state.cs[latentInd].svg.append("text")
+        .attr("x", (latentWidth / 2))             
+        .attr("y", 0 - (topMargin / 2))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "16px") 
+        .text(`Latent space, Town ${latentInd+1}`);
     }
   })
   

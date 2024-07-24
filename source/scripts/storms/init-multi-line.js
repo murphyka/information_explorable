@@ -185,7 +185,7 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
       .attr("y", function(d, i) { return state.bary(d); })
       .attr("width", state.barx.bandwidth())
       .attr("height", function(d, i) { return actualHeight - state.bary(d); })
-      .attr("fill", function(d, i) {return util.colors.bars[i];})
+      .attr("fill", function(d, i) {return util.colors.towns[i];})
 
   c.svg.select('.y').lower()  // z order
 
@@ -288,11 +288,11 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
   dummyData2 = Array(numberParetoPoints).fill(Array(2).fill(0)) 
   var line = d3.line().x(d => c.x(d[0])) 
   var paretoPathSel = c.svg.append('path')
-    .at({strokeWidth: 2, stroke: "#000", fill: 'none'})
+    .at({strokeWidth: 3, stroke: "#000", fill: 'none'})
   var paretoPathSel0 = c.svg.append('path')
-    .at({strokeWidth: 2, stroke: util.colors.features[0], fill: 'none'})
+    .at({strokeWidth: 3, stroke: util.colors.towns[0], fill: 'none'})
   var paretoPathSel1 = c.svg.append('path')
-    .at({strokeWidth: 2, stroke: util.colors.features[1], fill: 'none'})
+    .at({strokeWidth: 3, stroke: util.colors.towns[1], fill: 'none'})
 
       
   paretoPathSel.at({d: line.y(d => c.y(d[1]))(dummyData2)}).at("visibility", "hidden")

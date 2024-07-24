@@ -50,6 +50,7 @@ window.util = (function(){
     '#F59F00', '#BF211E', '#489FB5'],
     highlight: '#b4cc16',
     bars: ['#1f77b4', '#ff7f0e'],
+    towns: ['#69A3C9', '#E77377']
   }
   d3.entries(colors).forEach(({key, value}) => {
     d3.select('html').style('--color-' + key, value)

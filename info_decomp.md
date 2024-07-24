@@ -21,7 +21,7 @@ It might be an unusual phrasing, but you'd probably understand what they mean.
 You might mention the overall size or something about the rear, understanding that there is specific variation among vehicles that best distinguishes cars from trucks and other variation that is less relevant (e.g., the color).
 
 The goal of this post is to build intuition around localizing information, something we naturally do to make sense of the world, and show how it can be formulated with machine learning as a route to interpretability.
-The long and short (**TL;DR**) is that we can view the information in data as specific distinctions worth making, in that these distinctions tell us the most about some other quantity we care about.
+The long and short (**TL;DR**) is that **we can view the information in data as specific distinctions worth making, in that these distinctions tell us the most about some other quantity we care about.**
 
 This post presents a different take on mutual information than other intros to information theory<a class='footstart' key='other-info-resources'></a>.
 Rather than talking about the mutual information between two variables as something fixed in stone, we will introduce auxiliary variables that encapsulate some variation in a variable and compress away the rest.
@@ -112,44 +112,46 @@ Because mutual information is just shared variation, we've localized the informa
 
 #### Searching through the sea of variation with machine learning
 
-Having proven yourself with the economical storm warning system, the three towns have tasked you with building another communication system.
-Your town is home to the largest hospital in the region, but towns 1 and 2 contain specialized testing devices that your hospital regularly needs.
-A blood sample is sent off to town 1, and their device measures one of four results; another sample is sent to town 2 and its (different) device can also output one of four results.
-Whether or not to administer a full dose of a particular drug depends on the results from town 1 and town 2.
-**Where, in each of the test results, is the information about whether to administer the drug?**
+Having proven yourself with the storm warning system, you've been tasked with building another communication system.
+Your town has a hospital, and towns 1 and 2 contain specialized testing devices that your hospital regularly needs.
+A blood sample is sent off to town 1, and their device measures one of four results (<span style="font-weight:bold; color:#1f77b4;">A</span>, <span style="font-weight:bold; color:#ff7f0e;">B</span>, <span style="font-weight:bold; color:#2ca02c;">C</span>, or <span style="font-weight:bold; color:#d62728;">D</span>); 
+another sample is sent to town 2 and its device can also output one of four results (<span style="font-weight:bold; color:#9467bd;">a</span>, <span style="font-weight:bold; color:#8c564b;">b</span>, <span style="font-weight:bold; color:#e377c2;">c</span>, or <span style="font-weight:bold; color:#7f7f7f;">d</span>).
+The results from towns 1 and 2 determine which of two treatment plans to follow.
 
-The space of lossy compressions grows extremely quickly: it's already impractical to chart out all possibilities in this scenario.
-Since we are only interested in the Pareto front -- the information allocations that maximize predictive power -- we can set this up as an optimization problem.
-Specifically, we'll pass the possible messages for town 1 through a variational encoder and those for town 2 through a second one.
-These variational encoders look just like the front half of a variational autoencoder (VAE)<a class='citestart' key='vae'></a>, where the inputs are transformed to posterior distributions in a latent space.
-We can penalize the transmitted information in the same way VAEs do: with the expected KL divergence with some arbitrary (but convenient) prior<a class='footstart' key='dvib'></a>.
-Then the encodings, which will already have compressed away some information about the inputs, will be used for prediction of the target, and the whole setup can be trained end-to-end with gradient descent.
+The space of lossy compressions grows rapidly: it's already impractical to chart out all possibilities in this scenario.
+We are only interested in the Pareto front: the specific variation that maximizes predictive power while minimizing the total information extracted from the source variables.
+Can we tackle this optimization problem with machine learning?
 
 <div class="container">
   <img src="data/schematic.svg" width="300" />
 </div>
 
-Let's see how it does by sweeping over the cost of transmitting information.
-On the left is the distribution to model with the predictive models' reconstruction below it.
-The trajectory of information allocations versus error is mapped out during training, with the trajectory greyed out during the first stage -- where the relationship between `$X_1$`, `$X_2$`, and `$Y$` are learned with effectively no information cost -- and full color during the second.
+With a dataset of `$(x_1,x_2,y)$` samples, we'll optimize one embedding space for `$X_1$` that will serve as our auxiliary variable `$U_1$`, and another embedding space for `$X_2$`.
+Then the embeddings will be used to predict the target variable, `$Y$` (which of the two treatment plans to follow).
+To penalize the transmitted information, `$I(X_1;U_1)+I(X_2;U_2)$`, we'll use a variational encoder<a class='footstart' key='vae'></a> for each of `$X_1$` and `$X_2$`.
+The information transmitted is upper bounded by the expected KL divergence between the embedding (aka posterior) distributions and some arbitrary but convenient prior<a class='footstart' key='dvib'></a>.
+
+Let's train such a model in your browser, and gradually raise the cost of information in order to traverse the Pareto front<a class='footstart' key='tryAgain'></a>.
+On the left is the relationship between test results and treatment plan<a class='footstart' key='squareClick'></a> with the predictive models' reconstruction below it.
+The trajectory of information allocations versus error is mapped out during training, with the trajectory greyed out during the first stage -- where the relationship between `$X_1$`, `$X_2$`, and `$Y$` are learned with low information cost -- and full color during the second.
 
 <div class='pixel-game row'></div>
 
 <div class='container'>
   <div class='train-dib-button'></div>
   <div class='pixel-buttons' id='buttons3'></div>
+  <div class='pixel-buttons' id='buttons4'></div>
+  <div class='pixel-buttons' id='buttons5'></div>
 </div>
 
-Note, the training process is happening in your browser, so the models are lightweight and the learning rate is high.
-The model will occasionally fail to fit the simple distribution; just try training again.
-
-Underneath the information plane are the one dimensional latent spaces corresponding to `$U_1$` and `$U_2$`.
+Underneath the information plane are the one dimensional latent spaces corresponding to `$U_1$` and `$U_2$`, which should remind you of the telegraph messaging space earlier in this post.
 The colored Gaussians are the representations of the specific test outcomes, while the gray Gaussian is the prior to which all embeddings must conform when the information penalty is high.
 
-Try the <digits>checker</digits> pattern.
-The information about `$Y$` is quite apparent in the latent spaces.
-Outcomes A and C collapse, as do B and D; the same happens for `$U_2$`.
-Evidently the distinction between test results (A or C) and (B or D) is the one bit of relevance to `$Y$`.
+Try different patterns above; generally the information about `$Y$` is quite apparent in the latent spaces.
+For the <digits>checker</digits> pattern, outcomes A and C collapse, as do B and D; analogous collapse happens for `$U_2$`.
+
+
+Evidently the distinction between test results {<span style="font-weight:bold; color:#1f77b4;">A</span> or <span style="font-weight:bold; color:#2ca02c;">C</span>} and {<span style="font-weight:bold; color:#ff7f0e;">B</span> or <span style="font-weight:bold; color:#d62728;">D</span>} is the one bit from Town 1 of relevance to `$Y$`.
 The other bit is irrelevant.
 
 By sweeping the information penalty, we use machine learning to search through compression schemes and find the optimal information allocations.
@@ -216,10 +218,10 @@ If you find this manner of analysis intriguing and want to learn more, check out
 
 <a class="paper-title-link" href="https://www.pnas.org/doi/abs/10.1073/pnas.2312988121">Information decomposition in complex systems via machine learning (PNAS 2024)</a> 
 
+<hr>
+
 If you have any feedback or thoughts, we'd love to hear them!
 Please email kieranm@seas.upenn.edu.
-
-### Acknowledgements
 
 We thank Sam Dillavou and XYZ for feedback on this post.
 
@@ -259,8 +261,17 @@ The difference in error is large for XOR while it's almost nothing for the other
 <a class='footend' key='bhat'></a> 
 Specifically, we use the Bhattacharyya coefficient between the posterior distributions, which is one when they perfectly overlap and zero when they have no overlap.
 
+<a class='footend' key='vae'></a>
+Just the front end of a variational autoencoder (VAE)<a class='citestart' key='vae'></a>.
+
 <a class='footend' key='dvib'></a> 
 This way of restricting information is more general than VAEs; see Alemi et al. on the variational information bottleneck<a class='citestart' key='dvib'></a>.
+
+<a class='footend' key='tryAgain'></a>
+The models are lightweight and the learning rate is high, so the model will occasionally fail to fit the simple distribution.  If things look weird, just try training again.
+
+<a class='footend' key='squareClick'></a>
+Click the squares to toggle their values.
 
 ### References
 

@@ -128,49 +128,80 @@ window.initTrainDIB = function({sel, state}) {
   })
 }
 
-window.initPixelButtons = function({sel, state}){
+window.initPixelButtons = function({sel, state, columnIndex}){
+    if (columnIndex == 3) {
+      buttonSel = sel.append('div.button')
+      buttonSel.html(`<input type="button" class="pbutton" value="Checker">`)
+      .on('click', function () {
 
-    buttonSel = sel.append('div.button')
-    buttonSel.html(`<input type="button" class="pbutton" value="Checker">`)
-    .on('click', function () {
-
-      for (let i=0; i<state.originalDims[0]; i++) {
-        for (let j=0; j<state.originalDims[1]; j++) {
-          val = (i+j)%2
-          state.boardValues[i][j] = val;
-          state.d3ReadableBoardValues[i*state.originalDims[0]+j] = [state.rowLabels[i], state.colLabels[j], val];
+        for (let i=0; i<state.originalDims[0]; i++) {
+          for (let j=0; j<state.originalDims[1]; j++) {
+            val = (i+j)%2
+            state.boardValues[i][j] = val;
+            state.d3ReadableBoardValues[i*state.originalDims[0]+j] = [state.rowLabels[i], state.colLabels[j], val];
+          }
         }
-      }
-      state.renderAll.redraw()
-    })
+        state.renderAll.redraw()
+      })
 
-    buttonSel = sel.append('div.button')
-    buttonSel.html(`<input type="button" class="pbutton" value="In/Out">`)
-    .on('click', function () {
+      buttonSel = sel.append('div.button')
+      buttonSel.html(`<input type="button" class="pbutton" value="In/Out">`)
+      .on('click', function () {
 
-      for (let i=0; i<state.originalDims[0]; i++) {
-        for (let j=0; j<state.originalDims[1]; j++) {
-          val = (i==0) || (i==state.originalDims[0]-1) || (j==0) || (j==state.originalDims[1]-1)
-          state.boardValues[i][j] = val;
-          state.d3ReadableBoardValues[i*state.originalDims[0]+j] = [state.rowLabels[i], state.colLabels[j], val];
+        for (let i=0; i<state.originalDims[0]; i++) {
+          for (let j=0; j<state.originalDims[1]; j++) {
+            val = (i==0) || (i==state.originalDims[0]-1) || (j==0) || (j==state.originalDims[1]-1)
+            state.boardValues[i][j] = val;
+            state.d3ReadableBoardValues[i*state.originalDims[0]+j] = [state.rowLabels[i], state.colLabels[j], val];
+          }
         }
-      }
-      state.renderAll.redraw()
-    })
+        state.renderAll.redraw()
+      })
+    } else if (columnIndex == 4) {
+      buttonSel = sel.append('div.button')
+      buttonSel.html(`<input type="button" class="pbutton" value="Stripe">`)
+      .on('click', function () {
 
-    buttonSel = sel.append('div.button')
-    buttonSel.html(`<input type="button" class="pbutton" value="Random" id="random2">`)
-    .on('click', function () {
-
-      for (let i=0; i<state.originalDims[0]; i++) {
-        for (let j=0; j<state.originalDims[1]; j++) {
-          randValue = Math.floor(Math.random()*2)
-          state.boardValues[i][j] = randValue;
-          state.d3ReadableBoardValues[i*state.originalDims[0]+j] = [state.rowLabels[i], state.colLabels[j], randValue];
+        for (let i=0; i<state.originalDims[0]; i++) {
+          for (let j=0; j<state.originalDims[1]; j++) {
+            val = (i)%2
+            state.boardValues[i][j] = val;
+            state.d3ReadableBoardValues[i*state.originalDims[0]+j] = [state.rowLabels[i], state.colLabels[j], val];
+          }
         }
-      }
-      state.renderAll.redraw()
-    })
+        state.renderAll.redraw()
+      })
+
+      buttonSel = sel.append('div.button')
+      buttonSel.html(`<input type="button" class="pbutton" value="Diag">`)
+      .on('click', function () {
+
+        for (let i=0; i<state.originalDims[0]; i++) {
+          for (let j=0; j<state.originalDims[1]; j++) {
+            val = (i+j)<4
+            state.boardValues[i][j] = val;
+            state.d3ReadableBoardValues[i*state.originalDims[0]+j] = [state.rowLabels[i], state.colLabels[j], val];
+          }
+        }
+        state.renderAll.redraw()
+      })
+    } else {
+      buttonSel = sel.append('div.button')
+      buttonSel.html(`<input type="button" class="pbutton" value="Random" id="random2">`)
+      .on('click', function () {
+
+        for (let i=0; i<state.originalDims[0]; i++) {
+          for (let j=0; j<state.originalDims[1]; j++) {
+            randValue = Math.floor(Math.random()*2)
+            state.boardValues[i][j] = randValue;
+            state.d3ReadableBoardValues[i*state.originalDims[0]+j] = [state.rowLabels[i], state.colLabels[j], randValue];
+          }
+        }
+        state.renderAll.redraw()
+      })
+    }
+
+    
 }
 
 window.initCompressionLevelSlider = function({sel, state}){
