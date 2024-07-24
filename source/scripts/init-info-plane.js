@@ -70,6 +70,15 @@ window.initInfoPlane = async function({sel, state, isBig=true, lossLabel, width=
       .filter(d => d == state.curveHighlighter)
       .classed('active', 1)
 
+    for (let featureInd=0; featureInd<state.numberFeatures; featureInd++) {
+      
+      if (featureInd == state.curveHighlighter) {
+        weight = 'bold'
+      } else {
+        weight = 'light'
+      } 
+      state.distSVGs[featureInd].selectAll('text').at({'font-weight': weight})
+    }
     if (state.curveHighlighter < 0) return
 
   })
@@ -99,11 +108,11 @@ window.initInfoPlane = async function({sel, state, isBig=true, lossLabel, width=
     .attr("y1", 0)
     .attr("x2", c.x(2))
     .attr("y2", actualHeight)
-    .style("stroke-width", 4)
+    .style("stroke-width", 2)
     .style("stroke", "black")
     .style("fill", "none")
-    .style("stroke-dasharray", ("6, 6"))
-    .style("opacity", 0.5)
+    .style("stroke-dasharray", ("4, 4"))
+    // .style("opacity", 0.5)
 
   function drawData(featureIndex) {
     var sel = d3.select(this)

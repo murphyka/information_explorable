@@ -12,7 +12,7 @@ window.initDistinguishability = async function({sel, state}) {
 
   for (let featureInd=0; featureInd<state.numberFeatures; featureInd++) {
     let matDim = Math.floor(Math.sqrt(state.distMatrices[featureInd][0].length))
-    sel.append("div")
+    divSel = sel.append("div")
       .style("flex-direction", "column")
       .style("width", matWidth)
       .style("overflow", "auto")
@@ -24,6 +24,7 @@ window.initDistinguishability = async function({sel, state}) {
         .append("g")
         .attr("transform",
             "translate(" + margins.left + "," + margins.top + ")"))
+
     // Build X scales and axis:
     distX = d3.scaleBand()
         .range([ 0, matWidth ])
@@ -52,6 +53,7 @@ window.initDistinguishability = async function({sel, state}) {
       .attr("width", distX.bandwidth() )
       .attr("height", distY.bandwidth() )
       .style("fill", function(d) { return distinguishabilityColorMap(d[2])} )
+
     if (state.featureValueLabels[featureInd].length > 0) {
 
         yAxisGen = d3.axisLeft(distY).tickPadding(-2)

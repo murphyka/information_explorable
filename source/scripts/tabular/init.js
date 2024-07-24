@@ -97,7 +97,7 @@ window.initTabular = async function(){
     [0, 30, 60, 90],
   ]
 
-  state.compressionInd = 14
+  state.compressionInd = 13
   window.initDistinguishability({
     sel: d3.select('.distinguishability-mats'),
     state,

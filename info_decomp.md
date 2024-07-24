@@ -148,9 +148,7 @@ Underneath the information plane are the one dimensional latent spaces correspon
 The colored Gaussians are the representations of the specific test outcomes, while the gray Gaussian is the prior to which all embeddings must conform when the information penalty is high.
 
 Try different patterns above; generally the information about `$Y$` is quite apparent in the latent spaces.
-For the <digits>checker</digits> pattern, outcomes A and C collapse, as do B and D; analogous collapse happens for `$U_2$`.
-
-
+For the <digits>Checker</digits> pattern, test results <span style="font-weight:bold; color:#1f77b4;">A</span> and <span style="font-weight:bold; color:#2ca02c;">C</span> collapse, as do <span style="font-weight:bold; color:#ff7f0e;">B</span> and <span style="font-weight:bold; color:#d62728;">D</span>; analogous collapse happens for `$U_2$`.
 Evidently the distinction between test results {<span style="font-weight:bold; color:#1f77b4;">A</span> or <span style="font-weight:bold; color:#2ca02c;">C</span>} and {<span style="font-weight:bold; color:#ff7f0e;">B</span> or <span style="font-weight:bold; color:#d62728;">D</span>} is the one bit from Town 1 of relevance to `$Y$`.
 The other bit is irrelevant.
 
@@ -186,14 +184,14 @@ We ran the optimization offline, but you can run it yourself with the code on <a
 The optimal information allocations are shown above, and there's a lot to note.
 
 The <digits>hour</digits> feature is by far the most important, which is fairly intuitive. 
-The dataset includes rentals in the middle of the night, which are surely different than in the middle of the day. 
+The dataset includes rentals in the middle of the night, which must be very different than in the middle of the day. 
 <digits>temperature</digits> is important and contributes a growing share as the total information increases.
 By contrast, <digits>year</digits> and <digits>working day?</digits> contributed their partial bit and saturate. 
 <digits>wind</digits> and <digits>apparent temperature</digits> contribute almost nothing, with the latter presumably because we've already gotten information from the <digits>temperature</digits> feature.
 
 For reference, interpretable methods that are based on linear combinations of the features (e.g., Neural Additive Models<a class='citestart' key='nam'></a>) achieve RMSE of 100.
 For a fully nonlinear processing of the features, we need only 4 or 5 bits of information.
-We don't mind that the processing is opaque: our source of interpretability is the information in the features. 
+We don't mind that the processing is opaque: our source of interpretability is the localization of information in the features. 
 
 **What are the specific bits of variation in the different features?**
 Below are distinguishability matrices for the twelve features as a function of the total information extracted.
@@ -268,7 +266,7 @@ Just the front end of a variational autoencoder (VAE)<a class='citestart' key='v
 This way of restricting information is more general than VAEs; see Alemi et al. on the variational information bottleneck<a class='citestart' key='dvib'></a>.
 
 <a class='footend' key='tryAgain'></a>
-The models are lightweight and the learning rate is high, so the model will occasionally fail to fit the simple distribution.  If things look weird, just try training again.
+The models are lightweight and the learning rate is high, so the model will occasionally fail to fit the simple distribution.  If things look funny, just try training again.
 
 <a class='footend' key='squareClick'></a>
 Click the squares to toggle their values.
