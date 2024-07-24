@@ -129,7 +129,7 @@ Then the encodings, which will already have compressed away some information abo
   <img src="data/schematic.svg" width="300" />
 </div>
 
-Let's see how it does, by sweeping over the cost of transmitting information.
+Let's see how it does by sweeping over the cost of transmitting information.
 On the left is the distribution to model with the predictive models' reconstruction below it.
 The trajectory of information allocations versus error is mapped out during training, with the trajectory greyed out during the first stage -- where the relationship between `$X_1$`, `$X_2$`, and `$Y$` are learned with effectively no information cost -- and full color during the second.
 
