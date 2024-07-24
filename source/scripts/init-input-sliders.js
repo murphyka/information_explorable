@@ -1,5 +1,5 @@
 window.initProbabilitySliders = function({sel, state, hasColor=true}){
-  displayTexts = ['P(y|cc)', 'P(y|cs)', 'P(y|sc)', 'P(y|ss)']
+  displayTexts = ['P(stormy|c,c)', 'P(stormy|c,s)', 'P(stormy|s,c)', 'P(stormy|s,s)']
   var sliders = ['p00', 'p01', 'p10', 'p11'].map((key, i) => ({
     sel: sel.append('div.slider'),//.style("position", "relative").style("margin-left", "-150px"),
     key: displayTexts[i],
@@ -184,7 +184,7 @@ window.initCompressionLevelSlider = function({sel, state}){
     <div>
       Total information (bits): <val></val>
     </div>
-    <div>
+    <div style="margin-bottom:-20px;">
       <input type=range min=0 max=${state.infoLevels.length-2} value=${state.compressionInd}></input>
     </div>
   `)

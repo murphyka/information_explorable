@@ -31,78 +31,78 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
   for (let j=0; j<2; j++) {
     sels[j].append("p").style("align-items", "center")
 
-    pdf_margin = {left: 35, right: rightMargin, top: topMargin, bottom: bottomMargin}
-    pdf_width = 100
+    pdf_margin = {left: 35, right: rightMargin, top: 30, bottom: bottomMargin}
+    pdfWidth = 100
     state.pdf_svgs.push(sels[j]
     .append("svg")
-      .attr("width", pdf_width + pdf_margin.left + pdf_margin.right)
-      .attr("height", pdf_width + pdf_margin.top + pdf_margin.bottom)
+      .attr("width", pdfWidth + pdf_margin.left + pdf_margin.right)
+      .attr("height", pdfWidth + pdf_margin.top + pdf_margin.bottom)
     .append("g")
       .attr("transform",
             "translate(" + pdf_margin.left + "," + pdf_margin.top + ")"))
 
     // Build X scales and axis:
     state.pdfxs.push(d3.scaleBand()
-      .range([ 0, pdf_width ])
+      .range([ 0, pdfWidth ])
       .domain(rowLabels)
       .padding(0.01))
     state.pdf_svgs[j].append("g")
-      .attr("transform", "translate(0," + pdf_width + ")")
+      .attr("transform", "translate(0," + -23 + ")")
       .call(d3.axisBottom(state.pdfxs[j]))
       .selectAll("text")
         .style("text-anchor", "middle")
         .style("font-size", 14)
 
-  pdfxOffset = 40
-  pdfyOffset = -23
-  state.pdf_svgs[j].append('g')
-      .translate([pdf_width/2, pdf_width + pdfxOffset])
-      .append('text.axis-label')
-      .text('Town 1')
-      .at({textAnchor: 'middle', fill: '#000'})
+    pdfxOffset = 40
+    pdfyOffset = -23
+    state.pdf_svgs[j].append('g')
+        .translate([pdfWidth/2, -19])
+        .append('text.axis-label')
+        .text('Town 1')
+        .at({textAnchor: 'middle', fill: '#000'})
 
-  state.pdf_svgs[j]
-      .append('g')
-      .translate([pdfyOffset, pdf_width/2])
-      .append('text.axis-label')
-      .text('Town 2')
-      .at({textAnchor: 'middle', fill: '#000', transform: 'rotate(-90)'})
+    state.pdf_svgs[j]
+        .append('g')
+        .translate([pdfyOffset, pdfWidth/2])
+        .append('text.axis-label')
+        .text('Town 2')
+        .at({textAnchor: 'middle', fill: '#000', transform: 'rotate(-90)'})
 
-  state.pdf_svgs[j].append('g')
-      .translate([pdf_width/2, -10])
-      .append('text.axis-label')
-      .text('p(stormy|x1,x2)')
-      .at({textAnchor: 'middle', fill: '#000'})
+    state.pdf_svgs[j].append('g')
+        .translate([pdfWidth/2, pdfWidth+30])
+        .append('text.axis-label')
+        .text('p(stormy|x1,x2)')
+        .at({textAnchor: 'middle', fill: '#000', 'font-size': 18}) //, 'font-weight': 'bold'})
 
-  // Build X scales and axis:
-  state.pdfys.push(d3.scaleBand()
-    .range([ pdf_width, 0 ])
-    .domain(colLabels)
-    .padding(0.01))
-  state.pdf_svgs[j].append("g")
-    .call(d3.axisLeft(state.pdfys[j]))
-    .selectAll("text")
-      .attr("transform", "translate(-10,-25)rotate(-90)")
-      .style("text-anchor", "end")
-      .style("font-size", 14)  
+    // Build X scales and axis:
+    state.pdfys.push(d3.scaleBand()
+      .range([0, pdfWidth ])
+      .domain(colLabels)
+      .padding(0.01))
+    state.pdf_svgs[j].append("g")
+      .call(d3.axisLeft(state.pdfys[j]))
+      .selectAll("text")
+        .attr("transform", "translate(-10,-25)rotate(-90)")
+        .style("text-anchor", "end")
+        .style("font-size", 14)  
 
-  state.pdf_svgs[j].selectAll("path,line").remove()
+    state.pdf_svgs[j].selectAll("path,line").remove()
 
-  // Build color scale
-  var heatmapColor = d3.scaleLinear()
-    .range(["white", "#69b3a2"])
-    .domain([0,1])
+    // Build color scale
+    var heatmapColor = d3.scaleLinear()
+      .range(["white", "#69b3a2"])
+      .domain([0,1])
 
 
-  state.pdf_svgs[j].selectAll()
-      .data(pdf_data)
-      .enter()
-      .append("rect")
-      .attr("x", function(d) { return state.pdfxs[j](d.A) })
-      .attr("y", function(d) { return state.pdfys[j](d.B) })
-      .attr("width", state.pdfxs[j].bandwidth() )
-      .attr("height", state.pdfys[j].bandwidth() )
-      .style("fill", function(d) { return heatmapColor(d.value)} )
+    state.pdf_svgs[j].selectAll()
+        .data(pdf_data)
+        .enter()
+        .append("rect")
+        .attr("x", function(d) { return state.pdfxs[j](d.A) })
+        .attr("y", function(d) { return state.pdfys[j](d.B) })
+        .attr("width", state.pdfxs[j].bandwidth() )
+        .attr("height", state.pdfys[j].bandwidth() )
+        .style("fill", function(d) { return heatmapColor(d.value)} )
   }
 
 

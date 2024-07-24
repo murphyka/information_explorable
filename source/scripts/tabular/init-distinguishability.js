@@ -1,7 +1,7 @@
 window.initDistinguishability = async function({sel, state}) {
   // Plot the frame
   matWidth = 100
-  margins = {left: 10, right: 10, top: 25, bottom: 5}
+  margins = {left: 30, right: 10, top: 15, bottom: 25}
 
   sel.append("p")
   .style("align-items", "center")
@@ -30,19 +30,18 @@ window.initDistinguishability = async function({sel, state}) {
         .domain(d3.range(matDim))
         .padding(0.01)
 
-    // Build X scales and axis:
     distY = d3.scaleBand()
-        .range([ matWidth, 0 ])
+        .range([0, matWidth ])
         .domain(d3.range(matDim))
         .padding(0.01)
 
     state.distSVGs[featureInd].append('g')
-      .translate([pdf_width/2, -10])
+      .translate([matWidth/2, matWidth+16])
       .append('text.axis-label')
       .text(state.featureLabels[featureInd])
       .at({textAnchor: 'middle', fill: '#000'})
        
-    state.distSVGs[featureInd].selectAll("path,line").remove();
+    
 
     state.distSVGs[featureInd].selectAll()
       .data(state.distMatrices[featureInd][state.compressionInd])
@@ -53,7 +52,39 @@ window.initDistinguishability = async function({sel, state}) {
       .attr("width", distX.bandwidth() )
       .attr("height", distY.bandwidth() )
       .style("fill", function(d) { return distinguishabilityColorMap(d[2])} )
+    if (state.featureValueLabels[featureInd].length > 0) {
+
+        yAxisGen = d3.axisLeft(distY).tickPadding(-2)
+        yAxisGen.tickFormat(function(d, i) {
+            if (state.featureValueLocs[featureInd].includes(i)) {
+                tickIndex = state.featureValueLocs[featureInd].indexOf(i)
+                return state.featureValueLabels[featureInd][tickIndex];
+            } else {
+                return '';
+            }
+        });
+        state.distSVGs[featureInd].append('g').call(yAxisGen)
+        .selectAll("text")
+        .style("fill", '#bbb')
+
+        xAxisGen = d3.axisTop(distX).tickPadding(-2)
+        xAxisGen.tickFormat(function(d, i) {
+            if (state.featureValueLocs[featureInd].includes(i)) {
+                tickIndex = state.featureValueLocs[featureInd].indexOf(i)
+                return state.featureValueLabels[featureInd][tickIndex];
+            } else {
+                return '';
+            }
+        });
+        state.distSVGs[featureInd].append('g').call(xAxisGen)
+        .selectAll("text")
+        .style("fill", '#bbb')
+      
+    }
+    state.distSVGs[featureInd].selectAll("path,line").remove();
   }
+
+  
   state.renderAll.compressionLevel?.fns.push(redrawDistinguishability)
 
   state.renderAll.compressionLevel()

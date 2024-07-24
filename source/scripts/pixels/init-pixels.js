@@ -40,25 +40,25 @@ window.initPixelGame = async function({sel, state, isBig=true}){
   .style("overflow", "auto")
   .style("height", "100%")
 
-  pdf_margin = {left: 40, right: 20, top: 0, bottom: 40}
-  pdf_width = 100
+  pdf_margin = {left: 40, right: 20, top: 40, bottom: 0}
+  pdfWidth = 100
   clickableBoardSVG = boardSel
   .append("svg")
-    .attr("width", pdf_width + pdf_margin.left + pdf_margin.right)
-    .attr("height", pdf_width + pdf_margin.top + pdf_margin.bottom)
+    .attr("width", pdfWidth + pdf_margin.left + pdf_margin.right)
+    .attr("height", pdfWidth + pdf_margin.top + pdf_margin.bottom)
   .append("g")
     .attr("transform",
           "translate(" + pdf_margin.left + "," + pdf_margin.top + ")")
 
   // Build X scales and axis:
   clickableBoardX = d3.scaleBand()
-    .range([ 0, pdf_width ])
+    .range([ 0, pdfWidth ])
     // .domain(d3.range(state.boardValues.length))
     .domain(state.rowLabels)
     .padding(0.01)
 
   clickableBoardSVG.append("g")
-      .attr("transform", "translate(0," + (pdf_width-5) + ")")
+      .attr("transform", "translate(0," + -23 + ")")
       .call(d3.axisBottom(clickableBoardX))
       .selectAll("text")
         .style("text-anchor", "middle")
@@ -71,7 +71,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
 
   // Build X scales and axis:
   clickableBoardY = d3.scaleBand()
-    .range([ pdf_width, 0 ])
+    .range([ 0, pdfWidth ])
     // .domain(d3.range(state.boardValues[0].length))
     .domain(state.colLabels)
     .padding(0.01)
@@ -79,7 +79,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
   clickableBoardSVG.append("g")
       .call(d3.axisLeft(clickableBoardY))
       .selectAll("text")
-        .attr("transform", "translate(-10,-10)rotate(-90)")
+        // .attr("transform", "translate(-10,-10)rotate(-90)")
         .style("text-anchor", "middle")
         .style("font-size", 14)
         .style("font-weight", "bold")
@@ -89,14 +89,14 @@ window.initPixelGame = async function({sel, state, isBig=true}){
 
     clickableBoardSVG
       .append('g')
-      .translate([-23, pdf_width/2])
+      .translate([-21, pdfWidth/2])
       .append('text.axis-label')
       .text('Town 2')
       .at({textAnchor: 'middle', fill: '#000', transform: 'rotate(-90)'})
 
     clickableBoardSVG
       .append('g')
-      .translate([pdf_width/2, pdf_width +33])
+      .translate([pdfWidth/2, -19])
       .append('text.axis-label')
       .text('Town 1')
       .at({textAnchor: 'middle', fill: '#000'})
@@ -130,8 +130,8 @@ window.initPixelGame = async function({sel, state, isBig=true}){
 
   fittedBoardSVG = boardSel
   .append("svg")
-    .attr("width", pdf_width + pdf_margin.left + pdf_margin.right)
-    .attr("height", pdf_width + pdf_margin.top + pdf_margin.bottom)
+    .attr("width", pdfWidth + pdf_margin.left + pdf_margin.right)
+    .attr("height", pdfWidth + pdf_margin.top + pdf_margin.bottom)
 
   .append("g")
     .attr("transform",
@@ -139,12 +139,13 @@ window.initPixelGame = async function({sel, state, isBig=true}){
 
   // Build X scales and axis:
   fittedBoardX = d3.scaleBand()
-    .range([ 0, pdf_width ])
+    .range([ 0, pdfWidth ])
+    // .domain(d3.range(state.boardValues.length))
     .domain(state.rowLabels)
     .padding(0.01)
 
   fittedBoardSVG.append("g")
-      .attr("transform", "translate(0," + (pdf_width-5) + ")")
+      .attr("transform", "translate(0," + -23 + ")")
       .call(d3.axisBottom(fittedBoardX))
       .selectAll("text")
         .style("text-anchor", "middle")
@@ -154,16 +155,18 @@ window.initPixelGame = async function({sel, state, isBig=true}){
           return util.colors.features[i]
         })
 
+
   // Build X scales and axis:
   fittedBoardY = d3.scaleBand()
-    .range([ pdf_width, 0 ])
+    .range([ 0, pdfWidth ])
+    // .domain(d3.range(state.boardValues[0].length))
     .domain(state.colLabels)
     .padding(0.01)
 
   fittedBoardSVG.append("g")
       .call(d3.axisLeft(fittedBoardY))
       .selectAll("text")
-        .attr("transform", "translate(-10,-10)rotate(-90)")
+        // .attr("transform", "translate(-10,-10)rotate(-90)")
         .style("text-anchor", "middle")
         .style("font-size", 14)
         .style("font-weight", "bold")
@@ -171,7 +174,20 @@ window.initPixelGame = async function({sel, state, isBig=true}){
           return util.colors.features[i+state.originalDims[0]]
         })
 
+    fittedBoardSVG
+      .append('g')
+      .translate([-21, pdfWidth/2])
+      .append('text.axis-label')
+      .text('Town 2')
+      .at({textAnchor: 'middle', fill: '#000', transform: 'rotate(-90)'})
 
+    fittedBoardSVG
+      .append('g')
+      .translate([pdfWidth/2, -19])
+      .append('text.axis-label')
+      .text('Town 1')
+      .at({textAnchor: 'middle', fill: '#000'})
+       
   fittedBoardSVG.selectAll("path,line").remove();
 
   fittedBoardSVG.selectAll()
@@ -183,20 +199,6 @@ window.initPixelGame = async function({sel, state, isBig=true}){
       .attr("width", fittedBoardX.bandwidth() )
       .attr("height", fittedBoardY.bandwidth() )
       .style("fill", function(d) { return heatmapColor(d[2])} )
-
-  fittedBoardSVG
-      .append('g')
-      .translate([-23, pdf_width/2])
-      .append('text.axis-label')
-      .text('Town 2')
-      .at({textAnchor: 'middle', fill: '#000', transform: 'rotate(-90)'})
-
-    fittedBoardSVG
-      .append('g')
-      .translate([pdf_width/2, pdf_width +33])
-      .append('text.axis-label')
-      .text('Town 1')
-      .at({textAnchor: 'middle', fill: '#000'})
 
   ////////////////////////////////////// Display the information allocation
   var leftMargin = 60

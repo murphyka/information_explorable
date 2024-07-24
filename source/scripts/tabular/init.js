@@ -41,10 +41,12 @@ window.initTabular = async function(){
 
   // var topAccuracySel = d3.select('.tabular-decomp')//.classed('hidden-step', 1)
   state.distMatrices = []
+  state.displayFeatureVals = []
   state.numberFeatures = 12
   for (let featureInd=0; featureInd<state.numberFeatures; featureInd++) {
 
     distMat = await util.getFile(state.runPath + `_feature${featureInd}_mats.npy`)
+    
     matShape = distMat.shape
     matData = distMat.data
     parsedMat = [];
@@ -59,8 +61,41 @@ window.initTabular = async function(){
       }
       parsedMat.push(tempMat);
     }
+
     state.distMatrices.push(parsedMat.reverse())
+
+    // rawFeatureVals = await util.getFile(state.runPath + `_feature${featureInd}_vals.npy`)
+
   }
+  state.featureValueLabels = [
+    ['win','spr','sum','fall'],
+    [2011, 2012],
+    ['Mar','Jun','Sep','Dec'],
+    ['6a','12p','6p','12a'],
+    ['T','F'],
+    ['Tu','Th','Sa'],
+    ['T','F'],
+    ['fair','mist','wet'],
+    [0, 15, 25],
+    [0, 15, 25],
+    [0, 50, 75, 100],
+    [0, 5, 10, 15],
+  ]
+
+  state.featureValueLocs = [
+    [0, 1, 2, 3],
+    [0, 1],
+    [2, 5, 8, 11],
+    [5, 11, 17, 23],
+    [0, 1],
+    [1, 3, 5],
+    [0, 1],
+    [0, 1, 2, 3],
+    [0, 40, 100], 
+    [0, 40, 80],
+    [0, 30, 60, 127],
+    [0, 30, 60, 90],
+  ]
 
   state.compressionInd = 14
   window.initDistinguishability({
