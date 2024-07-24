@@ -186,6 +186,21 @@ window.initPixelButtons = function({sel, state, columnIndex}){
         state.renderAll.redraw()
       })
     } else {
+      presetBoardValues = [[1, 0, 0, 0], [0, 1, 1, 1], [1, 0, 0, 0], [1, 1, 1, 1]]
+      buttonSel = sel.append('div.button')
+      buttonSel.html(`<input type="button" class="pbutton" value="Preset">`)
+      .on('click', function () {
+
+        for (let i=0; i<state.originalDims[0]; i++) {
+          for (let j=0; j<state.originalDims[1]; j++) {
+            
+            state.boardValues[i][j] = presetBoardValues[i][j];
+            state.d3ReadableBoardValues[i*state.originalDims[0]+j] = [state.rowLabels[i], state.colLabels[j], presetBoardValues[i][j]];
+          }
+        }
+        state.renderAll.redraw()
+      })
+
       buttonSel = sel.append('div.button')
       buttonSel.html(`<input type="button" class="pbutton" value="Random" id="random2">`)
       .on('click', function () {

@@ -550,12 +550,14 @@ window.initPixelGame = async function({sel, state, isBig=true}){
         })
         
         boardVals = tf.tidy(() => {
-          return tf.stack([inds1Exhaustive, inds2Exhaustive, outputsShaped.mean(0).reshape([-1])], -1)
+          // return tf.stack([inds1Exhaustive, inds2Exhaustive, outputsShaped.mean(0).reshape([-1])], -1)
+          return outputsShaped.mean(0).reshape([-1])
         })
         boardVals.array().then(vals => {
           fittedBoardSVG.selectAll("rect")
           .data(vals)
-          .style("fill", function(d) { return heatmapColor(d[2])} )
+          // .style("fill", function(d) { return heatmapColor(d[2])} )
+          .style("fill", function(d) { return heatmapColor(d)} )
         })
 
         // update the latent vecs
