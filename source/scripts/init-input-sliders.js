@@ -129,7 +129,7 @@ window.initTrainDIB = function({sel, state}) {
 }
 
 window.initPixelButtons = function({sel, state, columnIndex}){
-    if (columnIndex == 3) {
+    if (columnIndex == 4) {
       buttonSel = sel.append('div.button')
       buttonSel.html(`<input type="button" class="pbutton" value="Checker">`)
       .on('click', function () {
@@ -157,14 +157,14 @@ window.initPixelButtons = function({sel, state, columnIndex}){
         }
         state.renderAll.redraw()
       })
-    } else if (columnIndex == 4) {
+    } else if (columnIndex == 3) {
       buttonSel = sel.append('div.button')
-      buttonSel.html(`<input type="button" class="pbutton" value="Stripe">`)
+      buttonSel.html(`<input type="button" class="pbutton" value="Half">`)
       .on('click', function () {
 
         for (let i=0; i<state.originalDims[0]; i++) {
           for (let j=0; j<state.originalDims[1]; j++) {
-            val = (i)%2
+            val = (i<2)
             state.boardValues[i][j] = val;
             state.d3ReadableBoardValues[i*state.originalDims[0]+j] = [state.rowLabels[i], state.colLabels[j], val];
           }

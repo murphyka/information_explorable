@@ -19,18 +19,21 @@ window.initPixelGame = async function({sel, state, isBig=true}){
 
   state.d3ReadableBoardValues = []
   d3zeroedBoardValues = []
+  d3zeroedBoardValuesDist1 = []
+  d3zeroedBoardValuesDist2 = []
   state.rowLabels = ['A', 'B', 'C', 'D']
   state.colLabels = ['a', 'b', 'c', 'd']
   for (let i=0; i<state.boardValues.length; i++){
     for (let j=0; j<state.boardValues[0].length; j++){
       state.d3ReadableBoardValues.push([state.rowLabels[i], state.colLabels[j], state.boardValues[i][j]])
       d3zeroedBoardValues.push([state.rowLabels[i], state.colLabels[j], 0.5])
+      d3zeroedBoardValuesDist1.push([state.rowLabels[i], state.rowLabels[j], 1])
+      d3zeroedBoardValuesDist2.push([state.colLabels[i], state.colLabels[j], 1])
     }
   }
   state.reconstructions = []
   
   //// Make the boards
-
   sel.append("p")
   .style("align-items", "center")
 
@@ -290,13 +293,11 @@ window.initPixelGame = async function({sel, state, isBig=true}){
     });
   }
   
-
-
   //////////////////////////// Show the latent spaces
-  var leftMargin = 40
-  var rightMargin = 60
+  var leftMargin = 20
+  var rightMargin = 20
   var topMargin = 40
-  var bottomMargin = 50
+  var bottomMargin = 40
   var latentHeight = 80
   var latentWidth = 150
   const xxLatentInputs = tf.linspace(-4, 4, 250)
@@ -306,6 +307,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
   prioryyLatents = tf.div(prioryyLatents, tf.sum(prioryyLatents).mul(xxLatentBinWidth))
   state.cs = []
   state.latentCurves = []
+  state.distinguishabilitySVGs = []
   
   tf.stack([xxLatentInputs, prioryyLatents], -1).array().then(priorData => {
     let latentRepPathSel;
@@ -319,11 +321,8 @@ window.initPixelGame = async function({sel, state, isBig=true}){
       state.cs[latentInd].x.domain([-4, 4])
       state.cs[latentInd].y.domain([0, 1])
 
-      state.cs[latentInd].yAxis.ticks(isBig ? 5 : 3)
-      // state.cs[latentInd].svg.attr({"float": "left"})
-      d3.drawAxis(state.cs[latentInd])
-
-      
+      // state.cs[latentInd].yAxis.ticks(isBig ? 5 : 3)
+      // d3.drawAxis(state.cs[latentInd])
 
       // Draw the prior
       state.cs[latentInd].svg.append('path').datum(priorData)
@@ -341,11 +340,88 @@ window.initPixelGame = async function({sel, state, isBig=true}){
       }
       state.cs[latentInd].svg.append("text")
         .attr("x", (latentWidth / 2))             
-        .attr("y", 0 - (topMargin / 2))
+        .attr("y", latentHeight+25)
         .attr("text-anchor", "middle")  
         .style("font-size", "16px") 
-        .text(`Latent space, Town ${latentInd+1}`);
-    }
+        .text(`Town ${latentInd+1}: latent space`);
+
+      //////// And now the distinguishability mats
+
+      distLabels = [state.rowLabels, state.colLabels][latentInd]
+      boardSel = sel.append("div")
+      .style("flex-direction", "column")
+      .style("width", latentWidth)
+      .style("overflow", "auto")
+      .style("height", latentHeight)
+
+      pdf_margin = {left: 40, right: 20, top: 20, bottom: 40}
+      pdfWidth = 100
+      state.distinguishabilitySVGs.push(boardSel
+      .append("svg")
+        .attr("width", pdfWidth + pdf_margin.left + pdf_margin.right)
+        .attr("height", pdfWidth + pdf_margin.top + pdf_margin.bottom)
+      .append("g")
+        .attr("transform",
+              "translate(" + pdf_margin.left + "," + pdf_margin.top + ")"))
+
+      // Build X scales and axis:
+      distSVGX = d3.scaleBand()
+        .range([ 0, pdfWidth ])
+        // .domain(d3.range(state.boardValues.length))
+        .domain(distLabels)
+        .padding(0.01)
+
+    state.distinguishabilitySVGs[latentInd].append("g")
+        .attr("transform", "translate(0," + -23 + ")")
+        .call(d3.axisBottom(distSVGX))
+        .selectAll("text")
+          .style("text-anchor", "middle")
+          .style("font-size", 14)
+          .style("font-weight", "bold")
+          .style("fill", function(d, i) {
+            return util.colors.features[i+state.originalDims[0]*latentInd]
+          })
+
+    // Build X scales and axis:
+    distSVGY = d3.scaleBand()
+      .range([ 0, pdfWidth ])
+      // .domain(d3.range(state.boardValues[0].length))
+      .domain(distLabels)
+      .padding(0.01)
+
+    state.distinguishabilitySVGs[latentInd].append("g")
+        .call(d3.axisLeft(distSVGY))
+        .selectAll("text")
+          // .attr("transform", "translate(-10,-10)rotate(-90)")
+          .style("text-anchor", "middle")
+          .style("font-size", 14)
+          .style("font-weight", "bold")
+          .style("fill", function(d, i) {
+            return util.colors.features[i+state.originalDims[0]*latentInd]
+          })
+         
+    state.distinguishabilitySVGs[latentInd].selectAll("path,line").remove();
+
+    state.distinguishabilitySVGs[latentInd].selectAll()
+        .data([d3zeroedBoardValuesDist1, d3zeroedBoardValuesDist2][latentInd])
+        .enter()
+        .append("rect")
+        .attr("x", function(d) {return distSVGX(d[0]) })
+        .attr("y", function(d) { return distSVGY(d[1]) })
+        .attr("width", distSVGX.bandwidth() )
+        .attr("height", distSVGY.bandwidth() )
+        .style("fill", function(d) { return util.distinguishabilityColorMap(d[2])} )
+
+    state.distinguishabilitySVGs[latentInd].append("text")
+        .attr("x", (pdfWidth / 2))             
+        .attr("y", pdfWidth+25)
+        .attr("text-anchor", "middle")  
+        .style("font-size", "16px") 
+        .text('Distinguishability');
+      }
+
+    
+
   })
   
   window.initTrainDIB({
@@ -496,6 +572,20 @@ window.initPixelGame = async function({sel, state, isBig=true}){
           return zLogVar2.reshape([numberAveragingRepeats, state.originalDims[0], state.originalDims[1]]).mean(0).mean(0)
         })
 
+        bhats1 = computeBhatDists(zMean1Scalar, zLogVar1Scalar)
+        bhats1Display = tf.stack([inds1Exhaustive, inds2Exhaustive, bhats1.reshape([-1])], -1)
+        bhats1Display.array().then(vals => {
+          state.distinguishabilitySVGs[0].selectAll("rect")
+          .data(vals)
+          .style("fill", function(d) { return util.distinguishabilityColorMap(d[2])} )
+        })
+        bhats2 = computeBhatDists(zMean2Scalar, zLogVar2Scalar)
+        bhats2Display = tf.stack([inds1Exhaustive, inds2Exhaustive, bhats2.reshape([-1])], -1)
+        bhats2Display.array().then(vals => {
+          state.distinguishabilitySVGs[1].selectAll("rect")
+          .data(vals)
+          .style("fill", function(d) { return util.distinguishabilityColorMap(d[2])} )
+        })
         pdfData1 = tf.tidy(() => {
           res = tf.exp(xxLatentInputs.expandDims(0)
             .sub(zMean1Scalar.expandDims(1))
@@ -635,7 +725,11 @@ window.initPixelGame = async function({sel, state, isBig=true}){
           zMean1Scalar, 
           zMean2Scalar, 
           zLogVar1Scalar, 
-          zLogVar2Scalar, 
+          zLogVar2Scalar,
+          bhats1,
+          bhats1Display,
+          bhats2,
+          bhats2Display, 
           pdfData1, 
           pdfData2, 
           pmfData1, 
@@ -673,6 +767,35 @@ window.initPixelGame = async function({sel, state, isBig=true}){
     console.log(tf.memory().numBytes, tf.memory().numTensors, tf.memory().unreliable)
   }
 
+}
+
+function computeBhatDists(mus, logvars) {
+  return tf.tidy(() => {
+    N = mus.shape[0]
+    embedding_dimension = 1
+    mus1 = tf.tile(tf.reshape(mus, [N, 1, 1]), [1, N, 1])
+    logvars1 = tf.tile(tf.reshape(logvars, [N, 1, 1]), [1, N, 1])
+    mus2 = tf.tile(tf.reshape(mus, [1, N, 1]), [N, 1, 1])
+    logvars2 = tf.tile(tf.reshape(logvars, [1, N, 1]), [N, 1, 1])
+    difference_mus = mus1.sub(mus2)
+    difference_mus = tf.expandDims(difference_mus, -1)
+    difference_mus_T = tf.transpose(difference_mus, [0, 1, 3, 2])
+
+    sigma_diag = (tf.exp(logvars1).add(tf.exp(logvars2))).mul(0.5)
+    sigma_mat = tf.expandDims(sigma_diag, -1)
+      .mul(tf.expandDims(tf.onesLike(sigma_diag), -2))
+        .mul(tf.reshape(tf.eye(embedding_dimension), [1, 1, embedding_dimension, embedding_dimension]))
+    sigma_mat_inv = tf.expandDims(tf.onesLike(sigma_diag).div(sigma_diag), -1)
+    .mul(tf.expandDims(tf.onesLike(sigma_diag), -2))
+    .mul(tf.reshape(tf.eye(embedding_dimension), [1, 1, embedding_dimension, embedding_dimension]))
+
+    determinant_sigma = tf.prod(sigma_diag, -1)
+    determinant_sigma1 = tf.exp(tf.sum(logvars1, -1))
+    determinant_sigma2 = tf.exp(tf.sum(logvars2, -1))
+    term1 = tf.reshape(difference_mus_T.matMul(sigma_mat_inv).matMul(difference_mus), [N, N]).mul(0.125)
+    term2 = tf.log(determinant_sigma.div(tf.sqrt(determinant_sigma1.mul(determinant_sigma2)))).mul(0.5)
+    return tf.exp(term1.add(term2).neg())
+  })
 }
 
 function callModels(enc1, enc2, dec) {

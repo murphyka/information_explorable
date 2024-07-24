@@ -146,10 +146,12 @@ The trajectory of information allocations versus error is mapped out during trai
 
 Underneath the information plane are the one dimensional latent spaces corresponding to `$U_1$` and `$U_2$`, which should remind you of the telegraph messaging space earlier in this post.
 The colored Gaussians are the representations of the specific test outcomes, while the gray Gaussian is the prior to which all embeddings must conform when the information penalty is high.
+To the right are matrices that display the distinguishability between different test results, given the embedding<a class='footstart' key='bhat1'></a>; blue means the pair of inputs are distinguishable and white means they are not.
+**The distinctions that are communicated by the auxiliary variables are the atoms of information.**
 
 Try different patterns above; generally the information about `$Y$` is quite apparent in the latent spaces.
-For the <digits>Checker</digits> pattern, test results <span style="font-weight:bold; color:#1f77b4;">A</span> and <span style="font-weight:bold; color:#2ca02c;">C</span> collapse, as do <span style="font-weight:bold; color:#ff7f0e;">B</span> and <span style="font-weight:bold; color:#d62728;">D</span>; analogous collapse happens for `$U_2$`.
-Evidently the distinction between test results {<span style="font-weight:bold; color:#1f77b4;">A</span> or <span style="font-weight:bold; color:#2ca02c;">C</span>} and {<span style="font-weight:bold; color:#ff7f0e;">B</span> or <span style="font-weight:bold; color:#d62728;">D</span>} is the one bit from Town 1 of relevance to `$Y$`.
+For the <digits>Half</digits> pattern, test results <span style="font-weight:bold; color:#1f77b4;">A</span> and <span style="font-weight:bold; color:#ff7f0e;">B</span> collapse, as do <span style="font-weight:bold; color:#2ca02c;">C</span> and <span style="font-weight:bold; color:#d62728;">D</span>; everything collapses for `$U_2$`.
+Evidently the distinction between test results {<span style="font-weight:bold; color:#1f77b4;">A</span> or <span style="font-weight:bold; color:#ff7f0e;">B</span>} and {<span style="font-weight:bold; color:#2ca02c;">C</span> or <span style="font-weight:bold; color:#d62728;">D</span>} is the one bit from Town 1 of relevance to `$Y$`.
 The other bit is irrelevant.
 
 By sweeping the information penalty, we use machine learning to search through compression schemes and find the optimal information allocations.

@@ -8,7 +8,6 @@ window.initDistinguishability = async function({sel, state}) {
   .style("display", "inline-block")
 
   state.distSVGs = []
-  var distinguishabilityColorMap = d3.scaleSequential(d3.interpolateBlues).domain([1, 0]);
 
   for (let featureInd=0; featureInd<state.numberFeatures; featureInd++) {
     let matDim = Math.floor(Math.sqrt(state.distMatrices[featureInd][0].length))
@@ -41,9 +40,7 @@ window.initDistinguishability = async function({sel, state}) {
       .append('text.axis-label')
       .text(state.featureLabels[featureInd])
       .at({textAnchor: 'middle', fill: '#000'})
-       
     
-
     state.distSVGs[featureInd].selectAll()
       .data(state.distMatrices[featureInd][state.compressionInd])
       .enter()
@@ -52,10 +49,9 @@ window.initDistinguishability = async function({sel, state}) {
       .attr("y", function(d) { return distY(d[1]) })
       .attr("width", distX.bandwidth() )
       .attr("height", distY.bandwidth() )
-      .style("fill", function(d) { return distinguishabilityColorMap(d[2])} )
+      .style("fill", function(d) { return util.distinguishabilityColorMap(d[2])} )
 
     if (state.featureValueLabels[featureInd].length > 0) {
-
         yAxisGen = d3.axisLeft(distY).tickPadding(-2)
         yAxisGen.tickFormat(function(d, i) {
             if (state.featureValueLocs[featureInd].includes(i)) {
@@ -98,7 +94,7 @@ window.initDistinguishability = async function({sel, state}) {
     for (let featureInd=0; featureInd<state.numberFeatures; featureInd++) {
         state.distSVGs[featureInd].selectAll("rect")
           .data(state.distMatrices[featureInd][state.compressionInd])
-          .style("fill", function(d) { return distinguishabilityColorMap(d[2])} )
+          .style("fill", function(d) { return util.distinguishabilityColorMap(d[2])} )
     }
 
   }
