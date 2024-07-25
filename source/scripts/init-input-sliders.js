@@ -186,7 +186,7 @@ window.initPixelButtons = function({sel, state, columnIndex}){
         state.renderAll.redraw()
       })
     } else {
-      presetBoardValues = [[1, 0, 0, 0], [0, 1, 1, 1], [1, 0, 0, 0], [1, 1, 1, 1]]
+      presetBoardValues = [[0, 0, 0, 0], [1, 1, 1, 1], [1, 0, 0, 0], [1, 1, 1, 1]]
       buttonSel = sel.append('div.button')
       buttonSel.html(`<input type="button" class="pbutton" value="Preset">`)
       .on('click', function () {
@@ -215,8 +215,42 @@ window.initPixelButtons = function({sel, state, columnIndex}){
         state.renderAll.redraw()
       })
     }
-
     
+}
+
+
+window.initTrainingProgressSlider = function({sel, state}){
+  slider = {
+    sel: sel.append('div.slider'),
+    getVal: _ => state.trainingStepDisplayIndex,
+    setVal: d => state.trainingStepDisplayIndex = d
+  }
+  
+  slider.sel.html(`
+    <div>
+      Training step: <val></val>/${state.numberTrainingSteps}
+    </div>
+    <div style="margin-bottom:-20px;">
+      <input type=range min=0 max=1 value=0 id=sliderStep></input>
+    </div>
+  `)
+
+  slider.sel.select('input[type="range"]')
+    .on('input', function () {
+      slider.setVal(this.value)
+      slider.sel.select('input').node().value = this.value
+      state.trainingStepDisplayIndex = this.value
+      state.manualOverride = true
+      state.renderAll.varyTrainingStep()
+    })
+  slider.sel.select('val').text(slider.getVal()*state.displayEvery)
+  state.renderAll.varyTrainingStep.fns.push(() => {
+    var value = slider.getVal()
+    slider.sel.select('#sliderStep').property("max", state.trainingBoards.length-1)
+    slider.sel.select('input').node().value = value
+    slider.sel.select('val').text(slider.getVal()*state.displayEvery)
+  })
+
 }
 
 window.initCompressionLevelSlider = function({sel, state}){

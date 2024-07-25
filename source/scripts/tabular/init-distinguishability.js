@@ -22,7 +22,11 @@ window.initDistinguishability = async function({sel, state}) {
         .attr("height", matWidth + margins.top + margins.bottom)
         .append("g")
         .attr("transform",
-            "translate(" + margins.left + "," + margins.top + ")"))
+            "translate(" + margins.left + "," + margins.top + ")")
+        .on('mouseover', () => {
+        state.curveHighlighter = featureInd
+        state.renderAll.curveHighlighter()
+      }))
 
     // Build X scales and axis:
     distX = d3.scaleBand()
@@ -50,6 +54,7 @@ window.initDistinguishability = async function({sel, state}) {
       .attr("width", distX.bandwidth() )
       .attr("height", distY.bandwidth() )
       .style("fill", function(d) { return util.distinguishabilityColorMap(d[2])} )
+
 
     if (state.featureValueLabels[featureInd].length > 0) {
         yAxisGen = d3.axisLeft(distY).tickPadding(-2)

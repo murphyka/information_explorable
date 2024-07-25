@@ -23,7 +23,7 @@ window.initSwoopy = function(annotations){
       .draggable(isDraggable)
       .annotations([d])
 
-    sel.append('svg').at({width: 1, height: 1})
+    sel.append('svg').at({width: 300, height: 300})
       .call(swoopy)
 
     if (isDraggable){
@@ -37,8 +37,8 @@ window.initSwoopy = function(annotations){
     .append('marker')
       .attr('id', 'arrow')
       .attr('viewBox', '-10 -10 20 20')
-      .attr('markerWidth', 20)
-      .attr('markerHeight', 20)
+      .attr('markerWidth', 200)
+      .attr('markerHeight', 200)
       .attr('orient', 'auto')
     .append('path')
       .attr('d', 'M-10,-10 L 0,0 L -10,10')
@@ -51,7 +51,3 @@ window.initSwoopy = function(annotations){
       opacity: d => d.path == 'M 0 0' ? 0 : '',
     })
 }
-
-window.initModTop?.()
-// window.initSparseParity?.()
-// window.initModBot?.()

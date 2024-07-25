@@ -142,6 +142,7 @@ The trajectory of information allocations versus error is mapped out during trai
   <div class='pixel-buttons' id='buttons3'></div>
   <div class='pixel-buttons' id='buttons4'></div>
   <div class='pixel-buttons' id='buttons5'></div>
+  <div class='training-progress-slider'></div>
 </div>
 
 Underneath the information plane are the one dimensional latent spaces corresponding to `$U_1$` and `$U_2$`, which should remind you of the telegraph messaging space earlier in this post.

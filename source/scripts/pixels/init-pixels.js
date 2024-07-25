@@ -1,20 +1,31 @@
 
 window.initPixelGame = async function({sel, state, isBig=true}){
-  state.renderAll = util.initRenderAll(['redraw', 'trainDIB']);
-  numTrainingSteps = 1000
-  displayEvery = 5
+  state.renderAll = util.initRenderAll(['redraw', 'trainDIB', 'varyTrainingStep']);
+  state.numberTrainingSteps = 1000
+  state.displayEvery = 5
+  state.trainingStepDisplayIndex = 0
+
+  state.trainingBoards = []
+  state.trainingDistMats1 = []
+  state.trainingDistMats2 = []
+  state.trainingLatents1 = []
+  state.trainingLatents2 = []
+  state.trainingInfoAllocs1 = []
+  state.trainingInfoAllocs2 = []
+  state.trainingError = []
+
   batchSize = 1024
   learningRate = 2e-2
   betaStart = tf.scalar(1e-3)
   betaEnd = tf.scalar(6e-1)
-  betas = tf.exp(tf.log(betaStart).add(tf.range(0, numTrainingSteps, 1, dtype='float32').div(numTrainingSteps).mul(tf.log(betaEnd.div(betaStart)))))
-  betasDisplay = await tf.exp(tf.log(betaStart).add(tf.range(0, numTrainingSteps/displayEvery, 1, dtype='float32').div(numTrainingSteps/displayEvery).mul(tf.log(betaEnd.div(betaStart))))).array()
+  betas = tf.exp(tf.log(betaStart).add(tf.range(0, state.numberTrainingSteps, 1, dtype='float32').div(state.numberTrainingSteps).mul(tf.log(betaEnd.div(betaStart)))))
+  betasDisplay = await tf.exp(tf.log(betaStart).add(tf.range(0, state.numberTrainingSteps/state.displayEvery, 1, dtype='float32').div(state.numberTrainingSteps/state.displayEvery).mul(tf.log(betaEnd.div(betaStart))))).array()
   
   let maxTotalInfoInDisplay = 2
   let maxSingleInfoInDisplay = 1
   // sel.append("p").style("align-items", "center")
 
-  state.boardValues = [[1, 0, 0, 0], [0, 1, 1, 1], [1, 0, 0, 0], [1, 1, 1, 1]]
+  state.boardValues = [[0, 0, 0, 0], [1, 1, 1, 1], [1, 0, 0, 0], [1, 1, 1, 1]]
   state.originalDims = [state.boardValues.length, state.boardValues[0].length]
 
   state.d3ReadableBoardValues = []
@@ -31,7 +42,6 @@ window.initPixelGame = async function({sel, state, isBig=true}){
       d3zeroedBoardValuesDist2.push([state.colLabels[i], state.colLabels[j], 1])
     }
   }
-  state.reconstructions = []
   
   //// Make the boards
   sel.append("p")
@@ -131,7 +141,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
   state.renderAll.redraw?.fns.push(redrawBoard)
   // now draw the fitted board
 
-  fittedBoardSVG = boardSel
+  state.fittedBoardSVG = boardSel
   .append("svg")
     .attr("width", pdfWidth + pdf_margin.left + pdf_margin.right)
     .attr("height", pdfWidth + pdf_margin.top + pdf_margin.bottom)
@@ -147,7 +157,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
     .domain(state.rowLabels)
     .padding(0.01)
 
-  fittedBoardSVG.append("g")
+  state.fittedBoardSVG.append("g")
       .attr("transform", "translate(0," + -23 + ")")
       .call(d3.axisBottom(fittedBoardX))
       .selectAll("text")
@@ -166,7 +176,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
     .domain(state.colLabels)
     .padding(0.01)
 
-  fittedBoardSVG.append("g")
+  state.fittedBoardSVG.append("g")
       .call(d3.axisLeft(fittedBoardY))
       .selectAll("text")
         // .attr("transform", "translate(-10,-10)rotate(-90)")
@@ -177,23 +187,23 @@ window.initPixelGame = async function({sel, state, isBig=true}){
           return util.colors.features[i+state.originalDims[0]]
         })
 
-    fittedBoardSVG
+    state.fittedBoardSVG
       .append('g')
       .translate([-21, pdfWidth/2])
       .append('text.axis-label')
       .text('Town 2')
       .at({textAnchor: 'middle', fill: '#000', transform: 'rotate(-90)'})
 
-    fittedBoardSVG
+    state.fittedBoardSVG
       .append('g')
       .translate([pdfWidth/2, -19])
       .append('text.axis-label')
       .text('Town 1')
       .at({textAnchor: 'middle', fill: '#000'})
        
-  fittedBoardSVG.selectAll("path,line").remove();
+  state.fittedBoardSVG.selectAll("path,line").remove();
 
-  fittedBoardSVG.selectAll()
+  state.fittedBoardSVG.selectAll()
       .data(d3zeroedBoardValues)
       .enter()
       .append("rect")
@@ -246,7 +256,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
     .at({strokeWidth: 2, stroke: "#000", fill: 'none'})
     .at({d: line.y(d => c.y(d[1]))(dummyData2)})
 
-  var currMarkerRMSE = c.svg.selectAll("myCircles").data(dummyData2)
+  state.currMarkerRMSE = c.svg.selectAll("myCircles").data(dummyData2)
     .enter()
     .append("circle")
     .attr("fill", "black")
@@ -255,7 +265,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
     .attr("cy", function(d) { return c.y(d[1]) })
     .attr("r", 3)
 
-  var currMarkerInfo1 = c.svg.selectAll("myCircles").data(dummyData2)
+  state.currMarkerInfo1 = c.svg.selectAll("myCircles").data(dummyData2)
     .enter()
     .append("circle")
     .attr("fill", util.colors.features[0])
@@ -264,7 +274,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
     .attr("cy", function(d) { return c.y2(d[1]) })
     .attr("r", 3)
 
-  var currMarkerInfo2 = c.svg.selectAll("myCircles").data(dummyData2)
+  state.currMarkerInfo2 = c.svg.selectAll("myCircles").data(dummyData2)
     .enter()
     .append("circle")
     .attr("fill", util.colors.features[1])
@@ -292,6 +302,55 @@ window.initPixelGame = async function({sel, state, isBig=true}){
       columnIndex,
     });
   }
+
+  window.initTrainingProgressSlider({
+    sel: d3.select('.training-progress-slider').html(''),
+    state,
+  })
+
+  async function drawTrainingStep() {
+    state.fittedBoardSVG.selectAll("rect")
+        .data(state.trainingBoards[state.trainingStepDisplayIndex])
+        .style("fill", function(d) { return heatmapColor(d)} )
+
+    state.distinguishabilitySVGs[0].selectAll("rect")
+          .data(state.trainingDistMats1[state.trainingStepDisplayIndex])
+          .style("fill", function(d) { return util.distinguishabilityColorMap(d)} )
+
+    state.distinguishabilitySVGs[1].selectAll("rect")
+          .data(state.trainingDistMats2[state.trainingStepDisplayIndex])
+          .style("fill", function(d) { return util.distinguishabilityColorMap(d)} )
+
+    for (let inputInd=0; inputInd<state.originalDims[0]; inputInd++) {
+      plotData = []
+      state.trainingLatents1[state.trainingStepDisplayIndex][inputInd].forEach((v, i) => plotData.push([xxLatentInputsJS[i], v]))
+      state.latentCurves[inputInd]
+        .at({d: d3.line()
+          .x(d => state.cs[0].x(d[0]))
+          .y(d => state.cs[0].y(d[1]))(plotData)})
+      }
+
+    for (let inputInd=0; inputInd<state.originalDims[1]; inputInd++) {
+      plotData = []
+      state.trainingLatents2[state.trainingStepDisplayIndex][inputInd].forEach((v, i) => plotData.push([xxLatentInputsJS[i], v]))
+      state.latentCurves[state.originalDims[0]+inputInd]
+        .at({d: d3.line()
+          .x(d => state.cs[1].x(d[0]))
+          .y(d => state.cs[1].y(d[1]))(plotData)})
+      }
+
+    state.currMarkerRMSE.datum(state.trainingError[state.trainingStepDisplayIndex])
+      .attr("cx", function(d) { return c.x(d[0]) })
+      .attr("cy", function(d) { return c.y(d[1]) })
+
+    state.currMarkerInfo1.datum(state.trainingInfoAllocs1[state.trainingStepDisplayIndex])
+      .attr("cx", function(d) { return c.x(d[0]) })
+      .attr("cy", function(d) { return c.y2(d[1]) })
+    state.currMarkerInfo2.datum(state.trainingInfoAllocs2[state.trainingStepDisplayIndex])
+      .attr("cx", function(d) { return c.x(d[0]) })
+      .attr("cy", function(d) { return c.y2(d[1]) })
+  }
+  state.renderAll.varyTrainingStep?.fns.push(drawTrainingStep)
   
   //////////////////////////// Show the latent spaces
   var leftMargin = 20
@@ -420,8 +479,6 @@ window.initPixelGame = async function({sel, state, isBig=true}){
         .text('Distinguishability');
       }
 
-    
-
   })
   
   window.initTrainDIB({
@@ -432,6 +489,16 @@ window.initPixelGame = async function({sel, state, isBig=true}){
   state.renderAll.trainDIB?.fns.push(trainDIB)
 
   async function trainDIB (){
+    state.trainingBoards = []
+    state.trainingDistMats1 = []
+    state.trainingDistMats2 = []
+    state.trainingLatents1 = []
+    state.trainingLatents2 = []
+    state.trainingInfoAllocs1 = []
+    state.trainingInfoAllocs2 = []
+    state.trainingError = []
+
+    state.manualOverride = false
     // console.log(tf.memory().numBytes, tf.memory().numTensors, tf.memory().unreliable)
 
     //////// Set up the networks
@@ -459,9 +526,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
     //////// Training step
     beta = tf.variable(betaStart, trainable=false)
     losses = []
-    infoAllocs1 = []
-    infoAllocs2 = []
-    display = []
+    
 
     maxTotalInfoInDisplay = 2
     maxSingleInfoInDisplay = 1
@@ -479,7 +544,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
 
     optimizer = tf.train.adam(learningRate)
 
-    numberAveragingRepeats = 256
+    numberAveragingRepeats = 128
     inds1Exhaustive = tf.tidy(() => {
       return tf.range(0, state.originalDims[0], 1, dtype='float32')
         .expandDims(1).tile([1, state.originalDims[1]]).reshape([-1])
@@ -516,7 +581,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
     // console.log(await tf.time(generateBatch))
     let turnAround = false 
     let turnAroundInd
-    for (let stepNum = 0; stepNum < numTrainingSteps; stepNum++) {
+    for (let stepNum = 0; stepNum < state.numberTrainingSteps; stepNum++) {
       // console.time()
       // beta.assign(betas.gather(stepNum))
       const [inps1, inps2, gatheredBoardValues] = generateBatch()
@@ -531,7 +596,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
       tf.dispose([inps1, inps2, gatheredBoardValues])
 
       //////// Update the displays
-      if (stepNum % displayEvery == 0) {
+      if (stepNum % state.displayEvery == 0) {
         // console.time()
         await tf.nextFrame();
         // console.log(tf.memory().numBytes, tf.memory().numTensors, tf.memory().unreliable)
@@ -554,10 +619,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
           return outputsShaped.mean(0).reshape([-1])
         })
         boardVals.array().then(vals => {
-          fittedBoardSVG.selectAll("rect")
-          .data(vals)
-          // .style("fill", function(d) { return heatmapColor(d[2])} )
-          .style("fill", function(d) { return heatmapColor(d)} )
+          state.trainingBoards.push(vals)
         })
 
         // update the latent vecs
@@ -575,18 +637,15 @@ window.initPixelGame = async function({sel, state, isBig=true}){
         })
 
         bhats1 = computeBhatDists(zMean1Scalar, zLogVar1Scalar)
-        bhats1Display = tf.stack([inds1Exhaustive, inds2Exhaustive, bhats1.reshape([-1])], -1)
+        // bhats1Display = tf.stack([inds1Exhaustive, inds2Exhaustive, bhats1.reshape([-1])], -1)
+        bhats1Display = bhats1.reshape([-1, 1])
         bhats1Display.array().then(vals => {
-          state.distinguishabilitySVGs[0].selectAll("rect")
-          .data(vals)
-          .style("fill", function(d) { return util.distinguishabilityColorMap(d[2])} )
+          state.trainingDistMats1.push(vals)
         })
         bhats2 = computeBhatDists(zMean2Scalar, zLogVar2Scalar)
-        bhats2Display = tf.stack([inds1Exhaustive, inds2Exhaustive, bhats2.reshape([-1])], -1)
+        bhats2Display = bhats2.reshape([-1, 1])
         bhats2Display.array().then(vals => {
-          state.distinguishabilitySVGs[1].selectAll("rect")
-          .data(vals)
-          .style("fill", function(d) { return util.distinguishabilityColorMap(d[2])} )
+          state.trainingDistMats2.push(vals)
         })
         pdfData1 = tf.tidy(() => {
           res = tf.exp(xxLatentInputs.expandDims(0)
@@ -600,14 +659,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
         })
 
         pdfData1.array().then(vals => {
-          for (let inputInd=0; inputInd<state.originalDims[0]; inputInd++) {
-            plotData = []
-            vals[inputInd].forEach((v, i) => plotData.push([xxLatentInputsJS[i], v]))
-            state.latentCurves[inputInd]//.data(plotData)
-              .at({d: d3.line()
-                .x(d => state.cs[1].x(d[0]))
-                .y(d => state.cs[1].y(d[1]))(plotData)})
-            }
+          state.trainingLatents1.push(vals)
         })
         pmfData1 = tf.tidy(() => {
           return pdfData1.mul(xxLatentBinWidth)
@@ -633,14 +685,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
         })
 
         pdfData2.array().then(vals => {
-          for (let inputInd=0; inputInd<state.originalDims[1]; inputInd++) {
-            plotData = []
-            vals[inputInd].forEach((v, i) => plotData.push([xxLatentInputsJS[i], v]))
-            state.latentCurves[state.originalDims[0]+inputInd]//.data(plotData)
-              .at({d: d3.line()
-                .x(d => state.cs[1].x(d[0]))
-                .y(d => state.cs[1].y(d[1]))(plotData)})
-            }
+          state.trainingLatents2.push(vals)
         })
 
         pmfData2 = tf.tidy(() => {
@@ -661,15 +706,15 @@ window.initPixelGame = async function({sel, state, isBig=true}){
           i2 = vals[1]
           rmseVal = vals[2]
           totalInfo = i1+i2 
-          display.push([totalInfo, rmseVal])
-
-          if ((display.length > 10) && (!turnAround)) {
+          state.trainingError.push([totalInfo, rmseVal])
+          
+          if ((state.trainingError.length > 10) && (!turnAround)) {
             lastInfoDiffs = 0
             for (let m=2; m<5; m++) {
-              lastInfoDiffs += display.slice(-m, -m+1)[0][0]-display.slice(-m-1, -m)[0][0]
+              lastInfoDiffs += state.trainingError.slice(-m, -m+1)[0][0]-state.trainingError.slice(-m-1, -m)[0][0]
             }
             if (lastInfoDiffs < 0) {
-              turnAroundInd = display.length
+              turnAroundInd = state.trainingError.length
               turnAround = true
             }
           }
@@ -683,39 +728,31 @@ window.initPixelGame = async function({sel, state, isBig=true}){
           c.y2.domain([0, maxSingleInfoInDisplay])
           c.svg.select('.y2.axis').call(c.y2Axis)
 
-          infoAllocs1.push([totalInfo, i1])
-          infoAllocs2.push([totalInfo, i2])
-
-          currMarkerRMSE.datum([totalInfo, rmseVal])
-            .attr("cx", function(d) { return c.x(d[0]) })
-            .attr("cy", function(d) { return c.y(d[1]) })
-
-          currMarkerInfo1.datum([totalInfo, i1])
-            .attr("cx", function(d) { return c.x(d[0]) })
-            .attr("cy", function(d) { return c.y2(d[1]) })
-
-          currMarkerInfo2.datum([totalInfo, i2])
-            .attr("cx", function(d) { return c.x(d[0]) })
-            .attr("cy", function(d) { return c.y2(d[1]) })
+          state.trainingInfoAllocs1.push([totalInfo, i1])
+          state.trainingInfoAllocs2.push([totalInfo, i2])
 
           if (!turnAround) {
-            errorPathSelRampUp.at({d: line.y(d => c.y(d[1]))(display)})
+            errorPathSelRampUp.at({d: line.y(d => c.y(d[1]))(state.trainingError)})
             state.townInfosRampUp[0]
-              .at({d: line.y(d => c.y2(d[1]))(infoAllocs1)})
+              .at({d: line.y(d => c.y2(d[1]))(state.trainingInfoAllocs1)})
             state.townInfosRampUp[1]
-              .at({d: line.y(d => c.y2(d[1]))(infoAllocs2)})
+              .at({d: line.y(d => c.y2(d[1]))(state.trainingInfoAllocs2)})
               // .style("opacity", function (d) {console.log(d); return d})
           } else {
-            errorPathSelRampUp.at({d: line.y(d => c.y(d[1]))(display.slice(0, turnAroundInd+1))})
-            errorPathSelTurnAround.at({d: line.y(d => c.y(d[1]))(display.slice(turnAroundInd))})
+            errorPathSelRampUp.at({d: line.y(d => c.y(d[1]))(state.trainingError.slice(0, turnAroundInd+1))})
+            errorPathSelTurnAround.at({d: line.y(d => c.y(d[1]))(state.trainingError.slice(turnAroundInd))})
             state.townInfosRampUp[0]
-              .at({d: line.y(d => c.y2(d[1]))(infoAllocs1.slice(0, turnAroundInd+1))})
+              .at({d: line.y(d => c.y2(d[1]))(state.trainingInfoAllocs1.slice(0, turnAroundInd+1))})
             state.townInfosTurnAround[0]
-              .at({d: line.y(d => c.y2(d[1]))(infoAllocs1.slice(turnAroundInd))})
+              .at({d: line.y(d => c.y2(d[1]))(state.trainingInfoAllocs1.slice(turnAroundInd))})
             state.townInfosRampUp[1]
-              .at({d: line.y(d => c.y2(d[1]))(infoAllocs2.slice(0, turnAroundInd+1))})
+              .at({d: line.y(d => c.y2(d[1]))(state.trainingInfoAllocs2.slice(0, turnAroundInd+1))})
             state.townInfosTurnAround[1]
-              .at({d: line.y(d => c.y2(d[1]))(infoAllocs2.slice(turnAroundInd))})
+              .at({d: line.y(d => c.y2(d[1]))(state.trainingInfoAllocs2.slice(turnAroundInd))})
+          }
+          if (!state.manualOverride) {
+            state.trainingStepDisplayIndex = state.trainingError.length-1
+            state.renderAll.varyTrainingStep()
           }
           
         })
@@ -746,6 +783,9 @@ window.initPixelGame = async function({sel, state, isBig=true}){
           info1,
           info2])
         // console.timeEnd()
+        // await tf.nextFrame()
+        // state.trainingStepDisplayIndex = state.trainingBoards.length-1
+        // state.renderAll.varyTrainingStep()
       } 
       
 
