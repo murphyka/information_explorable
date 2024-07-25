@@ -117,7 +117,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
   clickableBoardSVG.selectAll("path,line").remove();
 
   // Build color scale
-  var heatmapColor = d3.scaleSequential(d3.interpolateBrBG).domain([-0.3, 1.3]);
+  var heatmapColor = d3.scaleSequential(d3.interpolateBrBG).domain([-0.25, 1.25]);
   clickableBoardSVG.selectAll()
       .data(state.d3ReadableBoardValues)
       .enter()

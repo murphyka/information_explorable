@@ -264,7 +264,7 @@ window.initCompressionLevelSlider = function({sel, state}){
     <div>
       Total information (bits): <val></val>
     </div>
-    <div style="margin-bottom:-20px;">
+    <div style="margin-bottom:-20px">
       <input type=range min=0 max=${state.infoLevels.length-2} value=${state.compressionInd}></input>
     </div>
   `)

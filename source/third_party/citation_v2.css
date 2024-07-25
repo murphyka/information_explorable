@@ -46,6 +46,7 @@
   text-decoration: none;
   font-weight: 400;
   display: block;
+  color: teal;
 }
 .paper-title-link:hover{
   text-decoration: underline;

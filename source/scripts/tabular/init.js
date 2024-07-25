@@ -90,7 +90,7 @@ window.initTabular = async function(){
     [0, 55, 106],
   ]
 
-  state.compressionInd = 13
+  state.compressionInd = 15
   window.initDistinguishability({
     sel: d3.select('.distinguishability-mats'),
     state,
@@ -101,32 +101,5 @@ window.initTabular = async function(){
     state,
   })
 
-  // state.renderAll.compressionLevel.fns.push(d => {
-  //   var step = state.stepIndex*state.hyper.save_every
-
-
-
-  //   hoverTick.translate(c.x(step), 0)
-  //   hoverTick.select('text').text(d3.format(',')(step))
-  // })
-
-
-
-  // state.renderAll.compressionLevel()
-
-  
-
-  // initSwoopy(annotations)
-  // var observer = new IntersectionObserver(entries => {
-  //   entries.forEach(entry => {
-  //     if (entry.isIntersecting){
-  //       d3.select('.scroll-show').st({opacity: 1})
-  //       topAccuracySel.classed('hidden-step', 0)
-
-  
-  //     }
-  //   })
-  // }, {root: null, rootMargin: '0px', threshold: 1.0})
-  // observer.observe(distMatrices.node())
 }
 
