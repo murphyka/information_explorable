@@ -13,13 +13,13 @@ window.initInfoPlane = async function({sel, state, isBig=true, lossLabel, width=
     margin: {left: leftMargin, right: rightMargin, top: topMargin, bottom: bottomMargin}
   })
   // Add the per-feature information axis
-  c.y2 = d3.scaleLinear().domain([0, 4]).range([c.height, 0])
+  c.y2 = d3.scaleLinear().domain([0, 4.3]).range([c.height, 0])
   c.y2Axis = d3.axisRight(c.y2).ticks(isBig ? 5 : 3)
   c.svg.append("g") 
         .attr("transform", `translate(${actualWidth},0)`) 
         .call(c.y2Axis) 
         
-  c.x.domain([0, 10])
+  c.x.domain([0, 16])
   c.y.domain([0, 200])  // change this for diff datasets; could create a plotting params json for each dataset
 
   c.yAxis.ticks(isBig ? 5 : 3)

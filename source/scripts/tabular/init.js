@@ -19,27 +19,20 @@ window.initTabular = async function(){
   state.infoLevels = []
   for (l = decompData.length + 1; (i + decompShape[1]) < l; i += decompShape[1]) {
       parsedDecomp.push(decompData.slice(i, i + decompShape[1]));
-      if ((Math.floor(i/decompShape[1]) % 2) == 0) { // get the total info to help with displaying the distinguishability mats
-        state.infoLevels.push(decompData[i+12])
-      }
+      // if ((Math.floor(i/decompShape[1]) % 2) == 0) { // only if inds were skipped when saving the compression mats
+      state.infoLevels.push(decompData[i+12])
+      // }
   }
-  state.infoLevels = state.infoLevels.slice(-40).reverse()  // just the number of mats I saved
-  // quick transpose ty stackoverflow
-  // state.info_decomp = _.zip(...parsedDecomp)  // actually, we want [time step, index] for d3
+  state.infoLevels = state.infoLevels.reverse()  // just the number of mats I saved
   state.info_decomp = parsedDecomp
 
   state.featureLabels = ['season', 'year', 'month', 'hour', 'holiday?', 'day of week', 'working day?', 'weather', 'temperature', 'apparent temp.', 'humidity', 'wind']
-  // state.info_decomp = math.reshape(state.info_decomp.data, state.info_decomp.shape)
-  // state.dist_matrices = await util.getFile(state.runPath + '_dist_matrices.npy')
   window.initInfoPlane({
     sel: d3.select('.tabular-decomp'),
     state,
     lossLabel: "RMSE",
-    // title: `Information decomposition on ${state.dataset}`
   })
 
-
-  // var topAccuracySel = d3.select('.tabular-decomp')//.classed('hidden-step', 1)
   state.distMatrices = []
   state.displayFeatureVals = []
   state.numberFeatures = 12
@@ -75,11 +68,11 @@ window.initTabular = async function(){
     ['T','F'],
     ['Tu','Th','Sa'],
     ['T','F'],
-    ['fair','mist','wet'],
-    [0, 15, 25],
-    [0, 15, 25],
-    [0, 50, 75, 100],
-    [0, 5, 10, 15],
+    ['fair','mist','wet','bad'],
+    [0, 10, 20, '30C'],
+    [0, 10, 20, '30C'],
+    [25, 50, 75, '90%'],
+    [0, 10, 20],
   ]
 
   state.featureValueLocs = [
@@ -91,10 +84,10 @@ window.initTabular = async function(){
     [1, 3, 5],
     [0, 1],
     [0, 1, 2, 3],
-    [0, 40, 100], 
-    [0, 40, 80],
-    [0, 30, 60, 127],
-    [0, 30, 60, 90],
+    [2, 41, 78, 115], 
+    [17, 43, 78, 115],
+    [3, 36, 82, 112],
+    [0, 55, 106],
   ]
 
   state.compressionInd = 13

@@ -63,7 +63,7 @@ window.initDistinguishability = async function({sel, state}) {
         });
         state.distSVGs[featureInd].append('g').call(yAxisGen)
         .selectAll("text")
-        .style("fill", '#bbb')
+        .style("fill", '#999')
 
         xAxisGen = d3.axisTop(distX).tickPadding(-2)
         xAxisGen.tickFormat(function(d, i) {
@@ -76,7 +76,7 @@ window.initDistinguishability = async function({sel, state}) {
         });
         state.distSVGs[featureInd].append('g').call(xAxisGen)
         .selectAll("text")
-        .style("fill", '#bbb')
+        .style("fill", '#999')
       
     }
     state.distSVGs[featureInd].selectAll("path,line").remove();
