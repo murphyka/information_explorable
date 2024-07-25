@@ -156,7 +156,7 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
 
   state.barx = d3.scaleBand()
   .range([ 0, bars_width ])
-  .domain(['town1', 'town2'])
+  .domain(['Town1', 'Town2'])
   .padding(0.2);
 
   bars_svg.append("g")
@@ -175,7 +175,7 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
     .call(d3.axisLeft(state.bary));
 
   // Bars
-  barkeys = ['town1', 'town2']
+  barkeys = ['Town1', 'Town2']
   dummyData = [0.5, 0.75]
   state.bars = bars_svg.selectAll("mybar")
     .data(dummyData)

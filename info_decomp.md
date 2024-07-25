@@ -5,11 +5,11 @@ subtitle: An interactive tutorial about decomposing variation into distinctions 
 socialsummary: An interactive introduction to information decomposition as a route to interpretability.
 shareimg: 
 shareimgabstract: 
-authors: <a href=https://kieranamurphy.com>Kieran Murphy</a>, <a href=https://complexsystemsupenn.com>Dani Bassett</a>
+authors: <a href=https://kieranamurphy.com>Kieran Murphy</a>, <a href=https://complexsystemsupenn.com>Dani S. Bassett</a>
 date: July 2024
 ---
 
-Imagine someone asks you *"**Where is the information about whether something is a car or a truck?**"*
+Imagine someone asks you, *"**Where is the information about whether something is a car or a truck?**"*
 <div class="container">
   <p>
     <img src="data/car.jpg" width="300" />
@@ -17,11 +17,11 @@ Imagine someone asks you *"**Where is the information about whether something is
   </p>
 </div>
 
-It might be an unusual phrasing, but you'd probably understand what they mean.
-You might mention the overall size or something about the rear, understanding that there is specific variation among vehicles that best distinguishes cars from trucks and other variation that is less relevant (e.g., the color).
+It might be an unusual phrasing, but you'd probably understand what they meant.
+You might mention the overall size or something about the rear, because you understand that there is specific variation among vehicles that best distinguishes cars from trucks whereas other variation is less relevant (e.g., the color).
 
 The goal of this post is to build intuition around localizing information, something we naturally do to make sense of the world, and show how it can be formulated with machine learning as a route to interpretability.
-The long and short (**TL;DR**) is that **we can view the information in data as specific distinctions worth making, in that these distinctions tell us the most about some other quantity we care about.**
+The long and short (**TL;DR**) is that **we can view the information in data as composed of specific distinctions worth making, in that these distinctions tell us the most about some other quantity we care about.**
 
 This post presents a different take on mutual information than other intros to information theory<a class='footstart' key='other-info-resources'></a>.
 Rather than talking about the mutual information between two variables as something fixed in stone, we will introduce auxiliary variables that encapsulate some variation in a variable and compress away the rest.
@@ -39,12 +39,12 @@ A town sends a binary signal to tell about their weather conditions locally, usi
   </figure>
 </div>
 
-Let's say the weather in a neighboring town (town 1) is completely unpredictable one hour to the next<a class='footstart' key='weather-caveats'></a>, and it's calm half the time, stormy the other half of the time.
+Let's say the weather in a neighboring town (Town 1) is completely unpredictable from one hour to the next<a class='footstart' key='weather-caveats'></a>, and it's calm half the time, stormy the other half of the time.
 That town's weather will be one of our "source" random variables, which we'll call `$X_1$`.
 It has two equally probable outcomes (calm or stormy), so `$X_1$` has one bit of uncertainty (aka entropy)<a class='footstart' key='entropy'></a>.
 
-The message your town receives from the telegraph line will be our auxiliary random variable -- call it `$U_1$`.
-The mutual information between the two, `$I(X_1;U_1)$`, is the amount of information transmitted per message -- it's the amount that receiving a message reduces your uncertainty about town 1's weather<a class='footstart' key='mutual_info'></a>.
+The message your town receives from the telegraph line will be our auxiliary random variable&mdash;call it `$U_1$`.
+The mutual information between the two, `$I(X_1;U_1)$`, is the amount of information transmitted per message&mdash;it's the amount that receiving a message reduces your uncertainty about Town 1's weather<a class='footstart' key='mutual_info'></a>.
 The more money you spend on the telegraph line, the lower the noise in the line and the better you'll be able to infer the other town's weather.
 <div class="container">
   <div class='transmission-noise-slider'></div>
@@ -56,7 +56,7 @@ The more money you spend on the telegraph line, the lower the noise in the line 
 
 #### Information from multiple sources
 
-Now let's say there are two neighboring towns (1 and 2<a class='footstart' key='b-weather'></a>) with which to build telegraph lines, and you have a fixed budget for the whole project. How much money should you allocate for each line?  
+Now let's say there are two neighboring towns (1 and 2) with which to build telegraph lines, and you have a fixed budget for the whole project<a class='footstart' key='b-weather'></a>. How much money should you allocate for each line?  
 
 
 Due to the surrounding landscape, the weather is not trivially related between their towns and yours.  
@@ -65,19 +65,19 @@ A dataset has been collected (using the random variable `$Y$` to describe the we
 <div class='storm-heatmap' align='center'></div>
 
 To get the most value out of the telegraph lines, we need to localize the information contained in the sources `$X_1$` and `$X_2$` about the target `$Y$`.
-In order to do that, we'll look at all the possible ways to communicate information about the sources -- in effect, simulating every possible budget allocation.
+In order to do that, we'll look at all the possible ways to communicate information about the sources&mdash;in effect, simulating every possible budget allocation.
 
 <div class='sticky-container'>
 
 <div class='storm-telegraph row sticky'></div>
 
-Each dot in plot above represents a different information allocation between the two towns, and each one lowers your error in predicting `$Y$` (your town's weather) a different amount<a class='footstart' key='y-not-info'></a>.
+Each dot in the plot above represents a different information allocation between the two towns, and each one lowers your error in predicting `$Y$` (your town's weather) a different amount<a class='footstart' key='y-not-info'></a>.
 In the top left, you don't receive any information from the other towns and your error is maximal. 
 In the bottom right, you receive one bit of information from each town, and the error is as low as you can go (which is set by the total mutual information between sources and target `$I(X_1,X_2;Y)$`).
 
 What we've done is laid out all the ways to select variation from the source variables.
 Localizing the information that the sources contain about the target means identifying the variation that lowers the error the most.
-The most informative variation lies along the [Pareto front](https://en.wikipedia.org/wiki/Pareto_front) -- the curve of allocations that lower the error most while spending the least on the telegraph lines.
+The most informative variation lies along the [Pareto front](https://en.wikipedia.org/wiki/Pareto_front)&mdash;the curve of allocations that lower the error most while spending the least on the telegraph lines.
 Let's display these optimal information allocations by clicking the button below.
 
 <label class="switch">
@@ -86,7 +86,7 @@ Let's display these optimal information allocations by clicking the button below
 </label> *Display optimal information allocations*
 
 The right vertical axis now displays the optimal amount of information to receive from each town.
-If your budget only allows for one total bit of transmitted information, it's best to get about 0.7 bits from town 1 and 0.3 bits from town 2.
+If your budget only allows for one total bit of transmitted information, it's best to get about 0.7 bits from Town 1 and 0.3 bits from Town 2.
 Phrased more generally, given the statistical relationship observed in the dataset, we've found a spectrum of the most informative variation in `$X_1$` and `$X_2$` about `$Y$`.
 
 Let's change the statistical relationship between the towns' weather. 
@@ -97,14 +97,14 @@ Adjust the sliders or click on the buttons below, and watch for changes in the o
   <div class='storm-probability-buttons' id='buttons2'></div>
 </div>
 
-When mirroring town 1's weather (<digits>Mirror1</digits>), we see that there is no information in town 2 as it does nothing to reduce our predictive error.
+When mirroring Town 1's weather (<digits>Mirror1</digits>), we see that there is no information in Town 2 as it does nothing to reduce our predictive error.
 With the logic gates, we see that both towns contain relevant information because the optimal allocation is an equal split.
 <digits>XOR</digits> is unique among the logic gates in that the error is slow to decrease in the low-information regime, and in the greater discrepancy between optimal and suboptimal information allocations<a class='footstart' key='xor'></a>. 
 
 </div>
 
 Whereas a typical information theory treatment of this scenario might have looked at `$I(X_1;Y)$`, `$I(X_2;Y)$`, and `$I(X_1,X_2;Y)$`, we explored the space of partial information allocations by introducing the auxiliary variables `$U_1$` and `$U_2$`.
-We've searched through all possible lossy compressions of each source random variable to identify the information contained in each that is most predictive of the target.
+We searched through all possible lossy compressions of each source random variable to identify the information contained in each that is most predictive of the target.
 <!-- 
 **At a high level,** the variation in the sources (the weather of towns A and B) is not all equal in the amount of information it shares with the target variable (your town's weather).
 By mapping out the predictive error in all ways of selecting partial bits from the sources, the variation is sorted and we can "point" to the variation that is most shared with the target. 
@@ -114,8 +114,8 @@ Because mutual information is just shared variation, we've localized the informa
 
 Having proven yourself with the storm warning system, you've been tasked with building another communication system.
 Your town has a hospital, and towns 1 and 2 contain specialized testing devices that your hospital regularly needs.
-A blood sample is sent off to town 1, and their device measures one of four equally likely results (<span style="font-weight:bold; color:#1f77b4;">A</span>, <span style="font-weight:bold; color:#ff7f0e;">B</span>, <span style="font-weight:bold; color:#2ca02c;">C</span>, or <span style="font-weight:bold; color:#d62728;">D</span>); 
-another sample is sent to town 2 and its device can also output one of four equally likely results (<span style="font-weight:bold; color:#9467bd;">a</span>, <span style="font-weight:bold; color:#8c564b;">b</span>, <span style="font-weight:bold; color:#e377c2;">c</span>, or <span style="font-weight:bold; color:#7f7f7f;">d</span>).
+A blood sample is sent off to Town 1, and their device measures one of four equally likely results (<span style="font-weight:bold; color:#1f77b4;">A</span>, <span style="font-weight:bold; color:#ff7f0e;">B</span>, <span style="font-weight:bold; color:#2ca02c;">C</span>, or <span style="font-weight:bold; color:#d62728;">D</span>); 
+another sample is sent to Town 2 and its device can also output one of four equally likely results (<span style="font-weight:bold; color:#9467bd;">a</span>, <span style="font-weight:bold; color:#8c564b;">b</span>, <span style="font-weight:bold; color:#e377c2;">c</span>, or <span style="font-weight:bold; color:#7f7f7f;">d</span>).
 The results from towns 1 and 2 determine which of two treatment plans to follow.
 
 The space of lossy compressions grows rapidly: it's already impractical to chart out all possibilities in this scenario.
@@ -176,7 +176,7 @@ The goal is to predict the number of bikes rented given time and weather informa
 Our source variables `$X_i$` are the time and weather descriptors.
 Some, like temperature and humidity, are continuous variables.
 Others are categorical, including the season and the hour of the day.
-We want to identify -- out of all of the variation in these descriptors -- the specific bits that are most connected with bike rentals.
+We want to identify&mdash;out of all of the variation in these descriptors&mdash;the specific bits that are most connected with bike rentals.
 Where do you think the information resides?
 
 We ran the optimization offline, but you can also run it yourself with the code on <a href="https://github.com/distributed-information-bottleneck/distributed-information-bottleneck.github.io">github</a>. 
@@ -192,13 +192,13 @@ The dataset includes rentals in the middle of the night, which must be very diff
 By contrast, <digits>year</digits> and <digits>working day?</digits> contributed their partial bit and saturate. 
 <digits>wind</digits> and <digits>apparent temperature</digits> contribute almost nothing, with the latter presumably because we've already gotten information from the <digits>temperature</digits> feature.
 
-For reference, interpretable methods that are based on linear combinations of the features (e.g., Neural Additive Models<a class='citestart' key='nam'></a>) achieve RMSE of 100.
+For reference, interpretable methods that are based on linear combinations of the features (e.g., Neural Additive Models<a class='citestart' key='nam'></a>) achieve RMSEs round 100.
 For a fully nonlinear processing of the features, we need only 7 bits of information to do better.
 We don't mind that the predictive model is a black box: our source of interpretability is the localization of information in the features. 
 
 **What are the specific bits of variation in the different features?**
 Below are distinguishability matrices for the twelve features as a function of the total information extracted.
-The matrices visualize the distinctions between feature values that are passed along to the predictive model -- as in the earlier example -- and are agnostic to the dimensionality of the latent space (16 for each feature, in this case).
+The matrices visualize the distinctions between feature values that are passed along to the predictive model&mdash;as in the earlier example&mdash;and are agnostic to the dimensionality of the latent space (16 for each feature, in this case).
 The matrix entries are white if the feature values are indistinguishable (same as when the posterior distributions coincided in the above example) and blue depending on the degree of distinguishability<a class='footstart' key='bhat'></a>.
 
 </div>
@@ -260,7 +260,7 @@ It can be helpful to think of mutual information as a generalization of correlat
 Say `$X$` and `$Y$` are two random variables, the mutual information  between them is `$I(X;Y)=H(X)-H(X|Y)=H(Y)-H(Y|X)$`<a class='citestart' key='cover'></a>.
 
 <a class='footend' key='b-weather'></a> 
-Town 2's weather is, oddly enough, completely independent of town 1's weather.  It's also a 50/50 split between calm and stormy.
+Town 2's weather is, oddly enough, completely independent of Town 1's weather.  It's also a 50/50 split between calm and stormy.
 
 <a class='footend' key='y-not-info'></a> 
 The vertical axis could have displayed the mutual information `$I(U_1,U_2;Y)$` instead of cross entropy error `$BCE=H(Y)-I(U_1,U_2;Y)$` so that all quantities are mutual information terms.
