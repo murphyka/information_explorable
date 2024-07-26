@@ -194,7 +194,7 @@ The dataset includes rentals in the middle of the night, which must be very diff
 By contrast, <digits>year</digits> and <digits>working day?</digits> contributed their partial bit and saturate. 
 <digits>wind</digits> and <digits>apparent temperature</digits> contribute almost nothing, with the latter presumably because we've already gotten information from the <digits>temperature</digits> feature.
 
-For reference, interpretable methods that are based on linear combinations of the features (e.g., Neural Additive Models<a class='citestart' key='nam'></a>) achieve RMSEs round 100.
+For reference, interpretable methods that are based on linear combinations of the features (e.g., Neural Additive Models<a class='citestart' key='nam'></a>) achieve RMSEs around 100.
 For a fully nonlinear processing of the features, we need only 7 bits of information to do better.
 We don't mind that the predictive model is a black box: our source of interpretability is the localization of information in the features. 
 
