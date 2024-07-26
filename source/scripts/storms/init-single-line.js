@@ -3,7 +3,7 @@ window.initInfoTelegraphSingle = async function({sel, state, isBig=true}){
   sel.append("p")
   // Plot the frame
   var leftMargin = 50
-  var rightMargin = 50 
+  var rightMargin = 30 
   var topMargin = 25 
   var bottomMargin = 50
   var actualHeight = isBig ? 250 : 30
@@ -79,7 +79,7 @@ window.initInfoTelegraphSingle = async function({sel, state, isBig=true}){
     .at({d: line.y(d => c.y(d[1]))(plotDataBoth)})
 
   //////////// Bars
-  bars_margin = {left: leftMargin, right: rightMargin, top: topMargin, bottom: bottomMargin}
+  bars_margin = {left: leftMargin, right: 120, top: topMargin, bottom: bottomMargin}
   bars_width = 100
   var bars_svg = sel
   .append("svg")
@@ -94,20 +94,19 @@ window.initInfoTelegraphSingle = async function({sel, state, isBig=true}){
   .domain(['Transmitted info'])
   .padding(0.2);
 
-  bars_svg.append("g")
-    .attr("transform", "translate(0," + actualHeight + ")")
-    .call(d3.axisBottom(barx))
-    .selectAll("text")
-      .attr("transform", "translate(0,0)rotate(0)")
-      .style("text-anchor", "middle")
-      .style("font-size", 14)
-
   // Add Y axis
   var bary = d3.scaleLinear()
     .domain([0, 1])
     .range([ actualHeight, 0]);
   bars_svg.append("g")
-    .call(d3.axisLeft(bary));
+    .call(d3.axisLeft(bary).ticks(3));
+
+  bars_svg
+      .append('g')
+      .translate([-28, c.height/2])
+      .append('text.axis-label')
+      .text("Transmitted information (bits)")
+      .at({textAnchor: 'middle', fill: '#000', transform: 'rotate(-90)'})
 
   // Bars
   barkey = ['Transmitted info']
@@ -121,6 +120,26 @@ window.initInfoTelegraphSingle = async function({sel, state, isBig=true}){
       .attr("width", barx.bandwidth())
       .attr("height", function(d, i) { return actualHeight - bary(d); })
       .attr("fill", function(d, i) {return util.colors.bars[i];})
+
+  bars_svg.append("text")
+    .text("Indistinguishable")
+    .attr("x", bars_width/2)
+    .attr("y", actualHeight)
+    // .attr("dx", 5)
+    .attr("dy", 20)
+    .style("font-size", 14)
+    .attr("text-anchor", "middle")
+    // .style("font-weight", "bold")
+
+  bars_svg.append("text")
+    .text("Distinguishable")
+    .attr("x", bars_width/2)
+    .attr("y", 0)
+    // .attr("dx", 5)
+    .attr("dy", -10)
+    .style("font-size", 14)
+    .attr("text-anchor", "middle")
+    // .style("font-weight", "bold")
 
   state.renderAll.modNoise()
   async function drawMessagePlane (){

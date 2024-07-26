@@ -77,7 +77,7 @@ In the bottom right, you receive one bit of information from each town, and the 
 
 What we've done is laid out all the ways to select variation from the source variables.
 Localizing the information that the sources contain about the target means identifying the variation that lowers the error the most.
-The most informative variation lies along the [Pareto front](https://en.wikipedia.org/wiki/Pareto_front)&mdash;the curve of allocations that lower the error most while spending the least on the telegraph lines.
+The most informative variation lies along the [Pareto front](https://en.wikipedia.org/wiki/Pareto_front)&mdash;the curve of allocations that lower the error most for a given amount spent on the telegraph lines.
 Let's display these optimal information allocations by clicking the button below.
 
 <label class="switch">
@@ -97,9 +97,11 @@ Adjust the sliders or click on the buttons below, and watch for changes in the o
   <div class='storm-probability-buttons' id='buttons2'></div>
 </div>
 
-When mirroring Town 1's weather (<digits>Mirror1</digits>), we see that there is no information in Town 2 as it does nothing to reduce our predictive error.
+When mirroring Town 1's weather (<digits>Mirror1</digits>), we see that there is no **useful** information in Town 2 as it does nothing to reduce our predictive error.
+
 With the logic gates, we see that both towns contain relevant information because the optimal allocation is an equal split.
-<digits>XOR</digits> is unique among the logic gates in that the error is slow to decrease in the low-information regime, and in the greater discrepancy between optimal and suboptimal information allocations<a class='footstart' key='xor'></a>. 
+For example, the <digits>AND</digits> relationship means that it is only stormy in your town if both Town 1 and Town 2 are storming, while <digits>XOR</digits> means your town storms only if the other two towns have different weather
+<a class='footstart' key='xor'></a>. 
 
 </div>
 
@@ -267,6 +269,7 @@ The vertical axis could have displayed the mutual information `$I(U_1,U_2;Y)$` i
 However, later we'll want to use other errors like RMSE, so we opted for consistency.
 
 <a class='footend' key='xor'></a>
+<digits>XOR</digits> is unique among the logic gates in that the error is slow to decrease in the low-information regime, and in the greater discrepancy between optimal and suboptimal information allocations.
 Look at the difference in error between half a bit from each town and one bit from either town. 
 The difference in error is large for XOR while it's almost nothing for the other logic gates. 
 

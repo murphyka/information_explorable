@@ -42,7 +42,7 @@ window.initProbabilityButtons = function({sel, state, columnIndex}){
   ['Mirror2', [0, 1, 0, 1]],
   ]
   if (columnIndex == 2) {
-    gateButtons.slice(0, 4).forEach(stuff => {
+    gateButtons.slice(0, 3).forEach(stuff => {
       buttonSel = sel.append('div.button')//.style("position", "relative").style("margin-left", "800px"),
       buttonSel.html(`<input type="button" class="pbutton" value=${stuff[0]}>`)
       .on('click', function () {
