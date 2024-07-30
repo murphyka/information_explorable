@@ -113,7 +113,7 @@ Adjust the sliders or click on the buttons below, and watch for changes in the o
 When mirroring Town 1's weather (<digits>Mirror1</digits>), we see that there is no **useful** information in Town 2 as it does nothing to reduce our predictive error (and vice versa for <digits>Mirror2</digits>).
 
 The logical relationships (e.g., <digits>AND</digits> means that it is only stormy in your town if both Town 1 and Town 2 are storming, while <digits>XOR</digits> means your town storms only if the other two towns have different weather), though unrealistic for weather, represent commonly studied statistical relationships between variables. 
-We can see that both towns contain relevant information because the optimal allocation is an equal split.
+We can see that relevant information is evenly shared between the towns because the optimal allocation is an equal split.
 
 </div>
 
@@ -146,11 +146,11 @@ We'll encode the input `$X_1$` to an embedding space that will house our auxilia
 Just like the messages on the receiving end of the telegraph line, the variables `$U_1$` and `$U_2$` will have pulled some information out of the inputs and discarded the rest; they will then be used by another neural network to predict the target variable, `$Y$` (which of the treatment plans to follow).
 
 In order to be able to track of the amount of transmitted information, we'll use a probabilistic encoder<a class='footstart' key='vae'></a> for each of `$X_1$` and `$X_2$`, meaning that each input `$x$` will be transformed into a probability distribution `$p(u|x)$` in embedding space.
-There's a way to keep track of the transmitted information, `$I(X_1;U_1)$`, with some nice properties for optimization.
-The information is upper bounded by the average [Kullback-Leibler (KL) divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) between the embedding distributions and some arbitrary but convenient reference distribution.<a class='footstart' key='dvib'></a>
-In the language of variational autoencoders, the embedding distributions are called posteriors and the reference distribution is called the prior.
+There's a way to keep track of the transmitted information, `$I(X_1;U_1)$`, with some nice properties for optimization:
+the information is upper bounded by the average [Kullback-Leibler (KL) divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) between the embedding distributions and some arbitrary but convenient reference distribution.
+In the language of variational autoencoders, the embedding distributions are called posteriors and the reference distribution is called the prior.<a class='footstart' key='dvib'></a>
 
-Below is a possible embedding space for `$U_1$`, where the four test results for `$X_1$` have been embedded to four distributions that should remind you of the received telegraph messages from earlier in this post.
+Below is a possible embedding space for `$U_1$`, where the four test results for `$X_1$` have been embedded to four distributions that might remind you of the received telegraph messages from earlier in this post.
 The reference distribution is colored grey.
 The mean of the distribution for result <span style="font-weight:bold; color:#1f77b4;">A</span> can be moved around with the slider.
 
@@ -159,16 +159,16 @@ The mean of the distribution for result <span style="font-weight:bold; color:#1f
 While the optimization loss cares about *how much* information is transmitted by `$U_1$`, we care about *what* information was transmitted.
 **The degrees of distinction between every pair of inputs show us the transmitted information.**
 We use a matrix to display the distinguishability between every pair of inputs.<a class='footstart' key='bhat'></a>
-With white for complete indistinguishability and dark blue for perfect distinguishability, notice how the distinguishability between <span style="font-weight:bold; color:#2ca02c;">C</span> and <span style="font-weight:bold; color:#d62728;">D</span> is low, because the distributions overlap significantly.
+With white for complete indistinguishability and dark blue for perfect distinguishability, notice how the distinguishability between <span style="font-weight:bold; color:#2ca02c;">C</span> and <span style="font-weight:bold; color:#d62728;">D</span> is low because the distributions overlap significantly.
 As you move the embedding for <span style="font-weight:bold; color:#1f77b4;">A</span>, watch how the distinguishability changes based on the overlap with other embeddings.
 
 Finally, note how the KL loss is minimized when <span style="font-weight:bold; color:#1f77b4;">A</span> maximally overlaps with the reference distribution (the prior).
 The smallest value possible, zero, occurs when all embedding distributions become equal to the reference.
-We can think of the KL loss as pushing all embeddings inward to the reference distribution. 
+We can think of the KL loss as pushing all embeddings inward to the reference distribution, at which point all inputs are indistinguishable and no information is transmitted.
 
 Let's train a model in your browser and gradually raise the cost of information in order to traverse the Pareto front.<a class='footstart' key='tryAgain'></a>
-On the left is the relationship between test results and treatment plan, and the predictive models' reconstruction below it.
-The trajectory of information allocations versus error is greyed out during the first stage of training, where the relationship between `$X_1$`, `$X_2$`, and `$Y$` are learned with low information cost, and becomes full color during the second, where information is actively being eroded.
+On the left is the relationship between test results and treatment plan (green = treatment plan 1, orange = treatment plan 2), and the predictive models' reconstruction below it.
+The trajectory of information allocations versus error is greyed out during the first stage of training, where the relationship between `$X_1$`, `$X_2$`, and `$Y$` is learned with low information cost, and becomes full color during the second, where information is actively being eroded.
 
 <div class='pixel-game row'></div>
 
@@ -180,23 +180,23 @@ The trajectory of information allocations versus error is greyed out during the 
   <div class='training-progress-slider'></div>
 </div>
 
-Underneath the information plane are the one dimensional latent spaces corresponding to `$U_1$` and `$U_2$`.
-The colored Gaussians are the embedding distributions for the specific test outcomes, while the gray Gaussian is the reference (prior).
+Underneath the information plane are the one dimensional embedding spaces corresponding to `$U_1$` and `$U_2$`.
+The colored Gaussians are the embedding distributions (posteriors) for the specific test outcomes, while the gray Gaussian is the reference (prior).
 To the right are distinguishability matrices.
 **The distinctions that are communicated by the auxiliary variables are the atoms of the relevant information in the sources.**
 
-Try different patterns above, by toggling the tiles directly<a class='footstart' key='squareClick'></a> or by selecting one of the buttons, and watch how the information relevant to `$Y$` manifests in the latent spaces and the distinguishability matrices.
+Try different patterns above, by toggling the tiles directly<a class='footstart' key='squareClick'></a> or by selecting one of the buttons, and watch how the information relevant to `$Y$` manifests in the embedding spaces and the distinguishability matrices.
 For the <digits>Half</digits> pattern, test results <span style="font-weight:bold; color:#1f77b4;">A</span> and <span style="font-weight:bold; color:#ff7f0e;">B</span> collapse, as do <span style="font-weight:bold; color:#2ca02c;">C</span> and <span style="font-weight:bold; color:#d62728;">D</span>; everything collapses for `$X_2$`.
 If we compute the mutual information `$I(X_1;Y)=1 \ \text{bit}$`, we know *how much* information is shared between the test results from Town 1 and the treatment plan.
 With the optimization above, however, we see *what* the information is: the distinction between test results {<span style="font-weight:bold; color:#1f77b4;">A</span> or <span style="font-weight:bold; color:#ff7f0e;">B</span>} and {<span style="font-weight:bold; color:#2ca02c;">C</span> or <span style="font-weight:bold; color:#d62728;">D</span>} is the one bit from Town 1 of relevance to `$Y$`.
-The other bit is irrelevant.
+The other bit of entropy in `$X_1$` is irrelevant.
 
 For the <digits>Preset</digits> pattern, we can see an *approximation* to the relationship between the test results and the treatment plan.
 Information about `$X_2$` drops to zero, at which point the reconstructed board shows only vertical stripes.
 Alongside the spectrum of information allocations are different levels of approximations to the relationship between the sources and the target `$Y$`. 
 
 By sweeping the information penalty, we used machine learning to search through partial information allocations.
-This allowed us to "point" to where the information about `$Y$` is contained in the source variables `$X_1$` and `$X_2$` in terms of distinctions between their different test results.
+**This allowed us to "point" to where the information about `$Y$` is contained in the source variables `$X_1$` and `$X_2$` in terms of distinctions between their different test results.**
 <!-- Beyond finding the optimal budget allocations, we can also tell the two towns where to focus their resolution for new versions of their test devices. -->
 
 #### Where is the information in the bikeshare dataset?
@@ -229,16 +229,16 @@ The optimal information allocations are shown above, and there's a lot to note.
 The <digits>hour</digits> feature is by far the most important, which is fairly intuitive. 
 The dataset includes rentals in the middle of the night, which must be very different than in the middle of the day. 
 <digits>temperature</digits> is important and contributes a growing share as the total information increases.
-By contrast, <digits>year</digits> and <digits>working day?</digits> contributed their partial bit and saturate. 
+By contrast, <digits>year</digits> and <digits>working day?</digits> contribute their partial bit early and then saturate. 
 <digits>wind</digits> and <digits>apparent temperature</digits> contribute almost nothing, with the latter presumably because we've already gotten information from the <digits>temperature</digits> feature.
 
 For reference, interpretable methods that are based on linear combinations of the features (e.g., Neural Additive Models<a class='citestart' key='nam'></a>) achieve RMSEs around 100.
 For a fully nonlinear processing of the features, we need only 7 bits of information to do better.
-We don't mind that the predictive model is a black box: our source of interpretability is the localization of information in the features. 
+**We don't mind that the predictive model is a black box: our source of interpretability is the localization of information in the features.**
 
 **What are the specific bits of variation in the different features?**
 Below are distinguishability matrices for the twelve features as a function of the total information extracted.
-The matrices visualize the distinctions between feature values that are passed along to the predictive model&mdash;as in the earlier example&mdash;and are agnostic to the dimensionality of the latent space (16 for each feature, in this case).
+The matrices visualize the distinctions between feature values that are passed along to the predictive model&mdash;as in the earlier example&mdash;and are agnostic to the dimensionality of the embedding space (16 for each feature, in this case).
 The matrix entries are white if the feature values are indistinguishable (same as when the posterior distributions coincided in the above example) and blue depending on the degree of distinguishability.<a class='footstart' key='bhat'></a>
 
 </div>
@@ -247,9 +247,6 @@ The matrix entries are white if the feature values are indistinguishable (same a
   <div class='compression-level-slider'></div>
 </div>
 <div class='distinguishability-mats row' width="50"></div>
-
-
-
 
 The auxiliary variables select the distinctions among feature values that are worth communicating to the predictive model.
 The single most relevant bit in all the features resides in the <digits>hour</digits> feature and roughly groups the hours of the day into nighttime, commuting hours, and everything else.
@@ -261,10 +258,16 @@ Given the full spectrum of relevant bits, we can gradually widen our focus, star
 
 #### Conclusion
 
-By using auxiliary variables to compress our source variables, we gain the ability to identify specific variation across all the sources that is most predictive of the target variable.
-This grants a continuous spectrum of the important bits and a soft ramp of interpretability.
+Often it is an abundance of variation that impedes our understanding of a complex system.
+We don't know where to focus, long before caring about the nature of the functional relationship between observables.
+This post has presented a possible route forward: identify the most relevant variation and leave the functional relationship as a black box.
+Rather than asking *how much* mutual information there is between different sets of variables, the perspective changes to *what* is the mutual information?
+What are the specific distinctions that constitute the shared information?
 
-If you want to learn more, consider checking out our papers on the topic:
+Auxiliary variables serve a valuable purpose to this end: they control what specific variation to transmit and what to ignore.
+Posed as an optimization problem, the selection of relevant variation is well-suited for machine learning&mdash;requiring nothing more exotic than the front end of a variational autoencoder&mdash;and can be a practical route to interpretability.
+
+If you'd like to learn more, consider checking out our papers on the topic:
 
 <a class="paper-title-link" href="https://arxiv.org/abs/2211.17264">Interpretability with full complexity by constraining feature information (ICLR 2023)</a> 
 
@@ -315,14 +318,15 @@ This convenient relationship between the gap and the mutual information is only 
 <a class='footend' key='compression'></a> 
 The space of information allocations can be seen as the space of lossy compressions of the source variables.
 
-<a class='footend' key='bhat'></a> 
-Specifically, we use the Bhattacharyya coefficient between the embedding distributions, which is 1 when they perfectly overlap (white) and 0 when they have no overlap (dark blue).
-
 <a class='footend' key='vae'></a>
 Just the front end of a variational autoencoder (VAE)<a class='citestart' key='vae'></a>.
 
 <a class='footend' key='dvib'></a> 
 This way of restricting information is more general than VAEs; see Alemi et al. on the variational information bottleneck<a class='citestart' key='dvib'></a>.
+
+<a class='footend' key='bhat'></a> 
+Specifically, we use the [Bhattacharyya coefficient](https://en.wikipedia.org/wiki/Bhattacharyya_distance) between the embedding distributions, which is 1 when they perfectly overlap (white) and 0 when they have no overlap (dark blue).
+Like the relevant KL divergence terms, the Bhattacharyya coefficient is straightforward to compute when everything is a Gaussian.
 
 <a class='footend' key='tryAgain'></a>
 The models are lightweight and the learning rate is high, so the model will occasionally fail to fit the simple distribution.  If things look funny, just try training again.
