@@ -1,3 +1,244 @@
+window.initPixelExample = async function({sel, state, isBig=true}){
+  sel.append("p")
+
+  state.zMeans = [-1, -0.5, 0.8, 1.2]
+
+  var leftMargin = 20
+  var rightMargin = 20
+  var topMargin = 0
+  var bottomMargin = 40
+  var latentHeight = 150
+  var latentWidth = 250
+  const plotRange = 4
+  const xxLatentInputs = tf.linspace(-plotRange, plotRange, 250)
+  const xxLatentInputsJS = await xxLatentInputs.array()
+  const xxLatentBinWidth = tf.gather(xxLatentInputs, 1).sub(tf.gather(xxLatentInputs, 0))
+  let prioryyLatents = tf.exp(xxLatentInputs.square().neg().div(2))
+  prioryyLatents = tf.div(prioryyLatents, tf.sum(prioryyLatents).mul(xxLatentBinWidth))
+
+  priorData = await tf.stack([xxLatentInputs, prioryyLatents], -1).array()
+  latentCurves = []
+  rowLabels = ['A', 'B', 'C', 'D']
+  d3ReadableBoardValues = []
+  for (let i=0; i<rowLabels.length; i++){
+    for (let j=0; j<rowLabels.length; j++){
+      d3ReadableBoardValues.push([rowLabels[i], rowLabels[j], 0.5])
+    }
+  }
+  
+  c = d3.conventions({
+    sel: sel.append('div'),
+    width: latentWidth,
+    height: latentHeight,
+    margin: {left: leftMargin, right: rightMargin, top: topMargin, bottom: bottomMargin}
+  })
+  c.x.domain([-4, 4])
+  c.y.domain([0, 1])
+
+  // Draw the prior
+  c.svg.append('path').datum(priorData)
+      .at({strokeWidth: 2, stroke: '#aaa', fill: '#ccc'})
+      .at({d: d3.line()
+        .x(d => c.x(d[0]))
+        .y(d => c.y(d[1]))})
+
+  for (let inputInd=0; inputInd<4; inputInd++) {
+    latentCurves.push(c.svg.append('path').datum(priorData)
+      .at({strokeWidth: 3, stroke: util.colors.features[inputInd], fill: util.colors.features[inputInd], "fill-opacity": 0.2, "stroke-opacity": 1})
+      .at({d: d3.line()
+        .x(d => c.x(d[0]))
+        .y(d => c.y(d[1]))}))
+  }
+  c.svg.append("text")
+    .attr("x", (latentWidth / 2))             
+    .attr("y", latentHeight+25)
+    .attr("text-anchor", "middle")  
+    .style("font-size", "16px") 
+    .text(`Town 1 latent space`);
+
+  priorTextLabels = []
+  rowLabels.forEach((v, i) => {
+    priorTextLabels.push(c.svg.append("text")
+    .attr("x", 0)             
+    .attr("y", 20)
+    .attr("text-anchor", "middle")  
+    .style("font-size", 18) 
+    .style("font-weight", "bold")    
+    .style("fill", util.colors.features[i])
+    .text(v))
+  })
+
+  //////// And now the distinguishability mat
+
+  distLabels = rowLabels
+  boardSel = sel.append("div")
+
+  pdf_margin = {left: 40, right: 20, top: 20, bottom: bottomMargin}
+  pdfWidth = 100
+  distinguishabilitySVG = boardSel
+  .append("svg")
+    .attr("width", pdfWidth + pdf_margin.left + pdf_margin.right)
+    .attr("height", pdfWidth + pdf_margin.top + pdf_margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + pdf_margin.left + "," + pdf_margin.top + ")")
+
+  // Build X scales and axis:
+  distSVGX = d3.scaleBand()
+    .range([ 0, pdfWidth ])
+    .domain(distLabels)
+    .padding(0.01)
+
+  distinguishabilitySVG.append("g")
+      .attr("transform", "translate(0," + -23 + ")")
+      .call(d3.axisBottom(distSVGX))
+      .selectAll("text")
+        .style("text-anchor", "middle")
+        .style("font-size", 14)
+        .style("font-weight", "bold")
+        .style("fill", function(d, i) {
+          return util.colors.features[i]
+        })
+
+  // Build X scales and axis:
+  distSVGY = d3.scaleBand()
+    .range([ 0, pdfWidth ])
+    .domain(distLabels)
+    .padding(0.01)
+
+  distinguishabilitySVG.append("g")
+    .call(d3.axisLeft(distSVGY))
+    .selectAll("text")
+      .style("text-anchor", "middle")
+      .style("font-size", 14)
+      .style("font-weight", "bold")
+      .style("fill", function(d, i) {
+        return util.colors.features[i]
+      })
+       
+  distinguishabilitySVG.selectAll("path,line").remove();
+
+  distinguishabilitySVG.selectAll()
+      .data(d3ReadableBoardValues)
+      .enter()
+      .append("rect")
+      .attr("x", function(d) {return distSVGX(d[0]) })
+      .attr("y", function(d) { return distSVGY(d[1]) })
+      .attr("width", distSVGX.bandwidth() )
+      .attr("height", distSVGY.bandwidth() )
+      .style("fill", function(d) { return util.distinguishabilityColorMap(d[2])} )
+
+  distinguishabilitySVG.append("text")
+      .attr("x", (pdfWidth / 2))             
+      .attr("y", pdfWidth+25)
+      .attr("text-anchor", "middle")  
+      .style("font-size", "16px") 
+      .text('Distinguishability');
+
+  /////////////////////////////////////////////////// Slider
+  var slider = {
+    sel: sel.append('div.slider'),
+    getVal: _ => state.zMeans[0],
+    setVal: d => state.zMeans[0] = +d
+  }
+  
+  slider.sel.html(`
+    <div>
+      Mean of A's embedding: <valAMean></valAMean>
+    </div>
+    <div style="margin-bottom:-20px">
+      <input type=range min=-3 max=3 value=0 step=0.1></input>
+    </div>
+    <br>
+    <div>
+        KL loss: <valKL></valKL> bits
+    </div>
+    <div>
+        Transmitted info: <valInfo></valInfo> bits
+    </div>
+  `)
+  slider.sel.select('input[type="range"]')
+    .on('input', function () {
+      slider.setVal(this.value)
+      slider.sel.select('input').node().value = this.value
+      state.renderAll.modA()
+    })
+  slider.sel.select('valAMean').text(parseFloat(slider.getVal()).toFixed(2))
+  state.renderAll.modA.fns.push(() => {
+    var value = slider.getVal()
+    slider.sel.select('valAMean').text(parseFloat(value).toFixed(2))
+    slider.sel.select('input').node().value = value
+  })
+
+  state.renderAll.modA?.fns.push(modifyA)
+  state.renderAll.modA()
+  /////////////////////////////////////////////////// Update the positions
+
+  async function modifyA() {
+    // update the latent vecs
+    const rootTwoPi = tf.tensor(2*Math.PI).sqrt()
+
+    zMeans = tf.tensor(state.zMeans)
+    zLogVars = tf.ones([4]).mul(-1.5)
+
+    kl = klLoss(zMeans, zLogVars)
+
+    bhats1 = computeBhatDists(zMeans, zLogVars)
+    bhats1Display = bhats1.reshape([-1, 1])
+    pdfData1 = tf.tidy(() => {
+      res = tf.exp(xxLatentInputs.expandDims(0)
+        .sub(zMeans.expandDims(1))
+        .div(zLogVars.expandDims(1)
+          .div(2)
+          .exp())
+        .square().neg().div(2)).div(tf.exp(zLogVars.expandDims(1).div(2))).div(rootTwoPi)
+      // res = tf.div(res, tf.sum(res, 1, true).mul(xxLatentBinWidth))
+      return res
+    })
+
+    pmfData1 = tf.tidy(() => {
+      return pdfData1.mul(xxLatentBinWidth)
+    })
+    jointpmf1 = tf.tidy(() => {
+      return pmfData1.mean(0, true)
+    })
+
+    info1 = tf.tidy(() => {
+      return tf.where(pmfData1.greater(1e-6), 
+        pmfData1.div(jointpmf1).log(), 
+        tf.zerosLike(pmfData1)).mul(pmfData1).sum(1).mean().div(Math.log(2))
+    })
+
+    displayPackage = tf.tidy(() => {
+      return tf.concat([pdfData1.transpose(), tf.tile(bhats1Display, [1, 4]), tf.ones([1, 4]).mul(kl), tf.ones([1, 4]).mul(info1)])  // [250 + 16 + 1 + 1, 4]
+    })
+    displayPackage.array().then(vals => {
+      info = vals.slice(-1)[0]
+      kl = vals.slice(-2, -1)[0]
+      d3.select('valKL').text(parseFloat(kl).toFixed(2))
+      d3.select('valInfo').text(parseFloat(info).toFixed(2))
+
+      distMat = vals.slice(-18, -2)
+      distinguishabilitySVG.selectAll("rect")
+          .data(distMat)
+          .style("fill", function(d) { return util.distinguishabilityColorMap(d[0])} )
+      pdfData = vals.slice(0, -18)
+      for (let inputInd=0; inputInd<4; inputInd++) {
+        plotData = []
+        pdfData.forEach((v, i) => plotData.push([xxLatentInputsJS[i], v[inputInd]]))
+        plotData = [[-plotRange, 0], ...plotData, [plotRange, 0]]  // to force the fill to the corners of the plot
+        latentCurves[inputInd]
+          .at({d: d3.line()
+            .x(d => c.x(d[0]))
+            .y(d => c.y(d[1]))(plotData)})
+
+        priorTextLabels[inputInd].attr("x", c.x(state.zMeans[inputInd]))
+      } 
+    })
+  }
+
+  }
+
 
 window.initPixelGame = async function({sel, state, isBig=true}){
   state.renderAll = util.initRenderAll(['redraw', 'trainDIB', 'varyTrainingStep']);
@@ -369,7 +610,6 @@ window.initPixelGame = async function({sel, state, isBig=true}){
   state.distinguishabilitySVGs = []
   
   tf.stack([xxLatentInputs, prioryyLatents], -1).array().then(priorData => {
-    let latentRepPathSel;
     for (let latentInd=0; latentInd<2; latentInd++) {
       state.cs.push(d3.conventions({
         sel: sel.append('div'),
@@ -489,6 +729,8 @@ window.initPixelGame = async function({sel, state, isBig=true}){
   state.renderAll.trainDIB?.fns.push(trainDIB)
 
   async function trainDIB (){
+    const rootTwoPi = tf.tensor(2*Math.PI).sqrt()
+
     state.trainingBoards = []
     state.trainingDistMats1 = []
     state.trainingDistMats2 = []
@@ -653,8 +895,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
             .div(zLogVar1Scalar.expandDims(1)
               .div(2)
               .exp())
-            .square().neg().div(2))
-          res = tf.div(res, tf.sum(res, 1, true).mul(xxLatentBinWidth))
+            .square().neg().div(2)).div(tf.exp(zLogVar1Scalar.expandDims(1).div(2))).div(rootTwoPi)
           return res
         })
 
@@ -679,8 +920,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
             .div(zLogVar2Scalar.expandDims(1)
               .div(2)
               .exp())
-            .square().neg().div(2))
-          res = tf.div(res, tf.sum(res, 1, true).mul(xxLatentBinWidth))
+            .square().neg().div(2)).div(tf.exp(zLogVar2Scalar.expandDims(1).div(2))).div(rootTwoPi)
           return res
         })
 

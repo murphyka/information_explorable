@@ -101,7 +101,7 @@ window.initNoiseSlider = function({sel, state, hasColor=true}){
         <input type=range min=${Math.log(state.min_slider_value)} max=${Math.log(state.max_slider_value)} step=${state.slider_step_size} value=${slider.getVal()}></input>
       </div>
       <div style='color:${hasColor ? util.colors[slider.key + 'Input'] : ''}'>
-        Transmitted information (bits): <val2></val2>
+        Transmitted information: <val2></val2> bits
       </div>
     `)
 

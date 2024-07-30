@@ -1,4 +1,10 @@
 window.initPixels = async function(){
+  var stateExample = {}
+  stateExample.renderAll = util.initRenderAll(['modA']);
+  window.initPixelExample({
+    sel: d3.select('.pixel-space-example'),
+    state: stateExample,
+  })
 
   var statePixels = {}
   statePixels.renderAll = util.initRenderAll(['modBoard']);

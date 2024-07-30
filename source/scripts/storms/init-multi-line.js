@@ -189,7 +189,7 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
 
   c.svg.select('.y').lower()  // z order
 
-  util.addAxisLabel(c, 'Total information from other towns (bits)', 'X-entropy error, your town (bits)', y2Text='Information per town (bits)', xOffset=45, yOffset=-40)
+  util.addAxisLabel(c, 'Total information from other towns (bits)', 'X-entropy error, your town (bits)', y2Text='Information per town (bits)', xOffset=45, yOffset=-35)
 
   
 

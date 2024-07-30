@@ -4,7 +4,7 @@ window.initInfoTelegraphSingle = async function({sel, state, isBig=true}){
   // Plot the frame
   var leftMargin = 50
   var rightMargin = 30 
-  var topMargin = 25 
+  var topMargin = 42
   var bottomMargin = 50
   var actualHeight = isBig ? 250 : 30
   var actualWidth = isBig ? 350 : 50
@@ -23,7 +23,47 @@ window.initInfoTelegraphSingle = async function({sel, state, isBig=true}){
   c.svg.attr({"float": "left"})
   d3.drawAxis(c)
 
-  util.addAxisLabel(c, 'Message received, u (volts)', 'P(u)')
+  util.addAxisLabel(c, 'Message received, u1 (volts)', 'P(u1)', null, 40, -35)
+
+  c.svg.append("rect")
+    .attr("x", 5)
+    .attr("y", -40)
+    .attr("width", 160)
+    .attr("height", 40)
+    .style("fill", "#2c7bb6")
+    .style("opacity", "0.2");
+
+  c.svg.append("text")
+    // .attr("x", 10)
+    .attr("y", -30)
+    .append('svg:tspan')
+    .attr('x', 10)
+    .attr('dy', 5)
+    .text("Voltages you receive")
+    .append('svg:tspan')
+    .attr('x', 10)
+    .attr('dy', 18)
+    .text("if calm (-1V sent)")
+    
+  c.svg.append("rect")
+    .attr("x", actualWidth-165)
+    .attr("y", -40)
+    .attr("width", 160)
+    .attr("height", 40)
+    .style("fill", "#d7191c")
+    .style("opacity", "0.2");
+
+  c.svg.append("text")
+    // .attr("x", 10)
+    .attr("y", -30)
+    .append('svg:tspan')
+    .attr('x', actualWidth-160)
+    .attr('dy', 5)
+    .text("Voltages you receive")
+    .append('svg:tspan')
+    .attr('x', actualWidth-160)
+    .attr('dy', 18)
+    .text("if stormy (+1V sent)")
 
 
   state.noise = 1.
@@ -125,20 +165,20 @@ window.initInfoTelegraphSingle = async function({sel, state, isBig=true}){
     .text("Indistinguishable")
     .attr("x", bars_width/2)
     .attr("y", actualHeight)
-    // .attr("dx", 5)
+    .attr("dx", -45)
     .attr("dy", 20)
     .style("font-size", 14)
-    .attr("text-anchor", "middle")
+    .attr("text-anchor", "left")
     // .style("font-weight", "bold")
 
   bars_svg.append("text")
-    .text("Distinguishable")
+    .text("Perfectly distinguishable")
     .attr("x", bars_width/2)
     .attr("y", 0)
-    // .attr("dx", 5)
+    .attr("dx", -45)
     .attr("dy", -10)
     .style("font-size", 14)
-    .attr("text-anchor", "middle")
+    .attr("text-anchor", "left")
     // .style("font-weight", "bold")
 
   state.renderAll.modNoise()
