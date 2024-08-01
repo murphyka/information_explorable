@@ -74,10 +74,14 @@ window.initInfoPlane = async function({sel, state, isBig=true, lossLabel, width=
       
       if (featureInd == state.curveHighlighter) {
         weight = 'bold'
+        deco = 'underline'
       } else {
         weight = 'light'
+        deco = null 
       } 
+      // state.distSVGs[featureInd].selectAll('text').at({'font-weight': weight, 'text-decoration': deco})
       state.distSVGs[featureInd].selectAll('text').at({'font-weight': weight})
+      state.distSVGs[featureInd].selectAll('text.axis-label').at({'font-weight': weight, 'text-decoration': deco})
     }
     if (state.curveHighlighter < 0) return
 
@@ -124,7 +128,7 @@ window.initInfoPlane = async function({sel, state, isBig=true, lossLabel, width=
 
   function placeText(featureIndex) {
     var sel = d3.select(this)
-    sel.at({x: c.width + 50, y: c.height/2 - 100 + featureIndex*20}) //, dy: '.33em'})
+    sel.at({x: c.width + 75, y: c.height/2 - 100 + featureIndex*20}) //, dy: '.33em'})
     sel.text(state.featureLabels[featureIndex])
   }
 

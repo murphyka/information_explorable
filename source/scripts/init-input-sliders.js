@@ -230,7 +230,7 @@ window.initTrainingProgressSlider = function({sel, state}){
     <div>
       Training step: <val></val>/${state.numberTrainingSteps}
     </div>
-    <div style="margin-bottom:-20px;">
+    <div style="margin-bottom:0px;">
       <input type=range min=0 max=1 value=0 id=sliderStep></input>
     </div>
   `)
@@ -275,10 +275,10 @@ window.initCompressionLevelSlider = function({sel, state}){
       slider.sel.select('input').node().value = this.value
       state.renderAll.compressionLevel()
     })
-  slider.sel.select('val').text(parseFloat(state.infoLevels[slider.getVal()]).toFixed(2))
+  slider.sel.select('val').text(parseFloat(state.infoLevels[slider.getVal()]).toFixed(1))
   state.renderAll.compressionLevel.fns.push(() => {
     var value = slider.getVal()
-    slider.sel.select('val').text(parseFloat(state.infoLevels[value]).toFixed(2))
+    slider.sel.select('val').text(parseFloat(state.infoLevels[value]).toFixed(1))
     slider.sel.select('input').node().value = value
   })
 

@@ -17,6 +17,7 @@
 .feature-label.active{
   font-weight: 800;
   fill: 'r';
+  text-decoration: underline;
 }
 
 .hidden-step{

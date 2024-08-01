@@ -1,5 +1,5 @@
 window.initPixelExample = async function({sel, state, isBig=true}){
-  sel.append("p")
+  sel.append("div")
 
   state.zMeans = [-1, -0.5, 0.8, 1.2]
 
@@ -42,7 +42,7 @@ window.initPixelExample = async function({sel, state, isBig=true}){
         .x(d => c.x(d[0]))
         .y(d => c.y(d[1]))})
 
-  for (let inputInd=0; inputInd<4; inputInd++) {
+  for (let inputInd=3; inputInd>=0; inputInd--) {
     latentCurves.push(c.svg.append('path').datum(priorData)
       .at({strokeWidth: 3, stroke: util.colors.features[inputInd], fill: util.colors.features[inputInd], "fill-opacity": 0.2, "stroke-opacity": 1})
       .at({d: d3.line()
@@ -57,23 +57,22 @@ window.initPixelExample = async function({sel, state, isBig=true}){
     .text(`Town 1 latent space`);
 
   priorTextLabels = []
-  rowLabels.forEach((v, i) => {
+  rowLabels.reverse().forEach((v, i) => {
     priorTextLabels.push(c.svg.append("text")
     .attr("x", 0)             
     .attr("y", 20)
     .attr("text-anchor", "middle")  
     .style("font-size", 18) 
     .style("font-weight", "bold")    
-    .style("fill", util.colors.features[i])
+    .style("fill", util.colors.features[3-i])
     .text(v))
   })
 
   //////// And now the distinguishability mat
-
-  distLabels = rowLabels
+  distLabels = rowLabels.reverse()
   boardSel = sel.append("div")
 
-  pdf_margin = {left: 40, right: 20, top: 20, bottom: bottomMargin}
+  pdf_margin = {left: 40, right: 50, top: 50, bottom: bottomMargin}
   pdfWidth = 100
   distinguishabilitySVG = boardSel
   .append("svg")
@@ -227,12 +226,12 @@ window.initPixelExample = async function({sel, state, isBig=true}){
         plotData = []
         pdfData.forEach((v, i) => plotData.push([xxLatentInputsJS[i], v[inputInd]]))
         plotData = [[-plotRange, 0], ...plotData, [plotRange, 0]]  // to force the fill to the corners of the plot
-        latentCurves[inputInd]
+        latentCurves[3-inputInd]
           .at({d: d3.line()
             .x(d => c.x(d[0]))
             .y(d => c.y(d[1]))(plotData)})
 
-        priorTextLabels[inputInd].attr("x", c.x(state.zMeans[inputInd]))
+        priorTextLabels[inputInd].attr("x", c.x(state.zMeans[3-inputInd]))
       } 
     })
   }
@@ -283,20 +282,20 @@ window.initPixelGame = async function({sel, state, isBig=true}){
       d3zeroedBoardValuesDist2.push([state.colLabels[i], state.colLabels[j], 1])
     }
   }
-  
-  //// Make the boards
-  sel.append("p")
-  .style("align-items", "center")
+  ///////////////////////////////////////////// Draw the ground truth board with the buttons next to it
+  selGT = d3.select(".pixel-game-gt")
+  // sel.append("p")
+  // .style("align-items", "center")
 
-  boardSel = sel.append("div")
+  boardSelGT = selGT.append("div")
   .style("flex-direction", "column")
   .style("width", "200px")
   .style("overflow", "auto")
   .style("height", "100%")
 
-  pdf_margin = {left: 40, right: 20, top: 40, bottom: 0}
+  pdf_margin = {left: 40, right: 20, top: 40, bottom: 20}
   pdfWidth = 100
-  clickableBoardSVG = boardSel
+  clickableBoardSVG = boardSelGT
   .append("svg")
     .attr("width", pdfWidth + pdf_margin.left + pdf_margin.right)
     .attr("height", pdfWidth + pdf_margin.top + pdf_margin.bottom)
@@ -354,6 +353,15 @@ window.initPixelGame = async function({sel, state, isBig=true}){
       .append('text.axis-label')
       .text('Town 1')
       .at({textAnchor: 'middle', fill: '#000'})
+
+    clickableBoardSVG
+      .append("text")
+      .attr("x", (pdfWidth / 2))             
+      .attr("y", pdfWidth+20)
+      .attr("text-anchor", "middle")  
+      .style("font-weight", "bold") 
+      .text('Ground truth');
+
        
   clickableBoardSVG.selectAll("path,line").remove();
 
@@ -380,16 +388,42 @@ window.initPixelGame = async function({sel, state, isBig=true}){
       .style("fill", function(d) { return heatmapColor(d[2])} )
   }
   state.renderAll.redraw?.fns.push(redrawBoard)
+
+  for (let columnIndex=3; columnIndex<=5; columnIndex++) {
+    window.initPixelButtons({
+      sel: d3.select(`#buttons${columnIndex}`).html(''),
+      state,
+      columnIndex,
+    });
+  }
+
+
+  ///////////////////////////////////////// All of the training stuff
+
+  selTrainingTopDiv = d3.select(".pixel-game-top")
+  selTrainingBotDiv = d3.select(".pixel-game-bot")
+
+  selTrainingTopLeft = d3.select(".pixel-game-train-bank")
+  selTrainingTopRight = d3.select(".pixel-game-info-plane")
+  window.initTrainDIB({
+    sel: selTrainingTopLeft.append("div"),
+    state,
+  });
+
+  window.initTrainingProgressSlider({
+    sel: selTrainingTopLeft.append("div"),
+    state,
+  })
   // now draw the fitted board
 
-  state.fittedBoardSVG = boardSel
+  state.fittedBoardSVG = selTrainingTopLeft
   .append("svg")
     .attr("width", pdfWidth + pdf_margin.left + pdf_margin.right)
     .attr("height", pdfWidth + pdf_margin.top + pdf_margin.bottom)
 
   .append("g")
     .attr("transform",
-          "translate(" + pdf_margin.left + "," + pdf_margin.top + ")")
+          "translate(" + pdf_margin.left + "," + (pdf_margin.top) + ")")
 
   // Build X scales and axis:
   fittedBoardX = d3.scaleBand()
@@ -441,6 +475,14 @@ window.initPixelGame = async function({sel, state, isBig=true}){
       .append('text.axis-label')
       .text('Town 1')
       .at({textAnchor: 'middle', fill: '#000'})
+
+    state.fittedBoardSVG
+      .append("text")
+      .attr("x", (pdfWidth / 2))             
+      .attr("y", pdfWidth+20)
+      .attr("text-anchor", "middle")  
+      .style("font-weight", "bold") 
+      .text('Reconstruction');
        
   state.fittedBoardSVG.selectAll("path,line").remove();
 
@@ -462,7 +504,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
   var actualHeight = isBig ? 200 : 30
   var actualWidth = isBig ? 350 : 50
   var c = d3.conventions({
-    sel: sel.append('div'),
+    sel: selTrainingTopRight.append('div'),
     width: actualWidth,
     height: actualHeight,
     margin: {left: leftMargin, right: rightMargin, top: topMargin, bottom: bottomMargin}
@@ -536,19 +578,6 @@ window.initPixelGame = async function({sel, state, isBig=true}){
     .at({d: line.y(d => c.y2(d[1]))(dummyData2)}))
   }
 
-  for (let columnIndex=3; columnIndex<=5; columnIndex++) {
-    window.initPixelButtons({
-      sel: d3.select(`#buttons${columnIndex}`).html(''),
-      state,
-      columnIndex,
-    });
-  }
-
-  window.initTrainingProgressSlider({
-    sel: d3.select('.training-progress-slider').html(''),
-    state,
-  })
-
   async function drawTrainingStep() {
     state.fittedBoardSVG.selectAll("rect")
         .data(state.trainingBoards[state.trainingStepDisplayIndex])
@@ -612,7 +641,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
   tf.stack([xxLatentInputs, prioryyLatents], -1).array().then(priorData => {
     for (let latentInd=0; latentInd<2; latentInd++) {
       state.cs.push(d3.conventions({
-        sel: sel.append('div'),
+        sel: selTrainingBotDiv.append('div'),
         width: latentWidth,
         height: latentHeight,
         margin: {left: leftMargin, right: rightMargin, top: topMargin, bottom: bottomMargin}
@@ -647,7 +676,7 @@ window.initPixelGame = async function({sel, state, isBig=true}){
       //////// And now the distinguishability mats
 
       distLabels = [state.rowLabels, state.colLabels][latentInd]
-      boardSel = sel.append("div")
+      boardSel = selTrainingBotDiv.append("div")
       .style("flex-direction", "column")
       .style("width", latentWidth)
       .style("overflow", "auto")
@@ -720,11 +749,6 @@ window.initPixelGame = async function({sel, state, isBig=true}){
       }
 
   })
-  
-  window.initTrainDIB({
-    sel: d3.select('.train-dib-button').html(''),
-    state,
-  });
 
   state.renderAll.trainDIB?.fns.push(trainDIB)
 

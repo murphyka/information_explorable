@@ -154,7 +154,7 @@ Below is a possible embedding space for `$U_1$`, where the four test results for
 The reference distribution is colored grey.
 The mean of the distribution for result <span style="font-weight:bold; color:#1f77b4;">A</span> can be moved around with the slider.
 
-<div class='pixel-space-example row'></div>
+<div style="display:flex;justify-content:center;align-items:center;" class='pixel-space-example row'></div>
 
 While the optimization loss cares about *how much* information is transmitted by `$U_1$`, we care about *what* information was transmitted.
 **The degrees of distinction between every pair of inputs show us the transmitted information.**
@@ -166,37 +166,46 @@ Finally, note how the KL loss is minimized when <span style="font-weight:bold; c
 The smallest value possible, zero, occurs when all embedding distributions become equal to the reference.
 We can think of the KL loss as pushing all embeddings inward to the reference distribution, at which point all inputs are indistinguishable and no information is transmitted.
 
-Let's train a model in your browser and gradually raise the cost of information in order to traverse the Pareto front.<a class='footstart' key='tryAgain'></a>
-On the left is the relationship between test results and treatment plan (green = treatment plan 1, orange = treatment plan 2), and the predictive models' reconstruction below it.
-The trajectory of information allocations versus error is greyed out during the first stage of training, where the relationship between `$X_1$`, `$X_2$`, and `$Y$` is learned with low information cost, and becomes full color during the second, where information is actively being eroded.
+Back to the full two-town setup, let's train a model in your browser and gradually raise the cost of information in order to traverse the Pareto front.<a class='footstart' key='tryAgain'></a>
+Below is the ground truth relationship between test results and treatment plan (green = treatment plan 1, orange = treatment plan 2), which you can modify by toggling the tiles directly<a class='footstart' key='squareClick'></a> or by selecting one of the buttons.
 
-<div class='pixel-game row'></div>
-
-<div class='container'>
-  <div class='train-dib-button'></div>
+<div style="display:flex;justify-content:center;align-items:center;">
+  <div class='pixel-game-gt'></div>
   <div class='pixel-buttons' id='buttons3'></div>
   <div class='pixel-buttons' id='buttons4'></div>
   <div class='pixel-buttons' id='buttons5'></div>
-  <div class='training-progress-slider'></div>
 </div>
+
+Below we show several aspects of the training process: the reconstruction given the information allocation, the optimized Pareto front, and the information content of the latent spaces.
+
+<div>
+  <div class='row'>
+    <div class='pixel-game-train-bank'></div>
+    <div class='pixel-game-info-plane'></div>
+  </div>
+  <div class='pixel-game-bot row'></div>
+
+</div>
+
+The trajectory of information allocations versus error is greyed out during the first stage of training, where the relationship between `$X_1$`, `$X_2$`, and `$Y$` is learned with low information cost, and becomes full color during the second, where information is actively being eroded.
 
 Underneath the information plane are the one dimensional embedding spaces corresponding to `$U_1$` and `$U_2$`.
 The colored Gaussians are the embedding distributions (posteriors) for the specific test outcomes, while the gray Gaussian is the reference (prior).
 To the right are distinguishability matrices.
 **The distinctions that are communicated by the auxiliary variables are the atoms of the relevant information in the sources.**
 
-Try different patterns above, by toggling the tiles directly<a class='footstart' key='squareClick'></a> or by selecting one of the buttons, and watch how the information relevant to `$Y$` manifests in the embedding spaces and the distinguishability matrices.
+Try different ground truth relationships above, and watch how the information relevant to `$Y$` manifests in the embedding spaces and the distinguishability matrices.
 For the <digits>Half</digits> pattern, test results <span style="font-weight:bold; color:#1f77b4;">A</span> and <span style="font-weight:bold; color:#ff7f0e;">B</span> collapse, as do <span style="font-weight:bold; color:#2ca02c;">C</span> and <span style="font-weight:bold; color:#d62728;">D</span>; everything collapses for `$X_2$`.
 If we compute the mutual information `$I(X_1;Y)=1 \ \text{bit}$`, we know *how much* information is shared between the test results from Town 1 and the treatment plan.
-With the optimization above, however, we see *what* the information is: the distinction between test results {<span style="font-weight:bold; color:#1f77b4;">A</span> or <span style="font-weight:bold; color:#ff7f0e;">B</span>} and {<span style="font-weight:bold; color:#2ca02c;">C</span> or <span style="font-weight:bold; color:#d62728;">D</span>} is the one bit from Town 1 of relevance to `$Y$`.
+With the optimization, however, we see *what* the information is: the distinction between test results {<span style="font-weight:bold; color:#1f77b4;">A</span> or <span style="font-weight:bold; color:#ff7f0e;">B</span>} and {<span style="font-weight:bold; color:#2ca02c;">C</span> or <span style="font-weight:bold; color:#d62728;">D</span>} is the one bit from Town 1 of relevance to `$Y$`.
 The other bit of entropy in `$X_1$` is irrelevant.
 
 For the <digits>Preset</digits> pattern, we can see an *approximation* to the relationship between the test results and the treatment plan.
 Information about `$X_2$` drops to zero, at which point the reconstructed board shows only vertical stripes.
 Alongside the spectrum of information allocations are different levels of approximations to the relationship between the sources and the target `$Y$`. 
 
-By sweeping the information penalty, we used machine learning to search through partial information allocations.
-**This allowed us to "point" to where the information about `$Y$` is contained in the source variables `$X_1$` and `$X_2$` in terms of distinctions between their different test results.**
+By sweeping the cost of information from the source variables, we used machine learning to search through partial information allocations.
+**This allowed us to "point" to where the information about `$Y$` is contained in the source variables `$X_1$` and `$X_2$` in terms of distinctions between their outcomes.**
 <!-- Beyond finding the optimal budget allocations, we can also tell the two towns where to focus their resolution for new versions of their test devices. -->
 
 #### Where is the information in the bikeshare dataset?
@@ -278,7 +287,7 @@ If you'd like to learn more, consider checking out our papers on the topic:
 If you have any feedback or thoughts, we'd love to hear them!
 Please email kieranm@seas.upenn.edu.
 
-We thank Sam Dillavou and Thomas Varley for feedback on this post.
+We thank Sam Dillavou, Xiaohuan Xia, and Thomas Varley for feedback on this post.
 
 <br>
 
