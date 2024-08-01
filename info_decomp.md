@@ -360,7 +360,7 @@ Alemi, A. A., Fischer, I., Dillon, J. V., Murphy, K. (ICLR 2017).
 <a class='citeend' key='bikeshare'></a> [UCI machine learning repository](https://archive.ics.uci.edu/)
 Dua, D., & Graff, C. (2017).
 
-<a class='citeend' key='nam'></a> [Neural additive models: Interpretable machine learning with neural nets](https://archive.ics.uci.edu/)
+<a class='citeend' key='nam'></a> [Neural additive models: Interpretable machine learning with neural nets](https://arxiv.org/abs/2004.13912)
 Agarwal, R., Melnick, L., Frosst, N., Zhang, X., Lengerich, B., Caruana, R., & Hinton, G. (NeurIPS 2021).
 
 <link rel='stylesheet' href='source/third_party/footnote_v2.css'>
