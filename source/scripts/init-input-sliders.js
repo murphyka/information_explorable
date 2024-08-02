@@ -261,12 +261,16 @@ window.initCompressionLevelSlider = function({sel, state}){
   }
   
   slider.sel.html(`
-    <div>
+    <div style="text-align:center">
       Total information (bits): <val></val>
     </div>
-    <div style="margin-bottom:-20px">
+    <div style="margin:auto;width:50%;margin-bottom:-5px">
       <input type=range min=0 max=${state.infoLevels.length-2} value=${state.compressionInd}></input>
     </div>
+    <div style="text-align:center;margin-bottom:-10px">
+      RMSE: <valRMSE></valRMSE>
+    </div>
+
   `)
 
   slider.sel.select('input[type="range"]')
@@ -276,9 +280,11 @@ window.initCompressionLevelSlider = function({sel, state}){
       state.renderAll.compressionLevel()
     })
   slider.sel.select('val').text(parseFloat(state.infoLevels[slider.getVal()]).toFixed(1))
+  slider.sel.select('valRMSE').text(parseFloat(state.rmseLevels[slider.getVal()]).toFixed(1))
   state.renderAll.compressionLevel.fns.push(() => {
     var value = slider.getVal()
     slider.sel.select('val').text(parseFloat(state.infoLevels[value]).toFixed(1))
+    slider.sel.select('valRMSE').text(parseFloat(state.rmseLevels[value]).toFixed(1))
     slider.sel.select('input').node().value = value
   })
 

@@ -17,13 +17,16 @@ window.initTabular = async function(){
   var parsedDecomp = [];
   var i = 0;
   state.infoLevels = []
+  state.rmseLevels = []
   for (l = decompData.length + 1; (i + decompShape[1]) < l; i += decompShape[1]) {
       parsedDecomp.push(decompData.slice(i, i + decompShape[1]));
       // if ((Math.floor(i/decompShape[1]) % 2) == 0) { // only if inds were skipped when saving the compression mats
       state.infoLevels.push(decompData[i+12])
+      state.rmseLevels.push(decompData[i+13])
       // }
   }
-  state.infoLevels = state.infoLevels.reverse()  // just the number of mats I saved
+  state.infoLevels = state.infoLevels.reverse() 
+  state.rmseLevels = state.rmseLevels.reverse()
   state.info_decomp = parsedDecomp
 
   state.featureLabels = ['season', 'year', 'month', 'hour', 'holiday?', 'day of week', 'working day?', 'weather', 'temperature', 'apparent temp.', 'humidity', 'wind']
