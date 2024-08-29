@@ -234,8 +234,8 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
   var ent_y = tf.tidy(() => {
     return tf.div(tf.sum(tf.mul(tf.neg(p_y), tf.log(p_y))), tf.log(2))
   })
-  noise_vals = [1, 0.577, 0.452, 0.371, 0.310, 0.262, 0.222, 0.189, 0.160, 0.135, 0.113, 0.093, 0.076, 0.061, 0.047, 0.034, 0.0235, 0.0140, 0.006, 1e-8]
-  info_vals = [0, 0.053, 0.105, 0.158, 0.211, 0.263, 0.316, 0.368, 0.421, 0.474, 0.526, 0.579, 0.632, 0.684, 0.737, 0.789, 0.842, 0.895, 0.947, 1]
+  noise_vals = [1, 0.5767, 0.4521, 0.3707, 0.3101, 0.2620, 0.2223, 0.1889, 0.1601, 0.1350, 0.11295, 0.09342, 0.07604, 0.06055, 0.04672, 0.034414, 0.02353, 0.01403, 0.005997, 5.96e-6]
+  info_vals = [0, 0.05263, 0.1053, 0.15789, 0.21053, 0.26316, 0.3158, 0.3684, 0.42105, 0.4737, 0.5263, 0.5789, 0.6316, 0.6842, 0.7368, 0.7895, 0.8421, 0.8947, 0.9474, 0.9999]
   noise_vectors = tf.reshape(tf.stack(tf.meshgrid(noise_vals, noise_vals,  {'indexing': 'ij'}), -1), [-1, 2])
   info_vectors = tf.reshape(tf.stack(tf.meshgrid(info_vals, info_vals, {'indexing': 'ij'}), -1), [-1, 2])
   info_ins_full = tf.sum(info_vectors, axis=1)
@@ -347,15 +347,16 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
     })
     info_ins_full = tf.sum(info_vectors, axis=1)
 
-    // state.info_ins_all = await info_vectors.array()
     info_vectors.array().then(vals => {
       state.info_ins_all = vals
     })
 
     p_ui_cond_xi = tf.tidy(() => {
       return tf.concat([
-        tf.concat([tf.ones([numberSampleCompressions**2, 2, 1, 1]), tf.reshape(noise_vectors, [numberSampleCompressions**2, 2, 1, 1])], -1),
-        tf.concat([tf.reshape(noise_vectors, [numberSampleCompressions**2, 2, 1, 1]), tf.ones([numberSampleCompressions**2, 2, 1, 1])], -1)
+        tf.concat([tf.ones([numberSampleCompressions**2, 2, 1, 1]), 
+          tf.reshape(noise_vectors, [numberSampleCompressions**2, 2, 1, 1])], -1),
+        tf.concat([tf.reshape(noise_vectors, [numberSampleCompressions**2, 2, 1, 1]), 
+          tf.ones([numberSampleCompressions**2, 2, 1, 1])], -1)
       ], -2)  // 400, 2, 2, 2  ==>  400, channel, u, x
     })
     p_ui_cond_xi = tf.tidy(() => {
@@ -376,7 +377,9 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
       tile_channels[channel_id+3] = 1
 
       p_uxy = tf.tidy(() => {
-        return tf.mul(p_uxy, tf.tile(tf.reshape(tf.gather(p_ui_cond_xi, channel_id, axis=1), reshape_channels), tile_channels))
+        return tf.mul(p_uxy, tf.tile(
+          tf.reshape(
+            tf.gather(p_ui_cond_xi, channel_id, axis=1), reshape_channels), tile_channels))
       })
     }
     p_uy = tf.sum(p_uxy, axis=[3, 4])
@@ -400,10 +403,6 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
     })
     
     error_outs_all = ent_y.sub(info_y_u)
-    // infoPlaneData = await tf.stack([info_ins_full, error_outs_all], 1).array()
-    
-    // min_error = await tf.min(error_outs_all).array()
-    // ent_y_out = await ent_y.array()
     combinedVals = tf.stack([tf.min(error_outs_all), ent_y])
     combinedVals.array().then(vals => {
       min_error = vals[0]
@@ -422,11 +421,22 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
 
 
     unique_info_vals = tf.linspace(0, 2, numberParetoPoints)
+    sample_spacing = 2/numberParetoPoints/2/1.1
     min_vals = []
     min_error_allocs = []
     for (let i=0; i<numberParetoPoints; i++) {
       matching_template = tf.tidy(() => {
-        return tf.where(tf.less(tf.abs(tf.sub(tf.sum(info_vectors, axis=1),tf.gather(unique_info_vals, i))), tf.tensor(0.03)), error_outs_all, tf.onesLike(error_outs_all).mul(10))
+        return tf.where(
+          tf.less(
+            tf.abs(
+              tf.sub(
+                tf.sum(info_vectors, axis=1),
+                tf.gather(unique_info_vals, i))
+              ), 
+            tf.tensor(sample_spacing)
+            ), 
+          error_outs_all, 
+          tf.onesLike(error_outs_all).mul(10))
       })
       min_val = tf.min(matching_template)
       min_ind = tf.argMin(matching_template)

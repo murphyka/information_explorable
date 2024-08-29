@@ -38,7 +38,7 @@ window.initProbabilityButtons = function({sel, state, columnIndex}){
   ['OR', [0, 1, 1, 1]],
   ['XOR', [0, 1, 1, 0]],
   ['NAND', [1, 1, 1, 0]],
-  ['Mirror1', [0, 0, 1, 1]],
+  ['Mirror1', [0.9, 0.25, 0.6, 0.95]], //[0, 0, 1, 1]],
   ['Mirror2', [0, 1, 0, 1]],
   ]
   if (columnIndex == 2) {
