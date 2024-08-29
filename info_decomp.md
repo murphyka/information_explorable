@@ -287,7 +287,7 @@ If you'd like to learn more, consider checking out our papers on the topic:
 If you have any feedback or thoughts, we'd love to hear them!
 Please email kieranm@seas.upenn.edu.
 
-We thank Sam Dillavou, Xiaohuan Xia, and Thomas Varley for feedback on this post.
+We thank Sam Dillavou, Xiaohuan Xia, Thomas Varley, and Artemy Kolchinsky for feedback on this post.
 
 <br>
 
