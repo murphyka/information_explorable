@@ -10,11 +10,15 @@ date: July 2024
 ---
 
 Imagine someone asks you, *"**Where is the information about whether something is a car or a truck?**"*
+
 <div class="container">
-  <p>
+  <figure>
     <img src="data/car.jpg" width="300" />
     <img src="data/truck.jpg" width="300" /> 
-  </p>
+    <figcaption class="undercaption">Photos from unsplash.com: <a href="https://unsplash.com/photos/blue-coupe-beside-gray-house-p7tai9P7H-s">car</a>, <a href="https://unsplash.com/photos/red-and-white-truck-on-road-during-daytime-8MfyuZx8hyI">truck</a>
+    </figcaption>
+
+  </figure>
 </div>
 
 It might be an unusual phrasing, but you'd probably understand what they meant.
@@ -30,8 +34,10 @@ The auxiliary variables can be thought of as messages sent by one party who obse
 <div class="container">
   <figure>
     <img src="data/blue.jpg" width="300" />
-    <figcaption>**Source variable:** the car.<br>**Auxiliary variable:** message about the car's color.
+    <figcaption class="sidecaption">**Source variable:** the car.<br>**Auxiliary variable:** message about the car's color.
       <br><br>All other details about the car<br> have been left out of the message.
+      <br>
+      <br><a style="color:#BBB;">Photo: GPT-4o</a>
     </figcaption>
   </figure>
 </div>
@@ -45,7 +51,8 @@ A town sends a binary signal to tell about their weather conditions locally, usi
 <div class="container">
   <figure>
     <img src="data/weather.jpg" width="400" />
-    <figcaption>Calm weather: `$-1\text{V}$` <br>Stormy weather: `$+1\text{V}$`</figcaption>
+    <figcaption class="sidecaption">Calm weather: `$-1\text{V}$` <br>Stormy weather: `$+1\text{V}$`
+      <br><br><a style="color:#BBB;">Photo: GPT-4o</a></figcaption>
   </figure>
 </div>
 
@@ -219,6 +226,7 @@ The goal is to predict the number of bikes rented given time and weather informa
 <div class="container">
   <figure>
     <img src="data/bike.jpg" width="300" />
+    <figcaption class="undercaption">Photo: GPT-4o</figcaption>
   </figure>
 </div>
 

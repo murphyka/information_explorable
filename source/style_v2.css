@@ -247,7 +247,27 @@ h1{
   line-height: 1.3em;
 }
 
+figure {
+  display: inline-block;
+  margin: 0px; /* adjust as needed */
+}
 
+figure img {
+  vertical-align: middle;
+}
+figure figcaption {
+  color: teal;
+
+}
+.undercaption {
+  text-align: center;
+  font-size: 12px;
+}
+
+.sidecaption {
+  display: inline-block;
+  vertical-align: middle;
+}
 
 
 .tooltip {
@@ -319,15 +339,6 @@ h1{
 #recirc .post{
   margin-bottom: 30px;
 }
-
-
-
-
-
-
-
-
-
 
 
 
@@ -441,12 +452,6 @@ a:visited {
   display: none;
 }
 
-
-img,figcaption {
-  display: inline-block;
-  vertical-align: middle;
-  color: teal;
-}
 
 .container {
   display: flex;
