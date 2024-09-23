@@ -32,7 +32,7 @@ window.initInfoTelegraph = async function({selHeatmap, selRow, state, isBig=true
   for (let j=0; j<2; j++) {
     sels[j].append("p").style("align-items", "center")
 
-    pdf_margin = {left: 35, right: rightMargin, top: 30, bottom: bottomMargin}
+    pdf_margin = {left: 35, right: rightMargin, top: 35, bottom: bottomMargin}
     pdfWidth = 100
     state.pdf_svgs.push(sels[j]
     .append("svg")
